@@ -7,8 +7,9 @@
 #include <iostream>
 #include <windows.h>
 #include <algorithm>
-#include <filesystem>
 #include <functional>
+
+#include <QDebug>
 
 #include <opencv2/opencv.hpp>
 

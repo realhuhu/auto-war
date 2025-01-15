@@ -50,7 +50,7 @@ public:
         auto start = std::chrono::high_resolution_clock::now();
         auto maxTime = (timeout == -1) ? globalTimeout : timeout;
 
-        while (true) {
+        while (!state.stopFlag.load()) {
             auto now = std::chrono::high_resolution_clock::now();
             auto elapsed = std::chrono::duration<double>(now - start).count();
 
@@ -191,7 +191,7 @@ public:
             double interval = 0.1,
             double timeout = -1
     ) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, std::move(mode)) {
-        for (const auto& i: imgList) {
+        for (const auto &i: imgList) {
             imgPathList.push_back(i);
         }
     }

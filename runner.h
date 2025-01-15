@@ -81,7 +81,7 @@ public:
             previousSegment = std::make_unique<Segment>(position->copy());
         }
 
-        while (true) {
+        while (!state.stopFlag.load()) {
             qDebug() << QString::fromStdString("开始循环点击: " + position->toString());
 
 

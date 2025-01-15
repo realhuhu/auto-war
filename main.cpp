@@ -38,11 +38,9 @@ void country_war() {
     std::cout << "country_war function called" << std::endl;
 }
 
-
 class MainWindow : public QWidget {
 Q_OBJECT
 public:
-    QTextEdit *output_text;
     QMap<QString, std::function<void()>> command_options;
     bool isWaitingForHwnd = false;
     HHOOK hook;  // 新增：用于存储鼠标钩子句柄
@@ -65,7 +63,7 @@ public:
 
         auto *controlLayout = new QHBoxLayout();
 
-        auto *get_hwnd_button = new QPushButton("获取句柄");
+        auto *get_hwnd_button = new QPushButton("获取窗口");
         auto *execute_button = new QPushButton("执行命令");
         auto *stop_button = new QPushButton("停止命令");
         auto *clear_button = new QPushButton("清空输出");
@@ -82,11 +80,9 @@ public:
 
         mainLayout->addLayout(controlLayout);
 
-        output_text = new QTextEdit();
-        output_text->setReadOnly(true);
-        mainLayout->addWidget(output_text);
-
-        state.output_text = output_text;
+        state.output_text = new QTextEdit();
+        state.output_text->setReadOnly(true);
+        mainLayout->addWidget(state.output_text);
 
         command_options["公会报名"] = guild_war;
         command_options["军备获取"] = arms_compound;
@@ -98,6 +94,8 @@ public:
         // 初始时不安装钩子
         hook = nullptr;
         setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+
+        state.appendColoredText("使用方法: 先获取窗口，再执行命令");
     }
 
 
@@ -116,7 +114,7 @@ public:
 
     ~MainWindow() override = default;
 
-protected:
+
     // 全局鼠标钩子的回调函数
     static LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
         if (nCode >= 0) {
@@ -127,8 +125,9 @@ protected:
                     // 获取鼠标点击位置的句柄
                     HWND hwnd = WindowFromPoint(pMouseStruct->pt);
                     if (hwnd) {
-                        window->output_text->append(
-                                QString("获取到窗口句柄: 0x%1").arg(reinterpret_cast<qulonglong>(hwnd), 0, 16)
+                        // 返回转换后的字符串
+                        state.appendColoredText(
+                                "获取到窗口句柄: 0x" + QString::number(reinterpret_cast<qulonglong>(hwnd))
                         );
                         window->isWaitingForHwnd = false;
                         state.hwnd = hwnd;
@@ -136,7 +135,7 @@ protected:
                         UnhookWindowsHookEx(window->hook);
                         window->hook = nullptr;
                     } else {
-                        window->output_text->append("获取窗口句柄失败");
+                        state.appendColoredText("获取窗口句柄失败");
                     }
                 }
             }
@@ -148,37 +147,46 @@ protected:
 private slots:
 
     void start_hwnd_capture() {
-        output_text->append("请用鼠标点击任意窗口");
+        state.appendColoredText("请用鼠标点击任意窗口");
         isWaitingForHwnd = true;
         // 安装全局鼠标钩子
         hook = SetWindowsHookEx(WH_MOUSE_LL, MouseHookProc, nullptr, 0);
         if (hook == nullptr) {
-            output_text->append("Failed to set hook");
+            state.appendColoredText("Failed to set hook");
         }
     }
 
 
     void run_command(const QString &command) {
+        if (!state.hwnd) {
+            state.appendColoredText("请先获取游戏窗口!");
+            return;
+        }
+
         if (state.currentThread) {
+            state.stopFlag.store(true);
             state.currentThread->quit();
+            state.currentThread->wait();
             state.currentThread = nullptr;
             return;
         }
 
+        state.stopFlag.store(false);
         state.currentThread = new QThread(this);
 
         std::function<void()> func = command_options[command];
         QObject::connect(state.currentThread, &QThread::started, [func]() {
             try {
                 func();
-                state.output_text->append("运行完成");
+                state.appendColoredText("运行完成", "blue");
                 // 命令执行完成后，结束线程
                 if (state.currentThread) {
                     state.currentThread->quit();
                     state.currentThread = nullptr;
                 }
             } catch (const std::exception &e) {
-                state.output_text->append(QString("出错了: %1").arg(e.what()));
+                state.appendColoredText("出错了: ");
+                state.appendColoredText(e.what());
                 // 命令执行失败后，也结束线程
                 if (state.currentThread) {
                     state.currentThread->quit();
@@ -190,19 +198,20 @@ private slots:
         QObject::connect(state.currentThread, &QThread::finished, state.currentThread, &QThread::deleteLater);
         state.currentThread->start();
 
-        output_text->append(QString("开始执行命令: %1").arg(command));
+        state.appendColoredText("开始执行命令: " + command, "blue");
     }
 
 
-    void stop_command() const {
+    static void stop_command() {
         if (!state.currentThread || !state.currentThread->isRunning()) {
-            output_text->append("当前无命令正在执行");
+            state.output_text->append("当前无命令正在执行");
             return;
         }
 
+        state.stopFlag.store(true);
         state.currentThread->quit();
         state.currentThread->wait();
-        output_text->append("命令已停止执行");
+        state.output_text->append("命令已停止执行");
     }
 
 
@@ -241,11 +250,9 @@ private slots:
     }
 
 
-    void clear_text() const {
-        output_text->clear();
+    static void clear_text() {
+        state.output_text->clear();
     }
-
-
 };
 
 
