@@ -13,7 +13,7 @@ find_package(OpenCV REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets REQUIRED)
 
 add_executable(qt
-#        WIN32
+        WIN32
         main.cpp
         cv.h
         state.h

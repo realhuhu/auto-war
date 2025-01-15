@@ -28,7 +28,12 @@ struct State {
         QString timeString = currentTime.toString("hh:mm:ss");
 
         QString html = QString(
-                R"(<div><span style="color:white;background-color:green;">%1</span><span style="color:%2;">%3</span></div>)"
+                R"(
+                    <div>
+                    <span style="color:white;background-color:green;margin_right 5px">&nbsp;%1&nbsp;</span>
+                    <span style="color:%2;">%3</span>
+                    </div>
+                    )"
         ).arg(timeString, color.name(), text);
 
         // 将HTML字符串追加到QTextEdit中
