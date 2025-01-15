@@ -1,17 +1,22 @@
 #include <iostream>
-#include <QApplication>
-#include <QWidget>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QTextEdit>
-#include <QMessageBox>
-#include <QMouseEvent>
-#include <QThread>
-#include <functional>
 #include <Windows.h>
+#include <functional>
+
+#include <QMap>
+#include <QDebug>
+#include <QDialog>
+#include <QThread>
+#include <QWidget>
 #include <QScreen>
+#include <QTextEdit>
+#include <QMouseEvent>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QApplication>
+
 #include "state.h"
+#include "task.h"
+
 
 // 简单的模拟命令函数
 void guild_war() {
@@ -20,10 +25,6 @@ void guild_war() {
 
 void arms_compound() {
     std::cout << "arms_compound function called" << std::endl;
-}
-
-void exterminate_enemy() {
-    std::cout << "exterminate_enemy function called" << std::endl;
 }
 
 void country_arena() {
@@ -41,43 +42,19 @@ void country_war() {
 
 class MainWindow : public QWidget {
 Q_OBJECT
-protected:
-    void mousePressEvent(QMouseEvent* event) override {
-        clickHandler(event);
-        QWidget::mousePressEvent(event);
-    }
-
-private:
-    QTextEdit* output_text;
-    QMap<QString, std::function<void()>> command_options;
-    std::function<void(QMouseEvent*)> clickHandler;
-
-    // 内部辅助函数定义
-    void handleMouseClick(QMouseEvent* event) {
-        if (event->button() == Qt::LeftButton) {
-            POINT point;
-            GetCursorPos(&point);
-            HWND handle = WindowFromPoint(point);
-            wchar_t buffer[1024];
-            int length = GetWindowTextW(handle, buffer, sizeof(buffer) / sizeof(wchar_t));
-            if (length > 0) {
-                QString title = QString::fromWCharArray(buffer);
-                output_text->append(QString("游戏窗口: %1(%2)").arg(title).arg((quintptr)handle, 0, 16));
-                state.hwnd = handle;
-                output_text->append("请不要最小化游戏窗口！但可以放在其它窗口后面");
-            } else {
-                output_text->append("获取窗口标题失败");
-            }
-            this->setMouseTracking(false);
-        }
-    }
 public:
-    explicit MainWindow(QWidget* parent = nullptr) : QWidget(parent) {
+    QTextEdit *output_text;
+    QMap<QString, std::function<void()>> command_options;
+    bool isWaitingForHwnd = false;
+    HHOOK hook;  // 新增：用于存储鼠标钩子句柄
+
+
+    explicit MainWindow(QWidget *parent = nullptr) : QWidget(parent) {
         setWindowTitle("红警自动");
         resize(420, 280);
 
         // 获取主屏幕
-        QScreen* screen = QApplication::primaryScreen();
+        QScreen *screen = QApplication::primaryScreen();
         if (screen) {
             QRect screenGeometry = screen->geometry();
             int x = (screenGeometry.width() - width()) / 2;
@@ -85,16 +62,16 @@ public:
             move(x, y);
         }
 
-        auto* mainLayout = new QVBoxLayout(this);
+        auto *mainLayout = new QVBoxLayout(this);
 
-        auto* controlLayout = new QHBoxLayout();
+        auto *controlLayout = new QHBoxLayout();
 
-        auto* get_hwnd_button = new QPushButton("获取句柄");
-        auto* execute_button = new QPushButton("执行命令");
-        auto* stop_button = new QPushButton("停止命令");
-        auto* clear_button = new QPushButton("清空输出");
+        auto *get_hwnd_button = new QPushButton("获取句柄");
+        auto *execute_button = new QPushButton("执行命令");
+        auto *stop_button = new QPushButton("停止命令");
+        auto *clear_button = new QPushButton("清空输出");
 
-        connect(get_hwnd_button, &QPushButton::clicked, this, &MainWindow::get_hwnd);
+        connect(get_hwnd_button, &QPushButton::clicked, this, &MainWindow::start_hwnd_capture);
         connect(execute_button, &QPushButton::clicked, this, &MainWindow::select_command);
         connect(stop_button, &QPushButton::clicked, this, &MainWindow::stop_command);
         connect(clear_button, &QPushButton::clicked, this, &MainWindow::clear_text);
@@ -119,44 +96,107 @@ public:
         command_options["世界争霸"] = world_arena;
         command_options["国家战争"] = country_war;
 
-        clickHandler = [this](QMouseEvent* event) {
-            this->handleMouseClick(event);
-        };
+        // 初始时不安装钩子
+        hook = nullptr;
+        setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     }
 
-    ~MainWindow() override {}
 
-private slots:
-    void get_hwnd() {
-        output_text->append("请用鼠标点击游戏窗口");
-        setMouseTracking(true);
-    }
-
-    void run_command(const QString& command) {
+    void closeEvent(QCloseEvent *event) override {
         if (state.currentThread && state.currentThread->isRunning()) {
             state.currentThread->quit();
             state.currentThread->wait();
         }
+        // 移除鼠标钩子
+        if (hook) {
+            UnhookWindowsHookEx(hook);
+        }
+        QWidget::closeEvent(event);
+    }
+
+
+    ~MainWindow() override = default;
+
+protected:
+    // 全局鼠标钩子的回调函数
+    static LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
+        if (nCode >= 0) {
+            if (wParam == WM_LBUTTONDOWN) {
+                auto *window = qobject_cast<MainWindow *>(qApp->activeWindow());
+                if (window && window->isWaitingForHwnd) {
+                    auto *pMouseStruct = (MSLLHOOKSTRUCT *) lParam;
+                    // 获取鼠标点击位置的句柄
+                    HWND hwnd = WindowFromPoint(pMouseStruct->pt);
+                    if (hwnd) {
+                        window->output_text->append(
+                                QString("获取到窗口句柄: 0x%1").arg(reinterpret_cast<qulonglong>(hwnd), 0, 16)
+                        );
+                        window->isWaitingForHwnd = false;
+                        state.hwnd = hwnd;
+                        // 移除钩子
+                        UnhookWindowsHookEx(window->hook);
+                        window->hook = nullptr;
+                    } else {
+                        window->output_text->append("获取窗口句柄失败");
+                    }
+                }
+            }
+        }
+        // 调用下一个钩子
+        return CallNextHookEx(nullptr, nCode, wParam, lParam);
+    }
+
+private slots:
+
+    void start_hwnd_capture() {
+        output_text->append("请用鼠标点击任意窗口");
+        isWaitingForHwnd = true;
+        // 安装全局鼠标钩子
+        hook = SetWindowsHookEx(WH_MOUSE_LL, MouseHookProc, nullptr, 0);
+        if (hook == nullptr) {
+            output_text->append("Failed to set hook");
+        }
+    }
+
+
+    void run_command(const QString &command) {
+        if (state.currentThread) {
+            state.currentThread->quit();
+            state.currentThread = nullptr;
+            return;
+        }
 
         state.currentThread = new QThread(this);
+
         std::function<void()> func = command_options[command];
         QObject::connect(state.currentThread, &QThread::started, [func]() {
             try {
                 func();
                 state.output_text->append("运行完成");
-            } catch (const std::exception& e) {
+                // 命令执行完成后，结束线程
+                if (state.currentThread) {
+                    state.currentThread->quit();
+                    state.currentThread = nullptr;
+                }
+            } catch (const std::exception &e) {
                 state.output_text->append(QString("出错了: %1").arg(e.what()));
+                // 命令执行失败后，也结束线程
+                if (state.currentThread) {
+                    state.currentThread->quit();
+                    state.currentThread = nullptr;
+                }
             }
         });
 
         QObject::connect(state.currentThread, &QThread::finished, state.currentThread, &QThread::deleteLater);
         state.currentThread->start();
 
-        output_text->append(QString("开始执行命令(%1): %2").arg(state.hwnd? "后台" : "前台").arg(command));
+        output_text->append(QString("开始执行命令: %1").arg(command));
     }
 
-    void stop_command() {
-        if (!state.currentThread ||!state.currentThread->isRunning()) {
+
+    void stop_command() const {
+        if (!state.currentThread || !state.currentThread->isRunning()) {
             output_text->append("当前无命令正在执行");
             return;
         }
@@ -166,16 +206,21 @@ private slots:
         output_text->append("命令已停止执行");
     }
 
+
     void select_command() {
         QDialog selectDialog(this);
         selectDialog.setWindowTitle("选择命令");
 
-        auto* layout = new QVBoxLayout(&selectDialog);
+        auto *layout = new QVBoxLayout(&selectDialog);
 
-        auto* commandLayout = new QGridLayout();
-        int row = 0, col = 0;
-        for (const QString& command : command_options.keys()) {
-            auto* btn = new QPushButton(command);
+        auto *commandLayout = new QGridLayout();
+        auto it = command_options.begin();
+        int row = 0;
+        int col = 0;
+
+        while (it != command_options.end()) {
+            const QString &command = it.key();
+            auto *btn = new QPushButton(command);
             connect(btn, &QPushButton::clicked, [this, command, &selectDialog]() {
                 selectDialog.accept();
                 run_command(command);
@@ -186,6 +231,7 @@ private slots:
                 col = 0;
                 row++;
             }
+            ++it;
         }
 
         layout->addLayout(commandLayout);
@@ -195,17 +241,22 @@ private slots:
         }
     }
 
-    void clear_text() {
+
+    void clear_text() const {
         output_text->clear();
     }
 
+
 };
 
-int main(int argc, char* argv[]) {
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
+
+int main(int argc, char *argv[]) {
+    qRegisterMetaType<QTextCursor>("QTextCursor");
+    QApplication app(argc, argv);
+    MainWindow window;
+    window.show();
     return QApplication::exec();
 }
+
 
 #include "main.moc"
