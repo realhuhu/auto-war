@@ -7,11 +7,14 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 set(OpenCV_DIR "D:/opencv/dist/install")
 set(CMAKE_PREFIX_PATH "C:/Qt/Qt5.14.2/5.14.2/mingw73_64")
+set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
 
 find_package(OpenCV REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets REQUIRED)
 
-add_executable(qt main.cpp
+add_executable(qt
+        WIN32
+        main.cpp
         cv.h
         state.h
         until.h
@@ -22,6 +25,7 @@ add_executable(qt main.cpp
 
 target_link_libraries(qt ${OpenCV_LIBS})
 target_link_libraries(qt Qt5::Core Qt5::Gui Qt5::Widgets)
+#让链接器静态链接GCC和C++标准库
 
 if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(DEBUG_SUFFIX)

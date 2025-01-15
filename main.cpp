@@ -3,7 +3,6 @@
 #include <functional>
 
 #include <QMap>
-#include <QDebug>
 #include <QDialog>
 #include <QThread>
 #include <QWidget>
