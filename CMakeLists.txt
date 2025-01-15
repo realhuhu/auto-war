@@ -25,7 +25,7 @@ add_executable(qt
 
 target_link_libraries(qt ${OpenCV_LIBS})
 target_link_libraries(qt Qt5::Core Qt5::Gui Qt5::Widgets)
-set_target_properties(qt PROPERTIES RUNTIME_OUTPUT_DIRECTORY "C:/Users/huhu/Desktop/123")
+set_target_properties(qt PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/dist")
 
 if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(DEBUG_SUFFIX)
