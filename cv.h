@@ -7,7 +7,6 @@
 #include <QFile>
 #include <QString>
 #include <opencv2/opencv.hpp>
-#include <opencv2/imgcodecs/legacy/constants_c.h>
 
 #include "state.h"
 #include "segment.h"

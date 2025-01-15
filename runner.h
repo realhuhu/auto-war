@@ -2,11 +2,7 @@
 #define QT_RUNNER_H
 
 #include <vector>
-#include <memory>
-#include <string>
 #include <chrono>
-#include <thread>
-#include <utility>
 #include <iostream>
 #include <filesystem>
 

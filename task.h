@@ -36,6 +36,7 @@ void exterminate_enemy() {
         clear_until(start_until, click_until, run_until);
         run_until.emplace_back(std::make_unique<UntilImage>("/res/剿灭将领/确定.png", "inner", true));
         clicker->click(start_until, click_until, run_until);
+        return;
     }
 
     while (!state.stopFlag.load()) {

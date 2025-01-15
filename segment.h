@@ -5,12 +5,8 @@
 #include <vector>
 #include <thread>
 #include <iostream>
-#include <windows.h>
-#include <algorithm>
-#include <functional>
 
 #include <QDebug>
-
 #include <opencv2/opencv.hpp>
 
 #include "state.h"

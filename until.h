@@ -1,13 +1,9 @@
 #ifndef QT_UNTIL_H
 #define QT_UNTIL_H
 
-#include <utility>
 #include <vector>
-#include <string>
 #include <chrono>
 #include <iostream>
-#include <optional>
-#include <algorithm>
 
 #include <QDebug>
 
