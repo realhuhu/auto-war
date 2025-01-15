@@ -3,6 +3,7 @@
 
 #include <windows.h>
 
+#include <QDir>
 #include <QFile>
 #include <QString>
 #include <opencv2/opencv.hpp>
@@ -10,6 +11,7 @@
 
 #include "state.h"
 #include "segment.h"
+
 
 // 获取屏幕图像函数
 cv::Mat getScreen(const std::string &mode = "gray") {
@@ -55,11 +57,13 @@ std::vector<Segment> findPositions(
         const std::string &mode = "gray"
 ) {
     cv::Mat templateImg;
-
     cv::Mat Image1;
-    QFile file(QString::fromStdString(templatePath));
+
+    auto absolutePath = QCoreApplication::applicationDirPath() + QString::fromStdString(templatePath);
+    QFile file(absolutePath);
 
     if (!file.open(QIODevice::ReadOnly)) {
+        throw std::runtime_error("文件不存在: " + absolutePath.toStdString());
     }
 
     QByteArray byteArray = file.readAll();

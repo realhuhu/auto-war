@@ -94,9 +94,7 @@ public:
         // 初始时不安装钩子
         hook = nullptr;
         setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-
-        state.appendColoredText("使用方法: 先获取窗口，再执行命令");
-        state.log("233", "green");
+        state.appendColoredText("使用方法: 先获取窗口，再执行命令", "blue");
     }
 
 
