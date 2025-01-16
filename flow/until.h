@@ -92,7 +92,7 @@ public:
             std::string mode = "gray",
             double finishWait = 0,
             double threshold = 0.9,
-            double interval = 0.5,
+            double interval = 0.2,
             double timeout = -1
     );
 

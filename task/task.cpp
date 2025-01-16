@@ -124,7 +124,7 @@ void country_war() {
         clicker = std::make_unique<ImageClicker>(ImageClicker("/res/国战/扫荡.png"));
 
         clear_until(start_until, click_until, run_until);
-        start_until.emplace_back(std::make_unique<UntilImage>("/res/国战/可战斗.png"));
+        start_until.emplace_back(std::make_unique<UntilImage>("/res/国战/可战斗.png", "none", false, "gray", 0.5));
         run_until.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
                 "/res/国战/恢复行动力.png", "/res/国战/跳过战斗.png"
         }));
