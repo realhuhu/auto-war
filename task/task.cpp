@@ -368,7 +368,7 @@ void arms_compound() {
             clicker = clicker->click(start_until, click_until, run_until);
 
             clear_until(start_until, click_until, run_until);
-            click_until.emplace_back(std::make_unique<UntilImage>("/res/军备合成/关闭窗口.png", "inner", true));
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/军备合成/关闭窗口.png", "inner", true));
             clicker->click(start_until, click_until, run_until);
 
             break;
