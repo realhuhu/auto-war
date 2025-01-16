@@ -43,7 +43,6 @@ public:
     virtual void pre_hook(std::unique_ptr<Segment> &previous);
     virtual bool flag(std::unique_ptr<Segment> &previous);
     [[nodiscard]] virtual std::string toString() const;
-    [[nodiscard]] virtual std::string toRepr() const;
 };
 
 class UntilImage : public Until {
@@ -61,7 +60,6 @@ public:
 
     bool flag(std::unique_ptr<Segment> &previous) override;
     [[nodiscard]] std::string toString() const override;
-    [[nodiscard]] std::string toRepr() const override;
 };
 
 class UntilAnyImage : public Until {
@@ -81,7 +79,6 @@ public:
 
     bool flag(std::unique_ptr<Segment> &previous) override;
     [[nodiscard]] std::string toString() const override;
-    [[nodiscard]] std::string toRepr() const override;
 };
 
 class UntilImageStable : public Until {
@@ -102,7 +99,6 @@ public:
     void pre_hook(std::unique_ptr<Segment> &previous) override;
     bool flag(std::unique_ptr<Segment> &previous) override;
     [[nodiscard]] std::string toString() const override;
-    [[nodiscard]] std::string toRepr() const override;
 };
 
 #endif // QT_UNTIL_H

@@ -15,6 +15,7 @@
 class CV {
 public:
     static cv::Mat get_screen(const std::string &mode = "gray");
+
     static std::vector<Segment> find_positions(
             const cv::Mat &rawImg,
             const std::string &templatePath,

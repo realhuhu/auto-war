@@ -70,7 +70,7 @@ void country_war() {
 
     clear_until(start_until, click_until, run_until);
     run_until.emplace_back(std::make_unique<UntilImage>("/res/国战/前往.png"));
-    clicker = clicker->clickIfFound(start_until, click_until, run_until);
+    clicker->clickIfFound(start_until, click_until, run_until);
 
     while (!state.stopFlag.load()) {
         clicker = std::make_unique<ImageClicker>(ImageClicker("/res/国战/前往.png"));

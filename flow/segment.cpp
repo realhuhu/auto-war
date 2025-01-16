@@ -71,9 +71,6 @@ std::string Segment::toString() const {
            ")]";
 }
 
-std::string Segment::toRepr() const {
-    return toString();
-}
 
 Segment similarity_selector(const std::vector<Segment> &segments) {
     if (segments.empty()) {
@@ -122,8 +119,6 @@ Selector position_selector(const std::string &attribute, const std::string &opti
     };
     return selector_func;
 }
-
-std::random_device rd;
 
 Segment random_selector(const std::vector<Segment> &segments) {
     if (segments.empty()) {

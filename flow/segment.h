@@ -41,7 +41,6 @@ struct Segment {
     [[nodiscard]] Segment copy() const;
 
     [[nodiscard]] virtual std::string toString() const;
-    [[nodiscard]] virtual std::string toRepr() const;
 };
 
 template<typename T>

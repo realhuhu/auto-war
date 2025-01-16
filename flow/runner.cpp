@@ -305,7 +305,3 @@ std::string ImageClicker::toString() const {
     }
     return "[" + std::filesystem::path(templatePath).stem().string() + "]";
 }
-
-std::string ImageClicker::toRepr() const {
-    return toString();
-}

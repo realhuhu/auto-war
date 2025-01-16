@@ -262,8 +262,6 @@ LRESULT CALLBACK MainWindow::MouseHookProc(int nCode, WPARAM wParam, LPARAM lPar
 
 
 int main(int argc, char *argv[]) {
-//    state.hwnd = reinterpret_cast<HWND>(0x00060AC2);
-//    CV::find_positions(CV::get_screen(),R"("C:\Users\huhu\Desktop\123.png")");
     qRegisterMetaType<QTextCursor>("QTextCursor");
     QApplication app(argc, argv);
     MainWindow window;

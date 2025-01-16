@@ -112,10 +112,6 @@ std::string Until::toString() const {
     return "[Until" + std::filesystem::path(imgPath).stem().string() + "]";
 }
 
-std::string Until::toRepr() const {
-    return toString();
-}
-
 UntilImage::UntilImage(
         const std::string &imgPath,
         const std::string &onPrevious,
@@ -151,9 +147,6 @@ std::string UntilImage::toString() const {
     return "[等待图片 " + std::filesystem::path(imgPath).stem().string() + "]";
 }
 
-std::string UntilImage::toRepr() const {
-    return toString();
-}
 
 UntilAnyImage::UntilAnyImage(
         const std::initializer_list<const std::string> &imgList,
@@ -198,9 +191,6 @@ std::string UntilAnyImage::toString() const {
     return "[等待任意图片 " + img_stems + "]";
 }
 
-std::string UntilAnyImage::toRepr() const {
-    return toString();
-}
 
 UntilImageStable::UntilImageStable(
         std::string imgPath,
@@ -259,8 +249,4 @@ bool UntilImageStable::flag(std::unique_ptr<Segment> &previous) {
 
 std::string UntilImageStable::toString() const {
     return "[等待图片稳定 " + std::filesystem::path(imgPath).stem().string() + "]";
-}
-
-std::string UntilImageStable::toRepr() const {
-    return toString();
 }

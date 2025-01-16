@@ -35,7 +35,9 @@ public:
     );
 
     void _start(float startWait, const std::vector<std::unique_ptr<Until>> &startUntilList);
+
     void _click(std::unique_ptr<Segment> position, const std::vector<std::unique_ptr<Until>> &clickUntilList);
+
     void _finish(float finishWait, const std::vector<std::unique_ptr<Until>> &runUntilList);
 
     std::unique_ptr<ImageClicker> _execute(
@@ -79,7 +81,6 @@ public:
     );
 
     [[nodiscard]] std::string toString() const;
-    [[nodiscard]] std::string toRepr() const;
 };
 
 #endif // QT_RUNNER_H
