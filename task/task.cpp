@@ -1,7 +1,14 @@
-#ifndef QT_TASK_H
-#define QT_TASK_H
+// task.cpp
+#include "task.h"
+#include <algorithm>
+#include <stdexcept>
+#include <QDebug>
+#include <QCoreApplication>
 
-#include "runner.h"
+
+#include "../state.h"
+#include "../flow/cv.h"
+#include "../flow/runner.h"
 
 void clear_until(
         std::vector<std::unique_ptr<Until>> &start_until,
@@ -81,7 +88,7 @@ void country_war() {
         click_until.emplace_back(std::make_unique<UntilImage>("/res/国战/城市信息.png"));
         clicker->click(start_until, click_until, run_until, similarity_selector, -1, 0, 1);
 
-        if (findPositions(getScreen(), "/res/国战/游牧民族.png").empty()) {
+        if (CV::find_positions(CV::get_screen(), "/res/国战/游牧民族.png").empty()) {
             clicker = std::make_unique<ImageClicker>(ImageClicker("/res/国战/召唤支援兵.png"));
 
             clear_until(start_until, click_until, run_until);
@@ -118,7 +125,7 @@ void country_war() {
         clicker = std::make_unique<ImageClicker>(ImageClicker("/res/国战/扫荡.png"));
 
         clear_until(start_until, click_until, run_until);
-        start_until.emplace_back(std::make_unique<UntilImage>("/res/国战/可战斗.png", "none", false, "gray", 1));
+        start_until.emplace_back(std::make_unique<UntilImage>("/res/国战/可战斗.png"));
         run_until.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
                 "/res/国战/恢复行动力.png", "/res/国战/跳过战斗.png"
         }));
@@ -151,7 +158,6 @@ void country_war() {
         run_until.emplace_back(std::make_unique<UntilImage>("/res/国战/前往.png"));
         clicker->click(start_until, click_until, run_until);
     }
-
 }
 
 void country_arena() {
@@ -214,7 +220,6 @@ void country_arena() {
         clear_until(start_until, click_until, run_until);
         click_until.emplace_back(std::make_unique<UntilImage>("/res/国家争霸/结束战斗.png"));
         clicker = clicker->click(start_until, click_until, run_until);
-
 
         clear_until(start_until, click_until, run_until);
         run_until.emplace_back(std::make_unique<UntilImage>("/res/国家争霸/争霸战标题.png"));
@@ -283,7 +288,6 @@ void world_arena() {
         clear_until(start_until, click_until, run_until);
         click_until.emplace_back(std::make_unique<UntilImage>("/res/世界争霸/结束战斗.png"));
         clicker = clicker->click(start_until, click_until, run_until);
-
 
         clear_until(start_until, click_until, run_until);
         run_until.emplace_back(std::make_unique<UntilImage>("/res/世界争霸/争霸战标题.png"));
@@ -450,11 +454,8 @@ void exterminate_enemy() {
             break;
         }
 
-
         clear_until(start_until, click_until, run_until);
         run_until.emplace_back(std::make_unique<UntilImage>("/res/剿灭将领/信物商店.png"));
         clicker->click(start_until, click_until, run_until);
     }
 }
-
-#endif //QT_TASK_H

@@ -3,17 +3,19 @@
 #include <functional>
 
 #include <QMap>
+#include <QDebug>
 #include <QDialog>
 #include <QThread>
 #include <QWidget>
 #include <QScreen>
+#include <QDateTime>
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QApplication>
 
 #include "state.h"
-#include "task.h"
+#include "task/task.h"
 
 class MainWindow : public QWidget {
 Q_OBJECT
@@ -25,6 +27,7 @@ public:
     QMap<QString, std::function<void()>> command_options;
     bool isWaitingForHwnd = false;
     HHOOK hook;  // 新增：用于存储鼠标钩子句柄
+    QTextEdit *output_text;
 
     explicit MainWindow(QWidget *parent = nullptr) : QWidget(parent) {
         setWindowTitle("红警自动");
@@ -60,9 +63,9 @@ public:
 
         mainLayout->addLayout(controlLayout);
 
-        state.output_text = new QTextEdit();
-        state.output_text->setReadOnly(true);
-        mainLayout->addWidget(state.output_text);
+        output_text = new QTextEdit();
+        output_text->setReadOnly(true);
+        mainLayout->addWidget(output_text);
 
         command_options["公会报名"] = guild_war;
         command_options["军备获取"] = arms_compound;
@@ -74,7 +77,7 @@ public:
         // 初始时不安装钩子
         hook = nullptr;
         setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-        state.appendColoredText("使用方法: 先获取窗口，再执行命令", "blue");
+        onLogText("使用方法: 先获取窗口，再执行命令", "blue");
 
         // 连接日志信号和槽函数
         connect(this, &MainWindow::logMessage, this, &MainWindow::onLogMessage);
@@ -96,27 +99,54 @@ public:
 
 signals:
 
-    void logMessage(const QString &message, const QColor &color);  // 定义信号，用于发送日志信息
+    void logMessage(const QString &message, const QColor &color = "black");  // 定义信号，用于发送日志信息
+    void logText(const QString &message, const QColor &color = "red");  // 定义信号，用于发送日志信息
 
 private slots:
 
-    static void onLogMessage(const QString &message, const QColor &color) {
-        state.log(message, color);
+    void onLogText(const QString &text, const QColor &color = "red") const {
+        // 创建HTML格式的字符串，其中包含了颜色信息
+        QString html = QString("<div style=\"color:%1;\">%2</div>").arg(color.name(), text);
+
+        // 将HTML字符串追加到QTextEdit中
+        output_text->append(html);
+    }
+
+    void onLogMessage(const QString &text, const QColor &color = "black") const {
+        QDateTime currentDateTime = QDateTime::currentDateTime();
+
+        // 提取时间部分
+        QTime currentTime = currentDateTime.time();
+
+        // 格式化时间为字符串 "HH:MM:SS"
+        QString timeString = currentTime.toString("hh:mm:ss");
+
+        QString html = QString(
+                R"(
+                <div>
+                <span style="color:white;background-color:green;margin_right 5px">&nbsp;%1&nbsp;</span>
+                <span style="color:%2;">%3</span>
+                </div>
+                )"
+        ).arg(timeString, color.name(), text);
+
+        // 将HTML字符串追加到QTextEdit中
+        output_text->append(html);
     }
 
     void start_hwnd_capture() {
-        state.appendColoredText("请用鼠标点击游戏窗口");
+        onLogText("请用鼠标点击游戏窗口");
         isWaitingForHwnd = true;
         // 安装全局鼠标钩子
         hook = SetWindowsHookEx(WH_MOUSE_LL, MouseHookProc, nullptr, 0);
         if (hook == nullptr) {
-            state.appendColoredText("Failed to set hook");
+            onLogText("Failed to set hook");
         }
     }
 
     void run_command(const QString &command) {
         if (!state.hwnd) {
-            state.appendColoredText("请先获取游戏窗口!");
+            onLogText("请先获取游戏窗口!");
             return;
         }
 
@@ -159,19 +189,19 @@ private slots:
         QObject::connect(state.currentThread, &QThread::finished, state.currentThread, &QThread::deleteLater);
         state.currentThread->start();
 
-        state.appendColoredText("开始执行命令: " + command, "blue");
+        onLogText("开始执行命令: " + command, "blue");
     }
 
-    static void stop_command() {
+    void stop_command() {
         if (!state.currentThread || !state.currentThread->isRunning()) {
-            state.appendColoredText("当前无命令正在执行");
+            onLogText("当前无命令正在执行");
             return;
         }
 
         state.stopFlag.store(true);
         state.currentThread->quit();
         state.currentThread->wait();
-        state.appendColoredText("命令已停止执行");
+        onLogText("命令已停止执行");
     }
 
     void select_command() {
@@ -202,12 +232,12 @@ private slots:
         layout->addLayout(commandLayout);
 
         if (selectDialog.exec() == QDialog::Accepted) {
-            emit logMessage("开始运行", "red");
+            onLogMessage("开始运行", "red");
         }
     }
 
-    static void clear_text() {
-        state.output_text->clear();
+    void clear_text() {
+        output_text->clear();
     }
 
     // 全局鼠标钩子的回调函数
@@ -225,18 +255,18 @@ private slots:
                     GetWindowTextW(hwnd, buffer, 256);
                     if (hwnd) {
                         // 返回转换后的字符串
-                        state.appendColoredText(
+                        window->onLogText(
                                 QString("获取到窗口: ") + QString::fromWCharArray(buffer) + "(0x" +
                                 QString::number(reinterpret_cast<qulonglong>(hwnd), 16) + ")", "blue"
                         );
-                        state.appendColoredText("请不要最小化游戏窗口！但可以放在其它窗口后面", "red");
+                        window->onLogText("请不要最小化游戏窗口！但可以放在其它窗口后面", "red");
                         window->isWaitingForHwnd = false;
                         state.hwnd = hwnd;
                         // 移除钩子
                         UnhookWindowsHookEx(window->hook);
                         window->hook = nullptr;
                     } else {
-                        state.appendColoredText("获取窗口句柄失败", "red");
+                        window->onLogText("获取窗口句柄失败", "red");
                     }
                 }
             }
@@ -248,10 +278,12 @@ private slots:
 
 
 int main(int argc, char *argv[]) {
+//    state.hwnd = reinterpret_cast<HWND>(0x00060AC2);
+//    CV::find_positions(CV::get_screen(),R"("C:\Users\huhu\Desktop\123.png")");
     qRegisterMetaType<QTextCursor>("QTextCursor");
     QApplication app(argc, argv);
     MainWindow window;
-    window.show();
+    window.show();/**/
     return QApplication::exec();
 }
 

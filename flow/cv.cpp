@@ -1,20 +1,14 @@
-#ifndef QT_CV_H
-#define QT_CV_H
-
-#include <windows.h>
-
-#include <QDir>
+// qt_cv.cpp
+#include "cv.h"
 #include <QFile>
-#include <QString>
 #include <QCoreApplication>
-#include <opencv2/opencv.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
 
-#include "state.h"
+#include "../state.h"
 #include "segment.h"
 
-
-// 获取屏幕图像函数
-cv::Mat getScreen(const std::string &mode = "gray") {
+cv::Mat CV::get_screen(const std::string &mode) {
     SetProcessDPIAware();
     RECT rect;
     GetWindowRect(state.hwnd, &rect);
@@ -44,21 +38,19 @@ cv::Mat getScreen(const std::string &mode = "gray") {
         return screenshot;
     } else {
         cv::Mat gray;
-        cv::cvtColor(screenshot, gray, cv::COLOR_BGRA2GRAY);
+        cv::cvtColor(screenshot, gray, cv::COLOR_BGR2GRAY);
         return gray;
     }
 }
 
-// 查找模板位置函数
-std::vector<Segment> findPositions(
+std::vector<Segment> CV::find_positions(
         const cv::Mat &rawImg,
         const std::string &templatePath,
-        double threshold = 0.9,
-        const std::string &mode = "gray"
+        double threshold,
+        const std::string &mode
 ) {
     cv::Mat templateImg;
     cv::Mat Image1;
-
     auto absolutePath = QCoreApplication::applicationDirPath() + QString::fromStdString(templatePath);
     QFile file(absolutePath);
 
@@ -108,7 +100,4 @@ std::vector<Segment> findPositions(
         }
         return segments;
     }
-
 }
-
-#endif //QT_CV_H
