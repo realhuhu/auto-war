@@ -29,6 +29,7 @@ add_executable(qt
         main.h
         main.cpp
         flow/emitter.h
+        ico.o
 )
 
 target_link_libraries(qt ${OpenCV_LIBS})
