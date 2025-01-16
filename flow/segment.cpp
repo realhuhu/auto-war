@@ -28,7 +28,7 @@ void Segment::click(double wait) const {
     PostMessageW(state.hwnd, WM_LBUTTONDOWN, 0, lparam);
     PostMessageW(state.hwnd, WM_LBUTTONUP, 0, lparam);
 
-    emit SignalEmitter::instance()->logMessage( QString::fromStdString("点击: " + this->toString()));
+    emit SignalEmitter::instance()->logMessage(QString::fromStdString("点击: " + this->toString()));
 
     if (wait > 0) {
         std::this_thread::sleep_for(std::chrono::duration<float>(wait));
@@ -96,6 +96,10 @@ Selector position_selector(const std::string &attribute, const std::string &opti
 
         std::vector<Segment> sorted_segments = segments;
 
+        for (const auto &i: segments) {
+            emit SignalEmitter::instance()->logMessage(QString::fromStdString(i.toString()));
+        }
+
         auto compare = [&](const Segment &a, const Segment &b) {
             if (attribute == "x1") return a.x1 < b.x1;
             if (attribute == "y1") return a.y1 < b.y1;
@@ -111,6 +115,9 @@ Selector position_selector(const std::string &attribute, const std::string &opti
         if (option == "max") {
             std::reverse(sorted_segments.begin(), sorted_segments.end());
         }
+
+        emit SignalEmitter::instance()->logMessage(QString::fromStdString(sorted_segments[0].toString()) + "selected");
+
         return sorted_segments[0];
     };
     return selector_func;

@@ -78,6 +78,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
 
 void MainWindow::closeEvent(QCloseEvent *event) {
     if (state.currentThread && state.currentThread->isRunning()) {
+        state.stopFlag.store(true);
         state.currentThread->quit();
         state.currentThread->wait();
     }

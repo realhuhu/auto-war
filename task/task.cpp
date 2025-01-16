@@ -204,13 +204,13 @@ void country_arena() {
 
         if (clicker->templatePath == "/res/国家争霸/购买次数.png") {
             clear_until(start_until, click_until, run_until);
-            run_until.emplace_back(std::make_unique<UntilImage>("/res/国家争霸/关闭窗口.png", "right"));
-            clicker = clicker->click(start_until, click_until, run_until);
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/国家争霸/关闭窗口.png", "top"));
+            clicker = clicker->locate(start_until, run_until);
 
             clear_until(start_until, click_until, run_until);
             run_until.emplace_back(std::make_unique<UntilImage>("/res/国家争霸/购买次数.png", "none", true));
             run_until.emplace_back(std::make_unique<UntilImage>("/res/国家争霸/关闭窗口.png"));
-            clicker = clicker->click(start_until, click_until, run_until);
+            clicker = clicker->click(start_until, click_until, run_until, position_selector("x_center", "min"));
 
             clicker->click();
             break;
@@ -272,13 +272,13 @@ void world_arena() {
 
         if (clicker->templatePath == "/res/世界争霸/购买次数.png") {
             clear_until(start_until, click_until, run_until);
-            run_until.emplace_back(std::make_unique<UntilImage>("/res/世界争霸/关闭窗口.png", "right"));
-            clicker = clicker->click(start_until, click_until, run_until);
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/世界争霸/关闭窗口.png", "top"));
+            clicker = clicker->locate(start_until, run_until);
 
             clear_until(start_until, click_until, run_until);
             run_until.emplace_back(std::make_unique<UntilImage>("/res/世界争霸/购买次数.png", "none", true));
             run_until.emplace_back(std::make_unique<UntilImage>("/res/世界争霸/关闭窗口.png"));
-            clicker = clicker->click(start_until, click_until, run_until);
+            clicker = clicker->click(start_until, click_until, run_until, position_selector("x_center", "min"));
 
             clicker->click();
             break;
