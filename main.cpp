@@ -8,14 +8,12 @@
 #include <QWidget>
 #include <QScreen>
 #include <QTextEdit>
-#include <QMouseEvent>
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QApplication>
 
 #include "state.h"
 #include "task.h"
-
 
 class MainWindow : public QWidget {
 Q_OBJECT
@@ -27,7 +25,6 @@ public:
     QMap<QString, std::function<void()>> command_options;
     bool isWaitingForHwnd = false;
     HHOOK hook;  // 新增：用于存储鼠标钩子句柄
-
 
     explicit MainWindow(QWidget *parent = nullptr) : QWidget(parent) {
         setWindowTitle("红警自动");
@@ -78,8 +75,10 @@ public:
         hook = nullptr;
         setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
         state.appendColoredText("使用方法: 先获取窗口，再执行命令", "blue");
-    }
 
+        // 连接日志信号和槽函数
+        connect(this, &MainWindow::logMessage, this, &MainWindow::onLogMessage);
+    }
 
     void closeEvent(QCloseEvent *event) override {
         if (state.currentThread && state.currentThread->isRunning()) {
@@ -93,46 +92,17 @@ public:
         QWidget::closeEvent(event);
     }
 
-
     ~MainWindow() override = default;
 
+signals:
 
-    // 全局鼠标钩子的回调函数
-    static LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
-        if (nCode >= 0) {
-            if (wParam == WM_LBUTTONDOWN) {
-                auto *window = qobject_cast<MainWindow *>(qApp->activeWindow());
-                if (window && window->isWaitingForHwnd) {
-                    auto *pMouseStruct = (MSLLHOOKSTRUCT *) lParam;
-                    // 获取鼠标点击位置的句柄
-                    HWND hwnd = WindowFromPoint(pMouseStruct->pt);
-                    wchar_t buffer[256] = {0};
-
-                    // 调用GetWindowTextW函数获取Unicode字符串
-                    GetWindowTextW(hwnd, buffer, 256);
-                    if (hwnd) {
-                        // 返回转换后的字符串
-                        state.appendColoredText(
-                                QString("获取到窗口: ") + QString::fromWCharArray(buffer) + "(0x" +
-                                QString::number(reinterpret_cast<qulonglong>(hwnd)) + ")", "blue"
-                        );
-                        state.appendColoredText("请不要最小化游戏窗口！但可以放在其它窗口后面");
-                        window->isWaitingForHwnd = false;
-                        state.hwnd = hwnd;
-                        // 移除钩子
-                        UnhookWindowsHookEx(window->hook);
-                        window->hook = nullptr;
-                    } else {
-                        state.appendColoredText("获取窗口句柄失败");
-                    }
-                }
-            }
-        }
-        // 调用下一个钩子
-        return CallNextHookEx(nullptr, nCode, wParam, lParam);
-    }
+    void logMessage(const QString &message, const QColor &color);  // 定义信号，用于发送日志信息
 
 private slots:
+
+    static void onLogMessage(const QString &message, const QColor &color) {
+        state.log(message, color);
+    }
 
     void start_hwnd_capture() {
         state.appendColoredText("请用鼠标点击游戏窗口");
@@ -143,7 +113,6 @@ private slots:
             state.appendColoredText("Failed to set hook");
         }
     }
-
 
     void run_command(const QString &command) {
         if (!state.hwnd) {
@@ -162,19 +131,23 @@ private slots:
         state.stopFlag.store(false);
         state.currentThread = new QThread(this);
 
-        std::function<void()> func = command_options[command];
-        QObject::connect(state.currentThread, &QThread::started, [func]() {
+        auto func = command_options[command];
+        QObject::connect(state.currentThread, &QThread::started, [func, this]() {
             try {
                 func();
-                state.appendColoredText("运行完成", "blue");
+                emit logMessage("运行完成", "red");
                 // 命令执行完成后，结束线程
                 if (state.currentThread) {
                     state.currentThread->quit();
                     state.currentThread = nullptr;
                 }
             } catch (const std::exception &e) {
-                state.appendColoredText("出错了: ");
-                state.appendColoredText(e.what());
+                if (!state.stopFlag.load()) {
+                    emit logMessage("出错了: " + QString(e.what()), "red");
+                } else {
+                    emit logMessage("运行完成", "red");
+                }
+
                 // 命令执行失败后，也结束线程
                 if (state.currentThread) {
                     state.currentThread->quit();
@@ -189,19 +162,17 @@ private slots:
         state.appendColoredText("开始执行命令: " + command, "blue");
     }
 
-
     static void stop_command() {
         if (!state.currentThread || !state.currentThread->isRunning()) {
-            state.output_text->append("当前无命令正在执行");
+            state.appendColoredText("当前无命令正在执行");
             return;
         }
 
         state.stopFlag.store(true);
         state.currentThread->quit();
         state.currentThread->wait();
-        state.output_text->append("命令已停止执行");
+        state.appendColoredText("命令已停止执行");
     }
-
 
     void select_command() {
         QDialog selectDialog(this);
@@ -214,7 +185,6 @@ private slots:
         int col = 0;
 
         // 确保命令选项的顺序
-
         for (const auto &command: commands) {
             auto *btn = new QPushButton(command);
             connect(btn, &QPushButton::clicked, [this, command, &selectDialog]() {
@@ -232,13 +202,47 @@ private slots:
         layout->addLayout(commandLayout);
 
         if (selectDialog.exec() == QDialog::Accepted) {
-            // 对话框接受后执行相应操作
+            emit logMessage("开始运行", "red");
         }
     }
 
-
     static void clear_text() {
         state.output_text->clear();
+    }
+
+    // 全局鼠标钩子的回调函数
+    static LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
+        if (nCode >= 0) {
+            if (wParam == WM_LBUTTONDOWN) {
+                auto *window = qobject_cast<MainWindow *>(qApp->activeWindow());
+                if (window && window->isWaitingForHwnd) {
+                    auto *pMouseStruct = (MSLLHOOKSTRUCT *) lParam;
+                    // 获取鼠标点击位置的句柄
+                    HWND hwnd = WindowFromPoint(pMouseStruct->pt);
+                    wchar_t buffer[256] = {0};
+
+                    // 调用GetWindowTextW函数获取Unicode字符串
+                    GetWindowTextW(hwnd, buffer, 256);
+                    if (hwnd) {
+                        // 返回转换后的字符串
+                        state.appendColoredText(
+                                QString("获取到窗口: ") + QString::fromWCharArray(buffer) + "(0x" +
+                                QString::number(reinterpret_cast<qulonglong>(hwnd), 16) + ")", "blue"
+                        );
+                        state.appendColoredText("请不要最小化游戏窗口！但可以放在其它窗口后面", "red");
+                        window->isWaitingForHwnd = false;
+                        state.hwnd = hwnd;
+                        // 移除钩子
+                        UnhookWindowsHookEx(window->hook);
+                        window->hook = nullptr;
+                    } else {
+                        state.appendColoredText("获取窗口句柄失败", "red");
+                    }
+                }
+            }
+        }
+        // 调用下一个钩子
+        return CallNextHookEx(nullptr, nCode, wParam, lParam);
     }
 };
 
@@ -250,6 +254,5 @@ int main(int argc, char *argv[]) {
     window.show();
     return QApplication::exec();
 }
-
 
 #include "main.moc"

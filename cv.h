@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QFile>
 #include <QString>
+#include <QCoreApplication>
 #include <opencv2/opencv.hpp>
 
 #include "state.h"
