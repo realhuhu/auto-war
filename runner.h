@@ -175,7 +175,7 @@ public:
                 std::vector<Segment> positions;
                 auto start = std::chrono::high_resolution_clock::now();
 
-                while (positions.empty()) {
+                while (positions.empty() and !state.stopFlag.load()) {
                     auto now = std::chrono::high_resolution_clock::now();
 
                     if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count() > globalTimeout) {
@@ -189,6 +189,7 @@ public:
                     );
 
                     if (positions.empty()) {
+                        std::this_thread::sleep_for(std::chrono::duration<float>(0.1));
                         qDebug() << QString::fromStdString(this->toString() + "匹配失败，再次尝试");
                     }
                 }

@@ -17,30 +17,13 @@
 #include "task.h"
 
 
-// 简单的模拟命令函数
-void guild_war() {
-    std::cout << "guild_war function called" << std::endl;
-}
-
-void arms_compound() {
-    std::cout << "arms_compound function called" << std::endl;
-}
-
-void country_arena() {
-    std::cout << "country_arena function called" << std::endl;
-}
-
-void world_arena() {
-    std::cout << "world_arena function called" << std::endl;
-}
-
-void country_war() {
-    std::cout << "country_war function called" << std::endl;
-}
-
 class MainWindow : public QWidget {
 Q_OBJECT
 public:
+    QStringList commands = {
+            "公会报名", "军备获取", "剿灭将领",
+            "国家争霸", "世界争霸", "国家战争"
+    };
     QMap<QString, std::function<void()>> command_options;
     bool isWaitingForHwnd = false;
     HHOOK hook;  // 新增：用于存储鼠标钩子句柄
@@ -123,16 +106,14 @@ public:
                     auto *pMouseStruct = (MSLLHOOKSTRUCT *) lParam;
                     // 获取鼠标点击位置的句柄
                     HWND hwnd = WindowFromPoint(pMouseStruct->pt);
-                    char buffer[256] = {0};
+                    wchar_t buffer[256] = {0};
 
-                    // 调用GetWindowText函数获取窗口标题
-                    // 注意：这里使用GetWindowTextA来获取ANSI字符串，对于Unicode字符串应使用GetWindowTextW
-                    GetWindowTextA(hwnd, buffer, 256);
-
+                    // 调用GetWindowTextW函数获取Unicode字符串
+                    GetWindowTextW(hwnd, buffer, 256);
                     if (hwnd) {
                         // 返回转换后的字符串
                         state.appendColoredText(
-                                QString("获取到窗口: ") + buffer + "(0x" +
+                                QString("获取到窗口: ") + QString::fromWCharArray(buffer) + "(0x" +
                                 QString::number(reinterpret_cast<qulonglong>(hwnd)) + ")", "blue"
                         );
                         state.appendColoredText("请不要最小化游戏窗口！但可以放在其它窗口后面");
@@ -229,12 +210,12 @@ private slots:
         auto *layout = new QVBoxLayout(&selectDialog);
 
         auto *commandLayout = new QGridLayout();
-        auto it = command_options.begin();
         int row = 0;
         int col = 0;
 
-        while (it != command_options.end()) {
-            const QString &command = it.key();
+        // 确保命令选项的顺序
+
+        for (const auto &command: commands) {
             auto *btn = new QPushButton(command);
             connect(btn, &QPushButton::clicked, [this, command, &selectDialog]() {
                 selectDialog.accept();
@@ -242,11 +223,10 @@ private slots:
             });
             commandLayout->addWidget(btn, row, col);
             col++;
-            if (col % 3 == 0) {
+            if (col >= 3) {  // 每行最多3个按钮
                 col = 0;
                 row++;
             }
-            ++it;
         }
 
         layout->addLayout(commandLayout);

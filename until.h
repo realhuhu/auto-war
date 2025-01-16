@@ -57,12 +57,12 @@ public:
             bool fulfilled = this->fulfilled(previous);
             if (fulfilled) {
                 if (finishWait > 0) {
-                    std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(finishWait)));
+                    std::this_thread::sleep_for(std::chrono::duration<float>(finishWait));
                 }
                 break;
             }
 
-            std::this_thread::sleep_for(std::chrono::seconds(static_cast<int>(interval)));
+            std::this_thread::sleep_for(std::chrono::duration<float>(interval));
         }
     }
 
@@ -237,7 +237,7 @@ public:
             std::string mode = "gray",
             double finishWait = 0,
             double threshold = 0.9,
-            double interval = 0.1,
+            double interval = 0.5,
             double timeout = -1
     ) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, std::move(mode)) {
         this->imgPath = std::move(imgPath);

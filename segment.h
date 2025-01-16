@@ -38,18 +38,18 @@ struct Segment {
     }
 
     // 点击函数
-    void click(int wait = 100) const {
+    void click(double wait = 0.1) const {
         int x = x_center;
         int y = y_center;
         LPARAM lparam = (y << 16) | x;
         PostMessageW(state.hwnd, WM_LBUTTONDOWN, 0, lparam);
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(std::chrono::duration<float>(0.1));
         PostMessageW(state.hwnd, WM_LBUTTONUP, 0, lparam);
 
         qDebug() << QString::fromStdString("点击: " + this->toString());
 
         if (wait > 0) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(wait));
+            std::this_thread::sleep_for(std::chrono::duration<float>(wait));
         }
     }
 
@@ -94,6 +94,21 @@ struct Segment {
         return toString();
     }
 };
+
+
+template<typename T>
+T choice(const std::vector<T>& vec) {
+    if (vec.empty()) {
+        throw std::runtime_error("向量不能为空");
+    }
+
+    std::random_device rd;  // 非确定性随机数生成器
+    std::mt19937 gen(rd()); // 以随机设备作为种子的Mersenne Twister伪随机数生成器
+    std::uniform_int_distribution<> dis(0, vec.size() - 1); // 均匀分布
+
+    int index = dis(gen); // 生成随机索引
+    return vec[index]; // 返回随机选择的元素
+}
 
 // 定义Selector类型，使用std::function模拟Python中的Callable
 using Selector = std::function<Segment(const std::vector<Segment> &)>;
@@ -150,9 +165,7 @@ Segment random_selector(const std::vector<Segment> &segments) {
         throw std::runtime_error("random_selector::No segments");
     };
 
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, segments.size() - 1);
-    return segments[dis(gen)];
+    return choice(segments);
 }
 
 #endif //QT_SEGMENT_H
