@@ -123,11 +123,19 @@ public:
                     auto *pMouseStruct = (MSLLHOOKSTRUCT *) lParam;
                     // 获取鼠标点击位置的句柄
                     HWND hwnd = WindowFromPoint(pMouseStruct->pt);
+                    char buffer[256] = {0};
+
+                    // 调用GetWindowText函数获取窗口标题
+                    // 注意：这里使用GetWindowTextA来获取ANSI字符串，对于Unicode字符串应使用GetWindowTextW
+                    GetWindowTextA(hwnd, buffer, 256);
+
                     if (hwnd) {
                         // 返回转换后的字符串
                         state.appendColoredText(
-                                "获取到窗口句柄: 0x" + QString::number(reinterpret_cast<qulonglong>(hwnd))
+                                QString("获取到窗口: ") + buffer + "(0x" +
+                                QString::number(reinterpret_cast<qulonglong>(hwnd)) + ")", "blue"
                         );
+                        state.appendColoredText("请不要最小化游戏窗口！但可以放在其它窗口后面");
                         window->isWaitingForHwnd = false;
                         state.hwnd = hwnd;
                         // 移除钩子
@@ -146,7 +154,7 @@ public:
 private slots:
 
     void start_hwnd_capture() {
-        state.appendColoredText("请用鼠标点击任意窗口");
+        state.appendColoredText("请用鼠标点击游戏窗口");
         isWaitingForHwnd = true;
         // 安装全局鼠标钩子
         hook = SetWindowsHookEx(WH_MOUSE_LL, MouseHookProc, nullptr, 0);
