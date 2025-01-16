@@ -7,11 +7,11 @@
 #include <chrono>
 #include <thread>
 #include <functional>
-#include <QDebug>
 #include <QString>
 
 #include "../flow/until.h"
 #include "../flow/segment.h"
+#include "../flow/emitter.h"
 
 void clear_until(
         std::vector<std::unique_ptr<Until>> &start_until,

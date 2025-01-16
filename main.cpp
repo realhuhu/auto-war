@@ -14,6 +14,7 @@
 
 #include "state.h"
 #include "task/task.h"
+#include "flow/emitter.h"
 
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     setWindowTitle("红警自动");
@@ -72,6 +73,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
 
     // 连接日志信号和槽函数
     connect(this, &MainWindow::logMessage, this, &MainWindow::onLogMessage);
+    connect(SignalEmitter::instance(), &SignalEmitter::logMessage, this, &MainWindow::onLogMessage);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -86,15 +88,15 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     QWidget::closeEvent(event);
 }
 
-void MainWindow::onLogText(const QString &text, const QColor &color) const {
+void MainWindow::onLogText(const QString &text, const QString &color) const {
     // 创建HTML格式的字符串，其中包含了颜色信息
-    QString html = QString("<div style=\"color:%1;\">%2</div>").arg(color.name(), text);
+    QString html = QString("<div style=\"color:%1;\">%2</div>").arg(color, text);
 
     // 将HTML字符串追加到QTextEdit中
     output_text->append(html);
 }
 
-void MainWindow::onLogMessage(const QString &text, const QColor &color) const {
+void MainWindow::onLogMessage(const QString &text, const QString &color) const {
     QDateTime currentDateTime = QDateTime::currentDateTime();
 
     // 提取时间部分
@@ -110,7 +112,7 @@ void MainWindow::onLogMessage(const QString &text, const QColor &color) const {
                 <span style="color:%2;">%3</span>
                 </div>
                 )"
-    ).arg(timeString, color.name(), text);
+    ).arg(timeString, color, text);
 
     // 将HTML字符串追加到QTextEdit中
     output_text->append(html);
@@ -156,6 +158,7 @@ void MainWindow::run_command(const QString &command) {
         } catch (const std::exception &e) {
             if (!state.stopFlag.load()) {
                 emit logMessage("出错了: " + QString(e.what()), "red");
+                emit logMessage("运行结束", "red");
             } else {
                 emit logMessage("运行完成", "red");
             }
@@ -214,7 +217,7 @@ void MainWindow::select_command() {
     layout->addLayout(commandLayout);
 
     if (selectDialog.exec() == QDialog::Accepted) {
-        onLogMessage("开始运行", "red");
+//        onLogText("开始运行", "red");
     }
 }
 
@@ -266,5 +269,3 @@ int main(int argc, char *argv[]) {
     window.show();/**/
     return QApplication::exec();
 }
-
-#include "main.moc"

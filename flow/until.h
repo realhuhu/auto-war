@@ -10,7 +10,6 @@
 #include <memory>
 #include <thread>
 
-#include <QDebug>
 #include <QCoreApplication>
 
 #include "segment.h"

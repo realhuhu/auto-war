@@ -10,7 +10,6 @@
 #include <QApplication>
 #include <QScreen>
 #include <QDateTime>
-#include <QColor>
 #include <QHBoxLayout>
 #include <QGridLayout>
 #include <Windows.h>
@@ -24,20 +23,31 @@ class MainWindow : public QWidget {
 Q_OBJECT
 public:
     explicit MainWindow(QWidget *parent = nullptr);
+
     ~MainWindow() override = default;
 
 signals:
-    void logMessage(const QString &message, const QColor &color = "black");
-    void logText(const QString &message, const QColor &color = "red");
+
+    void logMessage(const QString &message, const QString &color = "black");
+
+    void logText(const QString &message, const QString &color = "red");
 
 private slots:
-    void onLogText(const QString &text, const QColor &color = "red") const;
-    void onLogMessage(const QString &text, const QColor &color = "black") const;
+
+    void onLogText(const QString &text, const QString &color = "red") const;
+
+    void onLogMessage(const QString &text, const QString &color = "black") const;
+
     void start_hwnd_capture();
+
     void run_command(const QString &command);
+
     void stop_command();
+
     void select_command();
+
     void clear_text();
+
     static LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam);
 
 private:

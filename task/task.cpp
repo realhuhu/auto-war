@@ -2,7 +2,6 @@
 #include "task.h"
 #include <algorithm>
 #include <stdexcept>
-#include <QDebug>
 #include <QCoreApplication>
 
 

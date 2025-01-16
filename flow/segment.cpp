@@ -6,6 +6,7 @@
 #include <windows.h>
 
 #include "../state.h"
+#include "emitter.h"
 
 Segment::Segment(
         std::string p,
@@ -25,10 +26,9 @@ void Segment::click(double wait) const {
     int y = y_center;
     LPARAM lparam = (y << 16) | x;
     PostMessageW(state.hwnd, WM_LBUTTONDOWN, 0, lparam);
-    std::this_thread::sleep_for(std::chrono::duration<float>(0.1));
     PostMessageW(state.hwnd, WM_LBUTTONUP, 0, lparam);
 
-    qDebug() << QString::fromStdString("点击: " + this->toString());
+    emit SignalEmitter::instance()->logMessage( QString::fromStdString("点击: " + this->toString()));
 
     if (wait > 0) {
         std::this_thread::sleep_for(std::chrono::duration<float>(wait));
@@ -77,7 +77,7 @@ std::string Segment::toRepr() const {
 
 Segment similarity_selector(const std::vector<Segment> &segments) {
     if (segments.empty()) {
-        throw std::runtime_error("similarity_selector::No segments");
+        throw std::runtime_error("similarity_selector: 列表为空");
     }
 
     auto result = segments;
@@ -91,7 +91,7 @@ Segment similarity_selector(const std::vector<Segment> &segments) {
 Selector position_selector(const std::string &attribute, const std::string &option) {
     auto selector_func = [attribute, option](const std::vector<Segment> &segments) {
         if (segments.empty()) {
-            throw std::runtime_error("position_selector::No segments");
+            throw std::runtime_error("position_selector: 列表为空");
         }
 
         std::vector<Segment> sorted_segments = segments;
@@ -120,7 +120,7 @@ std::random_device rd;
 
 Segment random_selector(const std::vector<Segment> &segments) {
     if (segments.empty()) {
-        throw std::runtime_error("random_selector::No segments");
+        throw std::runtime_error("random_selector: 列表为空");
     }
 
     return choice(segments);

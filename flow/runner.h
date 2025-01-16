@@ -9,7 +9,6 @@
 #include <memory>
 #include <thread>
 #include <functional>
-#include <QDebug>
 #include <QString>
 
 #include "until.h"

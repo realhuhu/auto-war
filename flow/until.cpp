@@ -10,6 +10,7 @@
 #include "../state.h"
 #include "cv.h"
 #include "segment.h"
+#include "emitter.h"
 
 Until::Until(
         double threshold,
@@ -36,7 +37,7 @@ void Until::loop(std::unique_ptr<Segment> &previous, int globalTimeout) {
         auto elapsed = std::chrono::duration<double>(now - start).count();
 
         if (elapsed > maxTime) {
-            throw std::runtime_error("timeout" + this->toString());
+            throw std::runtime_error("超时，结束运行: " + this->toString());
         }
 
         bool fulfilled = this->fulfilled(previous);
@@ -54,7 +55,8 @@ void Until::loop(std::unique_ptr<Segment> &previous, int globalTimeout) {
 bool Until::fulfilled(std::unique_ptr<Segment> &previous) {
     pre_hook(previous);
     bool is_fulfilled = reverse == !flag(previous);
-    qDebug() << QString::fromStdString((is_fulfilled ? "条件已满足: " : "条件未满足: ") + this->toString());
+    emit SignalEmitter::instance()->logMessage(
+            QString::fromStdString((is_fulfilled ? "条件已满足: " : "条件未满足: ") + this->toString()));
     return is_fulfilled;
 }
 
@@ -64,12 +66,13 @@ std::vector<Segment> Until::filter(const std::vector<Segment> &positions, std::u
     }
 
     if (!previous) {
-        throw std::runtime_error("No previous segment" + this->toString());
+        throw std::runtime_error("Previous segment为空" + this->toString());
     }
 
     std::vector<Segment> result;
 
-    qDebug() << QString::fromStdString("筛选: on " + previous->toString() + " " + onPrevious);
+    emit SignalEmitter::instance()->logMessage(
+            QString::fromStdString("筛选: on " + previous->toString() + " " + onPrevious));
 
     for (const auto &position: positions) {
         if (onPrevious == "left" && position.on(*previous, "vertical") == "left") {

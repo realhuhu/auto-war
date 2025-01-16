@@ -13,7 +13,7 @@ find_package(OpenCV REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets REQUIRED)
 
 add_executable(qt
-#        WIN32
+        WIN32
         flow/cv.h
         flow/until.h
         flow/runner.h
@@ -28,6 +28,7 @@ add_executable(qt
         state.cpp
         main.h
         main.cpp
+        flow/emitter.h
 )
 
 target_link_libraries(qt ${OpenCV_LIBS})

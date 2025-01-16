@@ -12,7 +12,6 @@
 #include <functional>
 #include <opencv2/opencv.hpp>
 
-#include <QDebug>
 #include <QCoreApplication>
 
 struct Segment {

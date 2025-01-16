@@ -4,11 +4,11 @@
 #include <stdexcept>
 #include <chrono>
 #include <thread>
-#include <QCoreApplication>
 
 #include "../state.h"
 #include "cv.h"
 #include "until.h"
+#include "emitter.h"
 #include "segment.h"
 
 ImageClicker::ImageClicker(
@@ -53,9 +53,10 @@ void ImageClicker::_start(float startWait, const std::vector<std::unique_ptr<Unt
     }
 
     for (const auto &startUntil: startUntilList) {
-        qDebug() << QString::fromStdString("start条件判断: " + startUntil->toString());
+
+        emit SignalEmitter::instance()->logMessage(QString::fromStdString("start条件判断: " + startUntil->toString()));
         (*startUntil).loop(previousSegment, globalTimeout);
-        qDebug() << QString::fromStdString("start条件满足: " + startUntil->toString());
+        emit SignalEmitter::instance()->logMessage(QString::fromStdString("start条件满足: " + startUntil->toString()));
     }
 }
 
@@ -68,16 +69,15 @@ ImageClicker::_click(std::unique_ptr<Segment> position, const std::vector<std::u
     }
 
     while (!state.stopFlag.load()) {
-        qDebug() << QString::fromStdString("开始循环点击: " + position->toString());
+        emit SignalEmitter::instance()->logMessage(QString::fromStdString("开始循环点击: " + position->toString()));
 
         auto now = std::chrono::high_resolution_clock::now();
         if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count() > globalTimeout) {
-            throw std::runtime_error("Timed out");
+            throw std::runtime_error("超时，结束运行: " + this->toString());
         }
 
         position->click();
 
-        std::this_thread::sleep_for(std::chrono::duration<float>(0.5));
 
         if (clickUntilList.empty()) {
             break;
@@ -92,10 +92,12 @@ ImageClicker::_click(std::unique_ptr<Segment> position, const std::vector<std::u
         }
 
         if (allFulfilled) {
-            qDebug() << "所有click条件已满足，结束循环点击";
+            emit SignalEmitter::instance()->logMessage("所有click条件已满足，结束循环点击");
             break;
         }
-        qDebug() << "click条件不满足，继续循环点击";
+        emit SignalEmitter::instance()->logMessage("click条件不满足，继续循环点击");
+
+        std::this_thread::sleep_for(std::chrono::duration<float>(0.5));
     }
 }
 
@@ -105,9 +107,9 @@ void ImageClicker::_finish(float finishWait, const std::vector<std::unique_ptr<U
     }
 
     for (const auto &runUntil: runUntilList) {
-        qDebug() << QString::fromStdString("run条件判断: " + runUntil->toString());
+        emit SignalEmitter::instance()->logMessage(QString::fromStdString("run条件判断: " + runUntil->toString()));
         (*runUntil).loop(previousSegment, globalTimeout);
-        qDebug() << QString::fromStdString("run条件满足: " + runUntil->toString());
+        emit SignalEmitter::instance()->logMessage(QString::fromStdString("run条件满足: " + runUntil->toString()));
     }
 }
 
@@ -121,7 +123,7 @@ std::unique_ptr<ImageClicker> ImageClicker::_execute(
         const std::vector<std::unique_ptr<Until>> &clickUntilList,
         const std::vector<std::unique_ptr<Until>> &runUntilList
 ) {
-    qDebug() << QString::fromStdString(this->toString() + "开始" + name + "流程");
+    emit SignalEmitter::instance()->logMessage(QString::fromStdString(this->toString() + "开始" + name + "流程"));
 
     std::unique_ptr<Segment> position;
 
@@ -142,8 +144,9 @@ std::unique_ptr<ImageClicker> ImageClicker::_execute(
 
     auto clicker = _createChain(clickUntilList, runUntilList);
 
-    qDebug() << QString::fromStdString(this->toString() + "结束" + name + "流程");
-    qDebug() << QString::fromStdString("下一调用链: " + (clicker ? clicker->toString() : "无"));
+    emit SignalEmitter::instance()->logMessage(QString::fromStdString(this->toString() + "结束" + name + "流程"));
+    emit SignalEmitter::instance()->logMessage(
+            QString::fromStdString("下一调用链: " + (clicker ? clicker->toString() : "无")));
 
     return clicker;
 }
@@ -166,7 +169,7 @@ std::unique_ptr<ImageClicker> ImageClicker::click(
                 auto now = std::chrono::high_resolution_clock::now();
 
                 if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count() > globalTimeout) {
-                    throw std::runtime_error("Timed out");
+                    throw std::runtime_error("超时，结束运行: " + this->toString());
                 }
 
                 positions = CV::find_positions(
@@ -177,7 +180,8 @@ std::unique_ptr<ImageClicker> ImageClicker::click(
 
                 if (positions.empty()) {
                     std::this_thread::sleep_for(std::chrono::duration<float>(0.1));
-                    qDebug() << QString::fromStdString(this->toString() + "匹配失败，再次尝试");
+                    emit SignalEmitter::instance()->logMessage(
+                            QString::fromStdString(this->toString() + "匹配失败，再次尝试"));
                 }
             }
 
@@ -185,7 +189,7 @@ std::unique_ptr<ImageClicker> ImageClicker::click(
         }
 
         if (!position) {
-            throw std::runtime_error("No position found");
+            throw std::runtime_error("未匹配到图片: " + this->templatePath);
         }
 
         _click(std::move(position), clickUntilList);
@@ -271,10 +275,11 @@ std::unique_ptr<ImageClicker> ImageClicker::locate(
         }
 
         if (!position) {
-            throw std::runtime_error("No position found");
+            throw std::runtime_error("未匹配到图片: " + this->templatePath);
         }
 
-        qDebug() << QString::fromStdString(this->toString() + "定位成功: " + position->toString());
+        emit SignalEmitter::instance()->logMessage(
+            QString::fromStdString(this->toString() + "定位成功: " + position->toString()));
 
         if (!previousSegment) {
             previousSegment = std::move(position);
@@ -295,7 +300,9 @@ std::unique_ptr<ImageClicker> ImageClicker::locate(
 }
 
 std::string ImageClicker::toString() const {
-    qDebug() << QString::fromStdString(templatePath);
+    if (templatePath.empty()) {
+        return "无";
+    }
     return "[" + std::filesystem::path(templatePath).stem().string() + "]";
 }
 
