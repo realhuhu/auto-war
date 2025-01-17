@@ -27,8 +27,8 @@
             },
             {
                 "order": 4,
-                "text": "蓝色元蓝色元",
-                "value": false
+                "text": "蓝色元",
+                "value": true
             },
             {
                 "order": 5,
@@ -54,16 +54,21 @@
                 "order": 9,
                 "text": "绿色番",
                 "value": false
+            },
+            {
+                "order": 10,
+                "text": "自动买刷新令",
+                "value": false
+            },
+            {
+                "order": 11,
+                "text": "自动买次数",
+                "value": false
             }
         ],
         "input": [
             {
                 "order": 1,
-                "text": "轮次",
-                "value": 2
-            },
-            {
-                "order": 2,
                 "text": "轮次",
                 "value": 2
             }

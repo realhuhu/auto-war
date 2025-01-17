@@ -21,14 +21,14 @@ Segment::Segment(
     y_center = y1 + h / 2;
 }
 
-void Segment::click(double wait) const {
-    int x = x_center;
-    int y = y_center;
+void Segment::click(double wait, int offset_x, int offset_y) const {
+    int x = x_center + offset_x;
+    int y = y_center + offset_y;
     LPARAM lparam = (y << 16) | x;
     PostMessageW(state.hwnd, WM_LBUTTONDOWN, 0, lparam);
     PostMessageW(state.hwnd, WM_LBUTTONUP, 0, lparam);
 
-    emit SignalEmitter::instance()->logMessage(QString::fromStdString("点击: " + this->toString()));
+    emit Emitter::instance()->log(QString::fromStdString("点击: " + this->toString()));
 
     if (wait > 0) {
         std::this_thread::sleep_for(std::chrono::duration<float>(wait));
@@ -94,7 +94,7 @@ Selector position_selector(const std::string &attribute, const std::string &opti
         std::vector<Segment> sorted_segments = segments;
 
         for (const auto &i: segments) {
-            emit SignalEmitter::instance()->logMessage(QString::fromStdString(i.toString()));
+            emit Emitter::instance()->log(QString::fromStdString(i.toString()));
         }
 
         auto compare = [&](const Segment &a, const Segment &b) {
@@ -113,7 +113,7 @@ Selector position_selector(const std::string &attribute, const std::string &opti
             std::reverse(sorted_segments.begin(), sorted_segments.end());
         }
 
-        emit SignalEmitter::instance()->logMessage(QString::fromStdString(sorted_segments[0].toString()) + "selected");
+        emit Emitter::instance()->log(QString::fromStdString(sorted_segments[0].toString()) + "selected");
 
         return sorted_segments[0];
     };

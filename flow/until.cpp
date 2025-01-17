@@ -56,7 +56,7 @@ void Until::loop(std::unique_ptr<Segment> &previous, int globalTimeout) {
 bool Until::fulfilled(std::unique_ptr<Segment> &previous) {
     pre_hook(previous);
     bool is_fulfilled = reverse == !flag(previous);
-    emit SignalEmitter::instance()->logMessage(
+    emit Emitter::instance()->log(
             QString::fromStdString((is_fulfilled ? "条件已满足: " : "条件未满足: ") + this->toString()));
     return is_fulfilled;
 }
@@ -72,8 +72,7 @@ std::vector<Segment> Until::filter(const std::vector<Segment> &positions, std::u
 
     std::vector<Segment> result;
 
-    emit SignalEmitter::instance()->logMessage(
-            QString::fromStdString("筛选: on " + previous->toString() + " " + onPrevious));
+    emit Emitter::instance()->log(QString::fromStdString("筛选: on " + previous->toString() + " " + onPrevious));
 
     for (const auto &position: positions) {
         if (onPrevious == "left" && position.on(*previous, "vertical") == "left") {

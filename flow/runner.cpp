@@ -1,6 +1,5 @@
 // runner.cpp
 #include "runner.h"
-#include <algorithm>
 #include <stdexcept>
 #include <chrono>
 #include <thread>
@@ -23,6 +22,24 @@ ImageClicker::ImageClicker(
 
     targetSegmentList = CV::find_positions(CV::get_screen(mode), imgPath, globalThreshold, mode);
 }
+
+
+ImageClicker::ImageClicker(
+        const std::vector<std::string> &imgPathList,
+        float threshold,
+        int timeout,
+        const std::string &mode
+) : globalThreshold(threshold),
+    globalTimeout(timeout) {
+    for (const auto &imgPath: imgPathList) {
+        auto ps = CV::find_positions(CV::get_screen(mode), imgPath, globalThreshold, mode);
+        if (!ps.empty()) {
+            templatePath = imgPath;
+            targetSegmentList = ps;
+        }
+    }
+}
+
 
 ImageClicker::ImageClicker(
         std::string imgPath,
@@ -80,27 +97,29 @@ void ImageClicker::_start(
 
     for (const auto &startUntil: startUntilList) {
 
-        emit SignalEmitter::instance()->logMessage(QString::fromStdString("start条件判断: " + startUntil->toString()));
+        emit Emitter::instance()->log(QString::fromStdString("start条件判断: " + startUntil->toString()));
         (*startUntil).loop(previousSegment, globalTimeout);
-        emit SignalEmitter::instance()->logMessage(QString::fromStdString("start条件满足: " + startUntil->toString()));
+        emit Emitter::instance()->log(QString::fromStdString("start条件满足: " + startUntil->toString()));
     }
 }
 
 void ImageClicker::_click(
         std::unique_ptr<Segment> position,
-        const std::vector<std::unique_ptr<Until>> &clickUntilList
+        const std::vector<std::unique_ptr<Until>> &clickUntilList,
+        int offset_x,
+        int offset_y
 ) {
     auto start = std::chrono::high_resolution_clock::now();
 
     while (!state.stopFlag.load()) {
-        emit SignalEmitter::instance()->logMessage(QString::fromStdString("开始循环点击: " + position->toString()));
+        emit Emitter::instance()->log(QString::fromStdString("开始循环点击: " + position->toString()));
 
         auto now = std::chrono::high_resolution_clock::now();
         if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count() > globalTimeout) {
             throw std::runtime_error("超时，结束运行: " + this->toString());
         }
 
-        position->click();
+        position->click(0, offset_x, offset_y);
 
 
         if (clickUntilList.empty()) {
@@ -116,10 +135,10 @@ void ImageClicker::_click(
         }
 
         if (allFulfilled) {
-            emit SignalEmitter::instance()->logMessage("所有click条件已满足，结束循环点击");
+            emit Emitter::instance()->log("所有click条件已满足，结束循环点击");
             break;
         }
-        emit SignalEmitter::instance()->logMessage("click条件不满足，继续循环点击");
+        emit Emitter::instance()->log("click条件不满足，继续循环点击");
 
         std::this_thread::sleep_for(std::chrono::duration<float>(0.5));
     }
@@ -133,9 +152,9 @@ void ImageClicker::_finish(
     }
 
     for (const auto &runUntil: runUntilList) {
-        emit SignalEmitter::instance()->logMessage(QString::fromStdString("run条件判断: " + runUntil->toString()));
+        emit Emitter::instance()->log(QString::fromStdString("run条件判断: " + runUntil->toString()));
         (*runUntil).loop(previousSegment, globalTimeout);
-        emit SignalEmitter::instance()->logMessage(QString::fromStdString("run条件满足: " + runUntil->toString()));
+        emit Emitter::instance()->log(QString::fromStdString("run条件满足: " + runUntil->toString()));
     }
 }
 
@@ -148,7 +167,7 @@ std::unique_ptr<ImageClicker> ImageClicker::_execute(
         const std::vector<std::unique_ptr<Until>> &clickUntilList,
         const std::vector<std::unique_ptr<Until>> &runUntilList
 ) {
-    emit SignalEmitter::instance()->logMessage(QString::fromStdString(this->toString() + "开始" + name + "流程"));
+    emit Emitter::instance()->log(QString::fromStdString(this->toString() + "开始" + name + "流程"));
 
     _start(startWait, startUntilList);
 
@@ -160,10 +179,8 @@ std::unique_ptr<ImageClicker> ImageClicker::_execute(
 
     auto clicker = _createChain(clickUntilList, runUntilList);
 
-    emit SignalEmitter::instance()->logMessage(QString::fromStdString(this->toString() + "结束" + name + "流程"));
-    emit SignalEmitter::instance()->logMessage(
-            QString::fromStdString("下一调用链: " + (clicker ? clicker->toString() : "无")));
-
+    emit Emitter::instance()->log(QString::fromStdString(this->toString() + "结束" + name + "流程"));
+    emit Emitter::instance()->log(QString::fromStdString("下一调用链: " + (clicker ? clicker->toString() : "无")));
     return clicker;
 }
 
@@ -173,9 +190,11 @@ std::unique_ptr<ImageClicker> ImageClicker::click(
         const std::vector<std::unique_ptr<Until>> &runUntilList,
         const Selector &selector,
         float startWait,
-        float finishWait
+        float finishWait,
+        int offset_x,
+        int offset_y
 ) {
-    auto executor = [this, &selector, &clickUntilList]() -> bool {
+    auto executor = [this, &selector, &clickUntilList, &offset_x, &offset_y]() -> bool {
         if (targetSegmentList.empty()) {
             throw std::runtime_error("图片列表为空: " + this->templatePath);
         }
@@ -184,7 +203,12 @@ std::unique_ptr<ImageClicker> ImageClicker::click(
 
         previousSegment = std::make_unique<Segment>(segment.copy());
 
-        _click(std::make_unique<Segment>(segment.copy()), clickUntilList);
+        _click(
+                std::make_unique<Segment>(segment.copy()),
+                clickUntilList,
+                offset_x,
+                offset_y
+        );
 
         return false;
     };
@@ -206,9 +230,11 @@ std::unique_ptr<ImageClicker> ImageClicker::clickIfFound(
         const std::vector<std::unique_ptr<Until>> &runUntilList,
         const Selector &selector,
         float startWait,
-        float finishWait
+        float finishWait,
+        int offset_x,
+        int offset_y
 ) {
-    auto executor = [this, &selector, &clickUntilList]() -> bool {
+    auto executor = [this, &selector, &clickUntilList, &offset_x, &offset_y]() -> bool {
         if (targetSegmentList.empty()) {
             return true;
         }
@@ -217,7 +243,12 @@ std::unique_ptr<ImageClicker> ImageClicker::clickIfFound(
 
         previousSegment = std::make_unique<Segment>(segment.copy());
 
-        _click(std::make_unique<Segment>(segment.copy()), clickUntilList);
+        _click(
+                std::make_unique<Segment>(segment.copy()),
+                clickUntilList,
+                offset_x,
+                offset_y
+        );
 
         return false;
     };
@@ -249,9 +280,7 @@ std::unique_ptr<ImageClicker> ImageClicker::locate(
 
         previousSegment = std::make_unique<Segment>(segment.copy());
 
-        emit SignalEmitter::instance()->logMessage(
-            QString::fromStdString(this->toString() + "定位成功: " + segment.toString()
-            ));
+        emit Emitter::instance()->log(QString::fromStdString(this->toString() + "定位成功: " + segment.toString()));
 
         return false;
     };

@@ -30,6 +30,13 @@ public:
     );
 
     explicit ImageClicker(
+            const std::vector<std::string> &imgPathList,
+            float threshold = 0.9,
+            int timeout = 60,
+            const std::string &mode = "gray"
+    );
+
+    explicit ImageClicker(
             std::string imgPath,
             const Segment &segment,
             float threshold = 0.9,
@@ -52,7 +59,12 @@ public:
 
     void _start(float startWait, const std::vector<std::unique_ptr<Until>> &startUntilList);
 
-    void _click(std::unique_ptr<Segment> position, const std::vector<std::unique_ptr<Until>> &clickUntilList);
+    void _click(
+            std::unique_ptr<Segment> position,
+            const std::vector<std::unique_ptr<Until>> &clickUntilList,
+            int offset_x = 0,
+            int offset_y = 0
+    );
 
     void _finish(float finishWait, const std::vector<std::unique_ptr<Until>> &runUntilList);
 
@@ -72,7 +84,9 @@ public:
             const std::vector<std::unique_ptr<Until>> &runUntilList = {},
             const Selector &selector = similarity_selector,
             float startWait = 0,
-            float finishWait = 0
+            float finishWait = 0,
+            int offset_x = 0,
+            int offset_y = 0
     );
 
     std::unique_ptr<ImageClicker> clickIfFound(
@@ -81,7 +95,9 @@ public:
             const std::vector<std::unique_ptr<Until>> &runUntilList = {},
             const Selector &selector = similarity_selector,
             float startWait = 0,
-            float finishWait = 0
+            float finishWait = 0,
+            int offset_x = 0,
+            int offset_y = 0
     );
 
     std::unique_ptr<ImageClicker> locate(

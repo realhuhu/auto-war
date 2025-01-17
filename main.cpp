@@ -35,6 +35,7 @@ public:
             : QWidget(parent) {
         auto *layout = new QHBoxLayout(this);
         layout->setSpacing(0);
+        layout->setContentsMargins(0, 0, 0, 0);
 
         // 创建文字按钮
         textButton = new QPushButton(text);
@@ -117,7 +118,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     commands = QStringList({
                                    "公会报名", "军备获取", "剿灭将领",
                                    "国家争霸", "世界争霸", "国家战争",
-                                   "公会任务"
+//                                   "公会任务"
                            });
 
     // 初始时不安装钩子
@@ -128,20 +129,18 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
 
     // 连接日志信号和槽函数
     connect(this, &MainWindow::logMessage, this, &MainWindow::onLogMessage);
-    connect(SignalEmitter::instance(), &SignalEmitter::logMessage, this, &MainWindow::onLogMessage);
-
-
-    QFile file(configFile);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        onLogText("无法打开配置文件: config.json");
-    } else {
-        auto jsonData = file.readAll();
-        auto doc = QJsonDocument::fromJson(jsonData);
-        config = doc.object();
-        file.close();
-    }
-
-
+    connect(Emitter::instance(), &Emitter::log, this, &MainWindow::onLogMessage);
+//
+//
+//    QFile file(configFile);
+//    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+//        onLogText("无法打开配置文件: config.json");
+//    } else {
+//        auto jsonData = file.readAll();
+//        auto doc = QJsonDocument::fromJson(jsonData);
+//        config = doc.object();
+//        file.close();
+//    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {

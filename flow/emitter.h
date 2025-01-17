@@ -3,17 +3,18 @@
 
 #include <QObject>
 
-class SignalEmitter : public QObject {
+
+class Emitter : public QObject {
 Q_OBJECT
 public:
-    static SignalEmitter *instance() {
-        static auto *emitter = new SignalEmitter();
+    static Emitter *instance() {
+        static auto *emitter = new Emitter();
         return emitter;
     }
 
 signals:
 
-    void logMessage(const QString &message, const QString &color = "black");
+    void log(const QString &message, const QString &color = "black");
 };
 
 #endif //QT_EMITTER_H
