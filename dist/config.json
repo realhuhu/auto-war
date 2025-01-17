@@ -1,4 +1,13 @@
 {
+    "公会战役": {
+        "input": [
+            {
+                "order": 1,
+                "text": "轮次",
+                "value": 1
+            }
+        ]
+    },
     "剿灭将领": {
         "checkbox": [
             {
@@ -18,18 +27,18 @@
             },
             {
                 "order": 4,
-                "text": "蓝色元",
+                "text": "蓝色元蓝色元",
                 "value": false
             },
             {
                 "order": 5,
                 "text": "蓝色帜",
-                "value": false
+                "value": true
             },
             {
                 "order": 6,
                 "text": "蓝色番",
-                "value": false
+                "value": true
             },
             {
                 "order": 7,
@@ -51,7 +60,12 @@
             {
                 "order": 1,
                 "text": "轮次",
-                "value": 1
+                "value": 2
+            },
+            {
+                "order": 2,
+                "text": "轮次",
+                "value": 2
             }
         ],
         "tips": "这是说明内容"

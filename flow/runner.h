@@ -23,24 +23,27 @@ public:
     std::unique_ptr<Segment> previousSegment;
 
     explicit ImageClicker(
-            std::string templatePath,
+            const std::string &imgPath,
             float threshold = 0.9,
             int timeout = 60,
-            const std::vector<Segment> &targetSegmentList = {}
+            const std::string &mode = "gray"
     );
 
     explicit ImageClicker(
+            std::string imgPath,
             const Segment &segment,
             float threshold = 0.9,
             int timeout = 60
     );
 
     explicit ImageClicker(
-            const std::vector<Segment> &targetSegmentList = {},
+            std::string imgPath,
+            const std::vector<Segment> &targetSegmentList,
             float threshold = 0.9,
             int timeout = 60
     );
 
+    [[nodiscard]] bool founded() const;
 
     std::unique_ptr<ImageClicker> _createChain(
             const std::vector<std::unique_ptr<Until>> &clickUntilList,
@@ -55,10 +58,9 @@ public:
 
     std::unique_ptr<ImageClicker> _execute(
             const std::string &name,
-            const std::function<bool(std::unique_ptr<Segment>)> &executor,
+            const std::function<bool()> &executor,
             float startWait,
             float finishWait,
-            const Selector &selector,
             const std::vector<std::unique_ptr<Until>> &startUntilList,
             const std::vector<std::unique_ptr<Until>> &clickUntilList,
             const std::vector<std::unique_ptr<Until>> &runUntilList
@@ -69,7 +71,6 @@ public:
             const std::vector<std::unique_ptr<Until>> &clickUntilList = {},
             const std::vector<std::unique_ptr<Until>> &runUntilList = {},
             const Selector &selector = similarity_selector,
-            float threshold = -1,
             float startWait = 0,
             float finishWait = 0
     );
@@ -79,7 +80,6 @@ public:
             const std::vector<std::unique_ptr<Until>> &clickUntilList = {},
             const std::vector<std::unique_ptr<Until>> &runUntilList = {},
             const Selector &selector = similarity_selector,
-            float threshold = -1,
             float startWait = 0,
             float finishWait = 0
     );
@@ -88,7 +88,6 @@ public:
             const std::vector<std::unique_ptr<Until>> &startUntilList = {},
             const std::vector<std::unique_ptr<Until>> &runUntilList = {},
             const Selector &selector = similarity_selector,
-            float threshold = -1,
             float startWait = 0,
             float finishWait = 0
     );

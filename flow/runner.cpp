@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <chrono>
 #include <thread>
+#include <utility>
 
 #include "../state.h"
 #include "cv.h"
@@ -12,42 +13,38 @@
 #include "segment.h"
 
 ImageClicker::ImageClicker(
-        std::string templatePath,
+        const std::string &imgPath,
         float threshold,
         int timeout,
-        const std::vector<Segment> &targetSegmentList
-) : templatePath(std::move(templatePath)),
+        const std::string &mode
+) : templatePath(imgPath),
     globalThreshold(threshold),
-    globalTimeout(timeout),
-    targetSegmentList(targetSegmentList) {
-    previousSegment = nullptr;
+    globalTimeout(timeout) {
+
+    targetSegmentList = CV::find_positions(CV::get_screen(mode), imgPath, globalThreshold, mode);
 }
 
 ImageClicker::ImageClicker(
+        std::string imgPath,
         const Segment &segment,
         float threshold,
         int timeout
-) : templatePath(segment.path),
+) : templatePath(std::move(imgPath)),
     globalThreshold(threshold),
     globalTimeout(timeout) {
+
     targetSegmentList.push_back(segment);
-    previousSegment = nullptr;
 }
 
 ImageClicker::ImageClicker(
+        std::string imgPath,
         const std::vector<Segment> &targetSegmentList,
         float threshold,
         int timeout
-) : globalThreshold(threshold),
+) : templatePath(std::move(imgPath)),
+    globalThreshold(threshold),
     globalTimeout(timeout),
-    targetSegmentList(targetSegmentList) {
-    if (targetSegmentList.empty()) {
-        emit SignalEmitter::instance()->logMessage(
-                QString::fromStdString("ImageClicker初始化失败: targetSegmentList为空"));
-    }
-    templatePath = targetSegmentList[0].path;
-    previousSegment = nullptr;
-}
+    targetSegmentList(targetSegmentList) {}
 
 std::unique_ptr<ImageClicker> ImageClicker::_createChain(
         const std::vector<std::unique_ptr<Until>> &clickUntilList,
@@ -67,13 +64,16 @@ std::unique_ptr<ImageClicker> ImageClicker::_createChain(
 
     return std::make_unique<ImageClicker>(
             until->imgPath,
+            until->targetSegmentList,
             globalThreshold,
-            globalTimeout,
-            until->targetSegmentList
+            globalTimeout
     );
 }
 
-void ImageClicker::_start(float startWait, const std::vector<std::unique_ptr<Until>> &startUntilList) {
+void ImageClicker::_start(
+        float startWait,
+        const std::vector<std::unique_ptr<Until>> &startUntilList
+) {
     if (startWait > 0) {
         std::this_thread::sleep_for(std::chrono::duration<float>(startWait));
     }
@@ -86,13 +86,11 @@ void ImageClicker::_start(float startWait, const std::vector<std::unique_ptr<Unt
     }
 }
 
-void
-ImageClicker::_click(std::unique_ptr<Segment> position, const std::vector<std::unique_ptr<Until>> &clickUntilList) {
+void ImageClicker::_click(
+        std::unique_ptr<Segment> position,
+        const std::vector<std::unique_ptr<Until>> &clickUntilList
+) {
     auto start = std::chrono::high_resolution_clock::now();
-
-    if (!previousSegment) {
-        previousSegment = std::make_unique<Segment>(position->copy());
-    }
 
     while (!state.stopFlag.load()) {
         emit SignalEmitter::instance()->logMessage(QString::fromStdString("开始循环点击: " + position->toString()));
@@ -127,7 +125,9 @@ ImageClicker::_click(std::unique_ptr<Segment> position, const std::vector<std::u
     }
 }
 
-void ImageClicker::_finish(float finishWait, const std::vector<std::unique_ptr<Until>> &runUntilList) {
+void ImageClicker::_finish(
+        float finishWait, const std::vector<std::unique_ptr<Until>> &runUntilList
+) {
     if (finishWait > 0) {
         std::this_thread::sleep_for(std::chrono::duration<float>(finishWait));
     }
@@ -141,28 +141,18 @@ void ImageClicker::_finish(float finishWait, const std::vector<std::unique_ptr<U
 
 std::unique_ptr<ImageClicker> ImageClicker::_execute(
         const std::string &name,
-        const std::function<bool(std::unique_ptr<Segment>)> &executor,
+        const std::function<bool()> &executor,
         float startWait,
         float finishWait,
-        const Selector &selector,
         const std::vector<std::unique_ptr<Until>> &startUntilList,
         const std::vector<std::unique_ptr<Until>> &clickUntilList,
         const std::vector<std::unique_ptr<Until>> &runUntilList
 ) {
     emit SignalEmitter::instance()->logMessage(QString::fromStdString(this->toString() + "开始" + name + "流程"));
 
-    std::unique_ptr<Segment> position;
-
-    if (!targetSegmentList.empty()) {
-        auto segment = selector(targetSegmentList);
-
-        previousSegment = std::make_unique<Segment>(segment.copy());
-        position = std::make_unique<Segment>(segment.copy());
-    }
-
     _start(startWait, startUntilList);
 
-    bool skipFinish = executor(std::move(position));
+    bool skipFinish = executor();
 
     if (!skipFinish) {
         _finish(finishWait, runUntilList);
@@ -182,43 +172,19 @@ std::unique_ptr<ImageClicker> ImageClicker::click(
         const std::vector<std::unique_ptr<Until>> &clickUntilList,
         const std::vector<std::unique_ptr<Until>> &runUntilList,
         const Selector &selector,
-        float threshold,
         float startWait,
         float finishWait
 ) {
-    auto executor = [this, &threshold, &selector, &clickUntilList](std::unique_ptr<Segment> position) -> bool {
-        if (!position) {
-            std::vector<Segment> positions;
-            auto start = std::chrono::high_resolution_clock::now();
-
-            while (positions.empty() and !state.stopFlag.load()) {
-                auto now = std::chrono::high_resolution_clock::now();
-
-                if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count() > globalTimeout) {
-                    throw std::runtime_error("超时，结束运行: " + this->toString());
-                }
-
-                positions = CV::find_positions(
-                        CV::get_screen(),
-                        templatePath,
-                        threshold > 0 ? threshold : this->globalThreshold
-                );
-
-                if (positions.empty()) {
-                    std::this_thread::sleep_for(std::chrono::duration<float>(0.1));
-                    emit SignalEmitter::instance()->logMessage(
-                            QString::fromStdString(this->toString() + "匹配失败，再次尝试"));
-                }
-            }
-
-            position = std::make_unique<Segment>(selector(positions));
+    auto executor = [this, &selector, &clickUntilList]() -> bool {
+        if (targetSegmentList.empty()) {
+            throw std::runtime_error("图片列表为空: " + this->templatePath);
         }
 
-        if (!position) {
-            throw std::runtime_error("未匹配到图片: " + this->templatePath);
-        }
+        auto segment = selector(targetSegmentList);
 
-        _click(std::move(position), clickUntilList);
+        previousSegment = std::make_unique<Segment>(segment.copy());
+
+        _click(std::make_unique<Segment>(segment.copy()), clickUntilList);
 
         return false;
     };
@@ -228,7 +194,6 @@ std::unique_ptr<ImageClicker> ImageClicker::click(
             executor,
             startWait,
             finishWait,
-            selector,
             startUntilList,
             clickUntilList,
             runUntilList
@@ -240,31 +205,21 @@ std::unique_ptr<ImageClicker> ImageClicker::clickIfFound(
         const std::vector<std::unique_ptr<Until>> &clickUntilList,
         const std::vector<std::unique_ptr<Until>> &runUntilList,
         const Selector &selector,
-        float threshold,
         float startWait,
         float finishWait
 ) {
-    auto executor = [this, &threshold, &selector, &clickUntilList](std::unique_ptr<Segment> position) -> bool {
-        std::vector<Segment> positions;
-
-        if (!position) {
-            positions = CV::find_positions(
-                    CV::get_screen(),
-                    templatePath,
-                    threshold > 0 ? threshold : this->globalThreshold
-            );
-
-            if (!positions.empty()) {
-                position = std::make_unique<Segment>(selector(positions));
-            }
-        }
-
-        if (position) {
-            _click(std::move(position), clickUntilList);
-            return false;
-        } else {
+    auto executor = [this, &selector, &clickUntilList]() -> bool {
+        if (targetSegmentList.empty()) {
             return true;
         }
+
+        auto segment = selector(targetSegmentList);
+
+        previousSegment = std::make_unique<Segment>(segment.copy());
+
+        _click(std::make_unique<Segment>(segment.copy()), clickUntilList);
+
+        return false;
     };
 
     return _execute(
@@ -272,7 +227,6 @@ std::unique_ptr<ImageClicker> ImageClicker::clickIfFound(
             executor,
             startWait,
             finishWait,
-            selector,
             startUntilList,
             clickUntilList,
             runUntilList
@@ -283,33 +237,22 @@ std::unique_ptr<ImageClicker> ImageClicker::locate(
         const std::vector<std::unique_ptr<Until>> &startUntilList,
         const std::vector<std::unique_ptr<Until>> &runUntilList,
         const Selector &selector,
-        float threshold,
         float startWait,
         float finishWait
 ) {
-    auto executor = [this, &selector, &threshold](std::unique_ptr<Segment> position) -> bool {
-        if (!position) {
-            std::vector<Segment> positions = CV::find_positions(
-                    CV::get_screen(),
-                    templatePath,
-                    threshold > 0 ? threshold : this->globalThreshold
-            );
-
-            if (!positions.empty()) {
-                position = std::make_unique<Segment>(selector(positions));
-            }
+    auto executor = [this, &selector]() -> bool {
+        if (targetSegmentList.empty()) {
+            throw std::runtime_error("图片列表为空: " + this->templatePath);
         }
 
-        if (!position) {
-            throw std::runtime_error("未匹配到图片: " + this->templatePath);
-        }
+        auto segment = selector(targetSegmentList);
+
+        previousSegment = std::make_unique<Segment>(segment.copy());
 
         emit SignalEmitter::instance()->logMessage(
-            QString::fromStdString(this->toString() + "定位成功: " + position->toString()));
+            QString::fromStdString(this->toString() + "定位成功: " + segment.toString()
+            ));
 
-        if (!previousSegment) {
-            previousSegment = std::move(position);
-        }
         return false;
     };
 
@@ -318,7 +261,6 @@ std::unique_ptr<ImageClicker> ImageClicker::locate(
             executor,
             startWait,
             finishWait,
-            selector,
             startUntilList,
             {},
             runUntilList
@@ -330,4 +272,8 @@ std::string ImageClicker::toString() const {
         return "无";
     }
     return "[" + std::filesystem::path(templatePath).stem().string() + "]";
+}
+
+bool ImageClicker::founded() const {
+    return !targetSegmentList.empty();
 }

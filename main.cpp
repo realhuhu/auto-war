@@ -35,7 +35,6 @@ public:
             : QWidget(parent) {
         auto *layout = new QHBoxLayout(this);
         layout->setSpacing(0);
-        layout->setContentsMargins(0, 0, 0, 0);
 
         // 创建文字按钮
         textButton = new QPushButton(text);
@@ -331,8 +330,7 @@ void MainWindow::set_command(const QString &command) {
 
     // 创建复选框布局
     auto *checkboxLayout = new QGridLayout();
-    checkboxLayout->setSpacing(10);
-    checkboxLayout->setContentsMargins(10, 10, 10, 10);
+    checkboxLayout->setSpacing(5);
 
     // 获取复选框配置
     QJsonArray checkboxArray = commandConfig["checkbox"].toArray();
@@ -360,6 +358,7 @@ void MainWindow::set_command(const QString &command) {
 
         auto *checkBox = new QCheckBox(text);
         checkBox->setChecked(value);
+
         checkboxLayout->addWidget(checkBox, row, col);
 
         col++;
@@ -382,8 +381,7 @@ void MainWindow::set_command(const QString &command) {
 
     // 创建输入框布局
     auto *inputLayout = new QGridLayout();
-    inputLayout->setSpacing(10);
-    inputLayout->setContentsMargins(10, 10, 10, 10);
+    inputLayout->setSpacing(5);
 
     // 获取输入框配置
     QJsonArray inputArray = commandConfig["input"].toArray();
@@ -391,7 +389,6 @@ void MainWindow::set_command(const QString &command) {
 
     for (const auto &input: inputArray) {
         QJsonObject inputObj = input.toObject();
-
         inputItems.emplace_back(
                 inputObj["order"].toInt(),
                 inputObj["text"].toString(),
@@ -414,6 +411,12 @@ void MainWindow::set_command(const QString &command) {
         auto *spinBox = new QSpinBox();
         spinBox->setValue(value);
         spinBox->setMinimum(1);  // 设置最小值
+        spinBox->setMinimumWidth(100);  // 设置最小值
+
+        // 设置大小策略，防止控件撑大窗口
+        label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        spinBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
         inputLayout->addWidget(label, row, col);
         inputLayout->addWidget(spinBox, row, col + 1);
 
@@ -432,7 +435,6 @@ void MainWindow::set_command(const QString &command) {
             row++;
         }
     }
-
     mainLayout->addLayout(inputLayout);
 
     // 添加提示文本
