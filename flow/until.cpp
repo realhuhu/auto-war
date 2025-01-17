@@ -5,6 +5,7 @@
 #include <thread>
 #include <stdexcept>
 #include <algorithm>
+#include <utility>
 
 
 #include "../state.h"
@@ -249,4 +250,21 @@ bool UntilImageStable::flag(std::unique_ptr<Segment> &previous) {
 
 std::string UntilImageStable::toString() const {
     return "[等待图片稳定 " + std::filesystem::path(imgPath).stem().string() + "]";
+}
+
+
+void UntilIfImage::loop(std::unique_ptr<Segment> &previous, int globalTimeout) {
+    bool fulfilled = this->fulfilled(previous);
+}
+
+std::string UntilIfImage::toString() const {
+    return "[尝试等待图片 " + std::filesystem::path(imgPath).stem().string() + "]";
+}
+
+void UntilIfAnyImage::loop(std::unique_ptr<Segment> &previous, int globalTimeout) {
+    bool fulfilled = this->fulfilled(previous);
+}
+
+std::string UntilIfAnyImage::toString() const {
+    return "[尝试等待任意图片 " + std::filesystem::path(imgPath).stem().string() + "]";
 }

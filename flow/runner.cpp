@@ -23,6 +23,32 @@ ImageClicker::ImageClicker(
     previousSegment = nullptr;
 }
 
+ImageClicker::ImageClicker(
+        const Segment &segment,
+        float threshold,
+        int timeout
+) : templatePath(segment.path),
+    globalThreshold(threshold),
+    globalTimeout(timeout) {
+    targetSegmentList.push_back(segment);
+    previousSegment = nullptr;
+}
+
+ImageClicker::ImageClicker(
+        const std::vector<Segment> &targetSegmentList,
+        float threshold,
+        int timeout
+) : globalThreshold(threshold),
+    globalTimeout(timeout),
+    targetSegmentList(targetSegmentList) {
+    if (targetSegmentList.empty()) {
+        emit SignalEmitter::instance()->logMessage(
+                QString::fromStdString("ImageClicker初始化失败: targetSegmentList为空"));
+    }
+    templatePath = targetSegmentList[0].path;
+    previousSegment = nullptr;
+}
+
 std::unique_ptr<ImageClicker> ImageClicker::_createChain(
         const std::vector<std::unique_ptr<Until>> &clickUntilList,
         const std::vector<std::unique_ptr<Until>> &runUntilList

@@ -1,4 +1,11 @@
 .idea
-dist
 cmake-build-debug
-qt.exe
+Qt5Core.dll
+plugins
+
+dist/*.dll
+dist/plugins
+dist/enigma.evb
+dist/setup.iss
+dist/qt.exe
+

@@ -29,6 +29,19 @@ public:
             const std::vector<Segment> &targetSegmentList = {}
     );
 
+    explicit ImageClicker(
+            const Segment &segment,
+            float threshold = 0.9,
+            int timeout = 60
+    );
+
+    explicit ImageClicker(
+            const std::vector<Segment> &targetSegmentList = {},
+            float threshold = 0.9,
+            int timeout = 60
+    );
+
+
     std::unique_ptr<ImageClicker> _createChain(
             const std::vector<std::unique_ptr<Until>> &clickUntilList,
             const std::vector<std::unique_ptr<Until>> &runUntilList

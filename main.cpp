@@ -2,19 +2,60 @@
 #include <Windows.h>
 #include <functional>
 
+#include <QIcon>
 #include <QDialog>
 #include <QThread>
 #include <QWidget>
 #include <QScreen>
 #include <QDateTime>
 #include <QTextEdit>
-#include <QVBoxLayout>
 #include <QPushButton>
+#include <QHBoxLayout>
+#include <QToolButton>
 #include <QApplication>
+
 
 #include "state.h"
 #include "task/task.h"
 #include "flow/emitter.h"
+
+
+
+class CustomCommandButton : public QWidget {
+Q_OBJECT
+public:
+    explicit CustomCommandButton(const QString& text, QWidget* parent = nullptr)
+            : QWidget(parent) {
+        auto *layout = new QHBoxLayout(this);
+        layout->setSpacing(0);
+        layout->setContentsMargins(0, 0, 0, 0);
+
+        // 创建文字按钮
+        textButton = new QPushButton(text);
+        textButton->setFixedHeight(25);
+
+        layout->addWidget(textButton);
+
+        // 创建设置按钮
+        settingButton = new QToolButton();
+        settingButton->setIcon(QIcon("ui/setting.png"));
+        settingButton->setIconSize(QSize(20, 20));
+        settingButton->setFixedHeight(25);
+
+
+        layout->addWidget(settingButton);
+
+        // 设置布局
+        setLayout(layout);
+    }
+
+    [[nodiscard]] QPushButton* getTextButton() const { return textButton; }
+    [[nodiscard]] QToolButton* getSettingButton() const { return settingButton; }
+
+private:
+    QPushButton *textButton;
+    QToolButton *settingButton;
+};
 
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     setWindowTitle("红警自动");
@@ -60,9 +101,11 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     command_options["国家争霸"] = country_arena;
     command_options["世界争霸"] = world_arena;
     command_options["国家战争"] = country_war;
+    command_options["公会任务"] = guild_building_task;
     commands = QStringList({
                                    "公会报名", "军备获取", "剿灭将领",
-                                   "国家争霸", "世界争霸", "国家战争"
+                                   "国家争霸", "世界争霸", "国家战争",
+                                   "公会任务"
                            });
 
     // 初始时不安装钩子
@@ -99,6 +142,9 @@ void MainWindow::onLogText(const QString &text, const QString &color) const {
 
 void MainWindow::onLogMessage(const QString &text, const QString &color) const {
     QDateTime currentDateTime = QDateTime::currentDateTime();
+    if (state.stopFlag.load()) {
+        return;
+    }
 
     // 提取时间部分
     QTime currentTime = currentDateTime.time();
@@ -197,19 +243,31 @@ void MainWindow::select_command() {
     auto *layout = new QVBoxLayout(&selectDialog);
 
     auto *commandLayout = new QGridLayout();
+    commandLayout->setSpacing(10);  // 设置布局间距为10
+
     int row = 0;
     int col = 0;
 
     // 确保命令选项的顺序
     for (const auto &command: commands) {
-        auto *btn = new QPushButton(command);
-        connect(btn, &QPushButton::clicked, [this, command, &selectDialog]() {
+        auto *customBtn = new CustomCommandButton(command);
+
+        // 连接文字按钮的点击事件
+        connect(customBtn->getTextButton(), &QPushButton::clicked, [this, command, &selectDialog]() {
             selectDialog.accept();
             run_command(command);
         });
-        commandLayout->addWidget(btn, row, col);
-        col++;
-        if (col >= 3) {  // 每行最多3个按钮
+
+        // 连接设置按钮的点击事件
+        connect(customBtn->getSettingButton(), &QToolButton::clicked, [this, command]() {
+            set_command(command);
+        });
+
+        customBtn->getTextButton()->setAutoDefault(false);
+        commandLayout->addWidget(customBtn, row, col);
+
+        col += 1;
+        if (col >= 3) {  // 每行最多3个按钮组
             col = 0;
             row++;
         }
@@ -218,7 +276,7 @@ void MainWindow::select_command() {
     layout->addLayout(commandLayout);
 
     if (selectDialog.exec() == QDialog::Accepted) {
-//        onLogText("开始运行", "red");
+        //        onLogText("开始运行", "red");
     }
 }
 
@@ -260,6 +318,17 @@ LRESULT CALLBACK MainWindow::MouseHookProc(int nCode, WPARAM wParam, LPARAM lPar
     return CallNextHookEx(nullptr, nCode, wParam, lParam);
 }
 
+void MainWindow::set_command(const QString &command) {
+    QDialog settingDialog(this);
+    settingDialog.setWindowTitle("设置" + command);
+    settingDialog.resize(300, 200);
+
+//    auto *layout = new QVBoxLayout(&settingDialog);
+//    auto *label = new QLabel(command);
+//    layout->addWidget(label);
+
+    settingDialog.exec();
+}
 
 int main(int argc, char *argv[]) {
     qRegisterMetaType<QTextCursor>("QTextCursor");
@@ -268,3 +337,5 @@ int main(int argc, char *argv[]) {
     window.show();/**/
     return QApplication::exec();
 }
+
+#include "main.moc"

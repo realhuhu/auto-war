@@ -20,10 +20,17 @@ void clear_until(
 );
 
 void guild_war();
+
 void country_war();
+
 void country_arena();
+
 void world_arena();
+
 void arms_compound();
+
 void exterminate_enemy();
+
+void guild_building_task();
 
 #endif // QT_TASK_H

@@ -42,11 +42,14 @@ private slots:
 
     void run_command(const QString &command);
 
+    void set_command(const QString &command);
+
     void stop_command();
 
     void select_command();
 
     void clear_text();
+
 
     static LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam);
 

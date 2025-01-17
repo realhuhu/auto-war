@@ -36,12 +36,19 @@ public:
             std::string mode = "gray"
     );
 
-    void loop(std::unique_ptr<Segment> &previous, int globalTimeout);
+    virtual void loop(std::unique_ptr<Segment> &previous, int globalTimeout);
+
     bool fulfilled(std::unique_ptr<Segment> &previous);
-    [[nodiscard]] std::vector<Segment> filter(const std::vector<Segment> &positions, std::unique_ptr<Segment> &previous) const;
+
+    [[nodiscard]] std::vector<Segment>
+    filter(const std::vector<Segment> &positions, std::unique_ptr<Segment> &previous) const;
+
     Until operator~();
+
     virtual void pre_hook(std::unique_ptr<Segment> &previous);
+
     virtual bool flag(std::unique_ptr<Segment> &previous);
+
     [[nodiscard]] virtual std::string toString() const;
 };
 
@@ -59,6 +66,7 @@ public:
     );
 
     bool flag(std::unique_ptr<Segment> &previous) override;
+
     [[nodiscard]] std::string toString() const override;
 };
 
@@ -78,6 +86,7 @@ public:
     );
 
     bool flag(std::unique_ptr<Segment> &previous) override;
+
     [[nodiscard]] std::string toString() const override;
 };
 
@@ -97,8 +106,24 @@ public:
     );
 
     void pre_hook(std::unique_ptr<Segment> &previous) override;
+
     bool flag(std::unique_ptr<Segment> &previous) override;
+
     [[nodiscard]] std::string toString() const override;
+};
+
+class UntilIfImage : public UntilImage {
+public:
+    [[nodiscard]] std::string toString() const override;
+
+    void loop(std::unique_ptr<Segment> &previous, int globalTimeout) override;
+};
+
+class UntilIfAnyImage : public UntilAnyImage {
+public:
+    [[nodiscard]] std::string toString() const override;
+
+    void loop(std::unique_ptr<Segment> &previous, int globalTimeout) override;
 };
 
 #endif // QT_UNTIL_H
