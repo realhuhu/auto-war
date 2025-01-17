@@ -3,28 +3,35 @@
 #include <functional>
 
 #include <QIcon>
+#include <QFile>
+#include <QLabel>
 #include <QDialog>
 #include <QThread>
 #include <QWidget>
 #include <QScreen>
+#include <QSpinBox>
+#include <QCheckBox>
 #include <QDateTime>
 #include <QTextEdit>
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QToolButton>
 #include <QApplication>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 
 #include "state.h"
 #include "task/task.h"
 #include "flow/emitter.h"
 
-
+auto configFile = "config.json";
 
 class CustomCommandButton : public QWidget {
 Q_OBJECT
 public:
-    explicit CustomCommandButton(const QString& text, QWidget* parent = nullptr)
+    explicit CustomCommandButton(const QString &text, bool showSettingButton = true, QWidget *parent = nullptr)
             : QWidget(parent) {
         auto *layout = new QHBoxLayout(this);
         layout->setSpacing(0);
@@ -33,24 +40,30 @@ public:
         // 创建文字按钮
         textButton = new QPushButton(text);
         textButton->setFixedHeight(25);
+        textButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
         layout->addWidget(textButton);
 
-        // 创建设置按钮
-        settingButton = new QToolButton();
-        settingButton->setIcon(QIcon("ui/setting.png"));
-        settingButton->setIconSize(QSize(20, 20));
-        settingButton->setFixedHeight(25);
+        // 根据参数决定是否创建和添加设置按钮
+        if (showSettingButton) {
+            settingButton = new QToolButton();
+            settingButton->setIcon(QIcon("ui/setting.png"));
+            settingButton->setIconSize(QSize(20, 20));
+            settingButton->setFixedHeight(25);
+            settingButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-
-        layout->addWidget(settingButton);
+            layout->addWidget(settingButton);
+        } else {
+            settingButton = nullptr;
+        }
 
         // 设置布局
         setLayout(layout);
     }
 
-    [[nodiscard]] QPushButton* getTextButton() const { return textButton; }
-    [[nodiscard]] QToolButton* getSettingButton() const { return settingButton; }
+    [[nodiscard]] QPushButton *getTextButton() const { return textButton; }
+
+    [[nodiscard]] QToolButton *getSettingButton() const { return settingButton; }
 
 private:
     QPushButton *textButton;
@@ -117,6 +130,19 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     // 连接日志信号和槽函数
     connect(this, &MainWindow::logMessage, this, &MainWindow::onLogMessage);
     connect(SignalEmitter::instance(), &SignalEmitter::logMessage, this, &MainWindow::onLogMessage);
+
+
+    QFile file(configFile);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        onLogText("无法打开配置文件: config.json");
+    } else {
+        auto jsonData = file.readAll();
+        auto doc = QJsonDocument::fromJson(jsonData);
+        config = doc.object();
+        file.close();
+    }
+
+
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -243,14 +269,20 @@ void MainWindow::select_command() {
     auto *layout = new QVBoxLayout(&selectDialog);
 
     auto *commandLayout = new QGridLayout();
-    commandLayout->setSpacing(10);  // 设置布局间距为10
+    commandLayout->setSpacing(5);  // 设置布局间距为10
+
+    // 设置每列的最小宽度
+    for (int i = 0; i < 3; ++i) {
+        commandLayout->setColumnMinimumWidth(i, 100);  // 设置每列的最小宽度为100
+        commandLayout->setColumnStretch(i, 1);  // 设置每列的伸缩比例为1
+    }
 
     int row = 0;
     int col = 0;
 
     // 确保命令选项的顺序
     for (const auto &command: commands) {
-        auto *customBtn = new CustomCommandButton(command);
+        auto *customBtn = new CustomCommandButton(command, config.contains(command));
 
         // 连接文字按钮的点击事件
         connect(customBtn->getTextButton(), &QPushButton::clicked, [this, command, &selectDialog]() {
@@ -263,7 +295,12 @@ void MainWindow::select_command() {
             set_command(command);
         });
 
+        // 取消按钮的默认选中状态
         customBtn->getTextButton()->setAutoDefault(false);
+
+        // 设置 CustomCommandButton 的大小策略
+        customBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
         commandLayout->addWidget(customBtn, row, col);
 
         col += 1;
@@ -278,6 +315,192 @@ void MainWindow::select_command() {
     if (selectDialog.exec() == QDialog::Accepted) {
         //        onLogText("开始运行", "red");
     }
+}
+
+
+void MainWindow::set_command(const QString &command) {
+    QDialog settingDialog(this);
+    settingDialog.setWindowTitle("设置 " + command);
+    settingDialog.resize(300, 200);
+
+    // 获取命令对应的配置
+    QJsonObject commandConfig = config[command].toObject();
+
+    // 创建主布局
+    auto *mainLayout = new QVBoxLayout(&settingDialog);
+
+    // 创建复选框布局
+    auto *checkboxLayout = new QGridLayout();
+    checkboxLayout->setSpacing(10);
+    checkboxLayout->setContentsMargins(10, 10, 10, 10);
+
+    // 获取复选框配置
+    QJsonArray checkboxArray = commandConfig["checkbox"].toArray();
+    std::vector<std::tuple<int, QString, bool>> checkboxItems;
+
+    for (const auto &checkbox: checkboxArray) {
+        QJsonObject checkboxObj = checkbox.toObject();
+        checkboxItems.emplace_back(
+                checkboxObj["order"].toInt(),
+                checkboxObj["text"].toString(),
+                checkboxObj["value"].toBool()
+        );
+    }
+
+    // 按 order 排序
+    std::sort(checkboxItems.begin(), checkboxItems.end(), [](const auto &a, const auto &b) {
+        return std::get<0>(a) < std::get<0>(b);
+    });
+
+    int row = 0, col = 0;
+    for (const auto &item: checkboxItems) {
+        int order = std::get<0>(item);
+        QString text = std::get<1>(item);
+        bool value = std::get<2>(item);
+
+        auto *checkBox = new QCheckBox(text);
+        checkBox->setChecked(value);
+        checkboxLayout->addWidget(checkBox, row, col);
+
+        col++;
+        if (col >= 3) {
+            col = 0;
+            row++;
+        }
+
+        connect(checkBox, &QCheckBox::toggled, [&checkboxItems, order, text](bool checked) {
+            for (auto &item: checkboxItems) {
+                if (std::get<0>(item) == order && std::get<1>(item) == text) {
+                    std::get<2>(item) = checked;
+                    break;
+                }
+            }
+        });
+    }
+
+    mainLayout->addLayout(checkboxLayout);
+
+    // 创建输入框布局
+    auto *inputLayout = new QGridLayout();
+    inputLayout->setSpacing(10);
+    inputLayout->setContentsMargins(10, 10, 10, 10);
+
+    // 获取输入框配置
+    QJsonArray inputArray = commandConfig["input"].toArray();
+    std::vector<std::tuple<int, QString, int>> inputItems;
+
+    for (const auto &input: inputArray) {
+        QJsonObject inputObj = input.toObject();
+
+        inputItems.emplace_back(
+                inputObj["order"].toInt(),
+                inputObj["text"].toString(),
+                inputObj["value"].toInt()
+        );
+    }
+
+    // 按 order 排序
+    std::sort(inputItems.begin(), inputItems.end(), [](const auto &a, const auto &b) {
+        return std::get<0>(a) < std::get<0>(b);
+    });
+
+    row = 0, col = 0;
+    for (const auto &item: inputItems) {
+        int order = std::get<0>(item);
+        QString text = std::get<1>(item);
+        int value = std::get<2>(item);
+
+        auto *label = new QLabel(text);
+        auto *spinBox = new QSpinBox();
+        spinBox->setValue(value);
+        spinBox->setMinimum(1);  // 设置最小值
+        inputLayout->addWidget(label, row, col);
+        inputLayout->addWidget(spinBox, row, col + 1);
+
+        connect(spinBox, QOverload<int>::of(&QSpinBox::valueChanged), [this, &inputItems, order, text](int newValue) {
+            for (auto &item: inputItems) {
+                if (std::get<0>(item) == order && std::get<1>(item) == text) {
+                    std::get<2>(item) = newValue;
+                    break;
+                }
+            }
+        });
+
+        col += 2;
+        if (col >= 4) {
+            col = 0;
+            row++;
+        }
+    }
+
+    mainLayout->addLayout(inputLayout);
+
+    // 添加提示文本
+    QString tips = commandConfig["tips"].toString();
+    auto *tipsLabel = new QLabel(tips);
+    tipsLabel->setWordWrap(true);
+    mainLayout->addWidget(tipsLabel);
+
+    // 创建保存按钮布局
+    auto *buttonLayout = new QHBoxLayout();
+    buttonLayout->addStretch();  // 添加伸缩空间，将按钮对齐到右侧
+    auto *saveButton = new QPushButton("保存");
+    buttonLayout->addWidget(saveButton);
+
+    mainLayout->addLayout(buttonLayout);
+
+    // 连接保存按钮的点击事件
+    connect(
+            saveButton,
+            &QPushButton::clicked,
+            [this, command, &checkboxItems, &inputItems, &settingDialog, commandConfig]() {
+
+                QJsonArray newCheckboxArray;
+                for (const auto &item: checkboxItems) {
+                    int order = std::get<0>(item);
+                    QString text = std::get<1>(item);
+                    bool value = std::get<2>(item);
+                    QJsonObject obj = {{"text",  text},
+                                       {"value", value},
+                                       {"order", order}};
+                    newCheckboxArray.append(obj);
+                }
+
+                QJsonArray newInputArray;
+                for (const auto &item: inputItems) {
+                    int order = std::get<0>(item);
+                    QString text = std::get<1>(item);
+                    int value = std::get<2>(item);
+                    QJsonObject obj = {{"text",  text},
+                                       {"value", value},
+                                       {"order", order}};
+                    newInputArray.append(obj);
+                }
+
+                QJsonObject newCommandConfig;
+                newCommandConfig["checkbox"] = newCheckboxArray;
+                newCommandConfig["input"] = newInputArray;
+                newCommandConfig["tips"] = commandConfig["tips"].toString();
+
+                config[command] = newCommandConfig;
+
+                // 将 config 写回 config.json 文件
+                QFile file("config.json");
+                if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                    QJsonDocument doc(config);
+                    file.write(doc.toJson());
+                    file.close();
+                    onLogText("配置保存成功", "blue");
+                } else {
+                    onLogText("配置保存失败");
+                }
+
+                // 关闭对话框
+                settingDialog.accept();
+            }
+    );
+
+    settingDialog.exec();
 }
 
 void MainWindow::clear_text() {
@@ -318,17 +541,6 @@ LRESULT CALLBACK MainWindow::MouseHookProc(int nCode, WPARAM wParam, LPARAM lPar
     return CallNextHookEx(nullptr, nCode, wParam, lParam);
 }
 
-void MainWindow::set_command(const QString &command) {
-    QDialog settingDialog(this);
-    settingDialog.setWindowTitle("设置" + command);
-    settingDialog.resize(300, 200);
-
-//    auto *layout = new QVBoxLayout(&settingDialog);
-//    auto *label = new QLabel(command);
-//    layout->addWidget(label);
-
-    settingDialog.exec();
-}
 
 int main(int argc, char *argv[]) {
     qRegisterMetaType<QTextCursor>("QTextCursor");

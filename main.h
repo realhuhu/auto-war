@@ -15,6 +15,7 @@
 #include <Windows.h>
 #include <QMap>
 #include <functional>
+#include <QJsonObject>
 
 #include "state.h"
 #include "task/task.h"
@@ -54,6 +55,7 @@ private slots:
     static LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam);
 
 private:
+    QJsonObject config;
     QStringList commands;
     QMap<QString, std::function<void()>> command_options;
     bool isWaitingForHwnd;

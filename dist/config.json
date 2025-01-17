@@ -1,0 +1,59 @@
+{
+    "剿灭将领": {
+        "checkbox": [
+            {
+                "order": 1,
+                "text": "紫色元",
+                "value": true
+            },
+            {
+                "order": 2,
+                "text": "紫色帜",
+                "value": true
+            },
+            {
+                "order": 3,
+                "text": "紫色番",
+                "value": true
+            },
+            {
+                "order": 4,
+                "text": "蓝色元",
+                "value": false
+            },
+            {
+                "order": 5,
+                "text": "蓝色帜",
+                "value": false
+            },
+            {
+                "order": 6,
+                "text": "蓝色番",
+                "value": false
+            },
+            {
+                "order": 7,
+                "text": "绿色元",
+                "value": false
+            },
+            {
+                "order": 8,
+                "text": "绿色帜",
+                "value": false
+            },
+            {
+                "order": 9,
+                "text": "绿色番",
+                "value": false
+            }
+        ],
+        "input": [
+            {
+                "order": 1,
+                "text": "轮次",
+                "value": 1
+            }
+        ],
+        "tips": "这是说明内容"
+    }
+}
