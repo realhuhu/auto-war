@@ -21,7 +21,7 @@ ImageClicker::ImageClicker(
     globalThreshold(threshold),
     globalTimeout(timeout) {
 
-    if(wait){
+    if (wait) {
         std::this_thread::sleep_for(std::chrono::duration<float>(wait));
     }
 
@@ -172,7 +172,7 @@ std::unique_ptr<ImageClicker> ImageClicker::_execute(
         const std::vector<std::unique_ptr<Until>> &clickUntilList,
         const std::vector<std::unique_ptr<Until>> &runUntilList
 ) {
-    emit Emitter::instance()->log(QString::fromStdString(this->toString() + "开始" + name + "流程"));
+    emit Emitter::instance()->log(QString::fromStdString(this->toString() + "开始" + name + "流程"), "green");
 
     _start(startWait, startUntilList);
 
@@ -184,7 +184,7 @@ std::unique_ptr<ImageClicker> ImageClicker::_execute(
 
     auto clicker = _createChain(clickUntilList, runUntilList);
 
-    emit Emitter::instance()->log(QString::fromStdString(this->toString() + "结束" + name + "流程"));
+    emit Emitter::instance()->log(QString::fromStdString(this->toString() + "结束" + name + "流程"), "green");
     emit Emitter::instance()->log(QString::fromStdString("下一调用链: " + (clicker ? clicker->toString() : "无")));
     return clicker;
 }

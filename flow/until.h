@@ -137,4 +137,11 @@ public:
     void loop(std::unique_ptr<Segment> &previous, int globalTimeout) override;
 };
 
+
+void clear_until(
+        std::vector<std::unique_ptr<Until>> &start_until,
+        std::vector<std::unique_ptr<Until>> &click_until,
+        std::vector<std::unique_ptr<Until>> &run_until
+);
+
 #endif // QT_UNTIL_H

@@ -22,14 +22,16 @@ add_executable(qt
         flow/until.cpp
         flow/runner.cpp
         flow/segment.cpp
-        task/task.h
-        task/task.cpp
+        task/battle.h
+        task/battle.cpp
         state.h
         state.cpp
         main.h
         main.cpp
         flow/emitter.h
         ico.o
+        task/daily.h
+        task/daily.cpp
 )
 
 target_link_libraries(qt ${OpenCV_LIBS})

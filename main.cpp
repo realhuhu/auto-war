@@ -20,11 +20,15 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QGroupBox>
 
 
 #include "state.h"
-#include "task/task.h"
+#include "task/battle.h"
+#include "task/daily.h"
 #include "flow/emitter.h"
+
+auto configFile = "config.json";
 
 float getScale() {
     MONITORINFOEX info = {};
@@ -37,12 +41,11 @@ float getScale() {
     return static_cast<float>(devmode.dmPelsWidth) / (info.rcMonitor.right - info.rcMonitor.left);
 }
 
-auto configFile = "config.json";
 
-class CustomCommandButton : public QWidget {
+class ButtonWithSetting : public QWidget {
 Q_OBJECT
 public:
-    explicit CustomCommandButton(const QString &text, bool showSettingButton = true, QWidget *parent = nullptr)
+    explicit ButtonWithSetting(const QString &text, bool showSettingButton = true, QWidget *parent = nullptr)
             : QWidget(parent) {
         auto *layout = new QHBoxLayout(this);
         layout->setSpacing(0);
@@ -59,7 +62,7 @@ public:
         if (showSettingButton) {
             settingButton = new QToolButton();
             settingButton->setIcon(QIcon("ui/setting.png"));
-            settingButton->setIconSize(QSize(20, 20));
+            settingButton->setIconSize(QSize(16, 16));
             settingButton->setFixedHeight(25);
             settingButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
@@ -79,6 +82,37 @@ public:
 private:
     QPushButton *textButton;
     QToolButton *settingButton;
+};
+
+
+class LabeledSpinBox : public QWidget {
+public:
+    LabeledSpinBox(const QString &text, int value, QWidget *parent = nullptr)
+            : QWidget(parent) {
+        auto *layout = new QHBoxLayout(this);
+        layout->setContentsMargins(0, 0, 0, 0);  // 移除外边距
+
+        label = new QLabel(text + ":");
+        spinBox = new QSpinBox();
+        spinBox->setValue(value);
+        spinBox->setMinimum(1);
+        spinBox->setFixedWidth(100);
+
+        label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        spinBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+        layout->addWidget(label);
+        layout->addWidget(spinBox);
+        layout->addStretch(1);
+    }
+
+    [[nodiscard]] QSpinBox *getSpinBox() const {
+        return spinBox;
+    }
+
+private:
+    QLabel *label;
+    QSpinBox *spinBox;
 };
 
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
@@ -119,18 +153,18 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     output_text->setReadOnly(true);
     mainLayout->addWidget(output_text);
 
-    command_options["公会报名"] = guild_war;
-    command_options["军备获取"] = arms_compound;
-    command_options["剿灭将领"] = exterminate_enemy;
-    command_options["国家争霸"] = country_arena;
-    command_options["世界争霸"] = world_arena;
-    command_options["国家战争"] = country_war;
-    command_options["公会任务"] = guild_building_task;
-    commands = QStringList({
-                                   "公会报名", "军备获取", "剿灭将领",
-                                   "国家争霸", "世界争霸", "国家战争",
-                                   "公会任务"
-                           });
+    tasks["公会报名"] = guild_war;
+    tasks["军备获取"] = arms_compound;
+    tasks["剿灭将领"] = exterminate_enemy;
+    tasks["国家争霸"] = country_arena;
+    tasks["世界争霸"] = world_arena;
+    tasks["国家战争"] = country_war;
+    tasks["公会任务"] = guild_building_task;
+    tasks["预设1"] = daily_task;
+    tasks["预设2"] = daily_task;
+    tasks["预设3"] = daily_task;
+    command_battle = QStringList({"公会报名", "军备获取", "剿灭将领", "国家争霸", "世界争霸", "国家战争"});
+    command_daily = QStringList({"预设1", "预设2", "预设3"});
 
     // 初始时不安装钩子
     hook = nullptr;
@@ -141,7 +175,6 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     // 连接日志信号和槽函数
     connect(this, &MainWindow::logMessage, this, &MainWindow::onLogMessage);
     connect(Emitter::instance(), &Emitter::log, this, &MainWindow::onLogMessage);
-
 
 
     onLogText(QString::fromStdString("当前缩放率: ") + QString::number(state.scale));
@@ -230,7 +263,7 @@ void MainWindow::run_command(const QString &command) {
     state.stopFlag.store(false);
     state.currentThread = new QThread(this);
 
-    auto func = command_options[command];
+    auto func = tasks[command];
     QObject::connect(state.currentThread, &QThread::started, [func, this]() {
         try {
             func();
@@ -280,21 +313,38 @@ void MainWindow::select_command() {
 
     auto *layout = new QVBoxLayout(&selectDialog);
 
-    auto *commandLayout = new QGridLayout();
-    commandLayout->setSpacing(5);  // 设置布局间距为10
+    auto style = R"(
+        QGroupBox {
+            border: 1px solid #888;
+            border-radius: 5px; /* 设置圆角 */
+            padding-top: 10px; /* 设置顶部内边距 */
+        }
+        QGroupBox::title {
+            border: 1px solid #888;
+            border-radius: 5px 1px 1px 1px; /* 设置圆角 */
+            padding: 2px;
+        }
+    )";
+
+    auto *battleGroupBox = new QGroupBox("自动战斗", &selectDialog);
+
+    battleGroupBox->setStyleSheet(style);
+
+    auto *battleLayout = new QGridLayout(battleGroupBox);
+    battleLayout->setSpacing(5);  // 设置布局间距为10
 
     // 设置每列的最小宽度
     for (int i = 0; i < 3; ++i) {
-        commandLayout->setColumnMinimumWidth(i, 100);  // 设置每列的最小宽度为100
-        commandLayout->setColumnStretch(i, 1);  // 设置每列的伸缩比例为1
+        battleLayout->setColumnMinimumWidth(i, 100);  // 设置每列的最小宽度为100
+        battleLayout->setColumnStretch(i, 1);  // 设置每列的伸缩比例为1
     }
 
     int row = 0;
     int col = 0;
 
     // 确保命令选项的顺序
-    for (const auto &command: commands) {
-        auto *customBtn = new CustomCommandButton(command, config.contains(command));
+    for (const auto &command: command_battle) {
+        auto *customBtn = new ButtonWithSetting(command, config.contains(command));
 
         // 连接文字按钮的点击事件
         connect(customBtn->getTextButton(), &QPushButton::clicked, [this, command, &selectDialog]() {
@@ -310,10 +360,10 @@ void MainWindow::select_command() {
         // 取消按钮的默认选中状态
         customBtn->getTextButton()->setAutoDefault(false);
 
-        // 设置 CustomCommandButton 的大小策略
+        // 设置 ButtonWithSetting 的大小策略
         customBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-        commandLayout->addWidget(customBtn, row, col);
+        battleLayout->addWidget(customBtn, row, col);
 
         col += 1;
         if (col >= 3) {  // 每行最多3个按钮组
@@ -322,7 +372,51 @@ void MainWindow::select_command() {
         }
     }
 
-    layout->addLayout(commandLayout);
+    auto *dailyGroupBox = new QGroupBox("一键杂项", &selectDialog);
+
+    dailyGroupBox->setStyleSheet(style);
+
+    auto *dailyLayout = new QGridLayout(dailyGroupBox);
+    dailyLayout->setSpacing(5);  // 设置布局间距为10
+
+    // 设置每列的最小宽度
+    for (int i = 0; i < 3; ++i) {
+        dailyLayout->setColumnMinimumWidth(i, 100);  // 设置每列的最小宽度为100
+        dailyLayout->setColumnStretch(i, 1);  // 设置每列的伸缩比例为1
+    }
+
+    // 确保命令选项的顺序
+    for (const auto &command: command_daily) {
+        auto *customBtn = new ButtonWithSetting(command, config.contains(command));
+
+        // 连接文字按钮的点击事件
+        connect(customBtn->getTextButton(), &QPushButton::clicked, [this, command, &selectDialog]() {
+            selectDialog.accept();
+            run_command(command);
+        });
+
+        // 连接设置按钮的点击事件
+        connect(customBtn->getSettingButton(), &QToolButton::clicked, [this, command]() {
+            set_command(command);
+        });
+
+        // 取消按钮的默认选中状态
+        customBtn->getTextButton()->setAutoDefault(false);
+
+        // 设置 ButtonWithSetting 的大小策略
+        customBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+        dailyLayout->addWidget(customBtn, row, col);
+
+        col += 1;
+        if (col >= 3) {  // 每行最多3个按钮组
+            col = 0;
+            row++;
+        }
+    }
+
+    layout->addWidget(battleGroupBox);
+    layout->addWidget(dailyGroupBox);
 
     if (selectDialog.exec() == QDialog::Accepted) {
         //        onLogText("开始运行", "red");
@@ -333,7 +427,7 @@ void MainWindow::select_command() {
 void MainWindow::set_command(const QString &command) {
     QDialog settingDialog(this);
     settingDialog.setWindowTitle("设置 " + command);
-    settingDialog.resize(300, 200);
+    settingDialog.setMinimumWidth(300);
 
     // 获取命令对应的配置
     QJsonObject commandConfig = config[command].toObject();
@@ -363,7 +457,6 @@ void MainWindow::set_command(const QString &command) {
         return std::get<0>(a) < std::get<0>(b);
     });
 
-    int row = 0, col = 0;
     for (const auto &item: checkboxItems) {
         int order = std::get<0>(item);
         QString text = std::get<1>(item);
@@ -372,13 +465,7 @@ void MainWindow::set_command(const QString &command) {
         auto *checkBox = new QCheckBox(text);
         checkBox->setChecked(value);
 
-        checkboxLayout->addWidget(checkBox, row, col);
-
-        col++;
-        if (col >= 3) {
-            col = 0;
-            row++;
-        }
+        checkboxLayout->addWidget(checkBox, std::floor(order / 3), order % 3);
 
         connect(checkBox, &QCheckBox::toggled, [&checkboxItems, order, text](bool checked) {
             for (auto &item: checkboxItems) {
@@ -394,7 +481,7 @@ void MainWindow::set_command(const QString &command) {
 
     // 创建输入框布局
     auto *inputLayout = new QGridLayout();
-    inputLayout->setSpacing(5);
+    inputLayout->setSpacing(10);
 
     // 获取输入框配置
     QJsonArray inputArray = commandConfig["input"].toArray();
@@ -414,40 +501,26 @@ void MainWindow::set_command(const QString &command) {
         return std::get<0>(a) < std::get<0>(b);
     });
 
-    row = 0, col = 0;
     for (const auto &item: inputItems) {
         int order = std::get<0>(item);
         QString text = std::get<1>(item);
         int value = std::get<2>(item);
 
-        auto *label = new QLabel(text);
-        auto *spinBox = new QSpinBox();
-        spinBox->setValue(value);
-        spinBox->setMinimum(1);  // 设置最小值
-        spinBox->setMinimumWidth(100);  // 设置最小值
+        auto *labeledSpinBox = new LabeledSpinBox(text, value);
 
-        // 设置大小策略，防止控件撑大窗口
-        label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        spinBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        inputLayout->addWidget(labeledSpinBox, std::floor(order / 2), 2 * (order % 3), 1, 2);
 
-        inputLayout->addWidget(label, row, col);
-        inputLayout->addWidget(spinBox, row, col + 1);
-
-        connect(spinBox, QOverload<int>::of(&QSpinBox::valueChanged), [this, &inputItems, order, text](int newValue) {
-            for (auto &item: inputItems) {
-                if (std::get<0>(item) == order && std::get<1>(item) == text) {
-                    std::get<2>(item) = newValue;
-                    break;
-                }
-            }
-        });
-
-        col += 2;
-        if (col >= 4) {
-            col = 0;
-            row++;
-        }
+        connect(labeledSpinBox->getSpinBox(), QOverload<int>::of(&QSpinBox::valueChanged),
+                [this, &inputItems, order, text](int newValue) {
+                    for (auto &item: inputItems) {
+                        if (std::get<0>(item) == order && std::get<1>(item) == text) {
+                            std::get<2>(item) = newValue;
+                            break;
+                        }
+                    }
+                });
     }
+
     mainLayout->addLayout(inputLayout);
 
     // 添加提示文本
@@ -459,7 +532,7 @@ void MainWindow::set_command(const QString &command) {
     // 创建保存按钮布局
     auto *buttonLayout = new QHBoxLayout();
     buttonLayout->addStretch();  // 添加伸缩空间，将按钮对齐到右侧
-    auto *saveButton = new QPushButton("保存");
+    auto *saveButton = new QPushButton("确定");
     buttonLayout->addWidget(saveButton);
 
     mainLayout->addLayout(buttonLayout);

@@ -74,26 +74,68 @@ std::vector<Segment> Until::filter(const std::vector<Segment> &positions, std::u
 
     emit Emitter::instance()->log(QString::fromStdString("筛选: on " + previous->toString() + " " + onPrevious));
 
-    for (const auto &position: positions) {
-        if (onPrevious == "left" && position.on(*previous, "vertical") == "left") {
+    if (onPrevious == "left") {
+        for (const auto &position: positions) {
+            if (!(position.on(*previous, "vertical") == "left")) continue;
             result.push_back(position);
-        } else if (onPrevious == "right" && position.on(*previous, "vertical") == "right") {
+        }
+    }else if(onPrevious == "right") {
+        for (const auto &position: positions) {
+            if (!(position.on(*previous, "vertical") == "right")) continue;
             result.push_back(position);
-        } else if (onPrevious == "top" && position.on(*previous, "horizontal") == "top") {
+        }
+    } if(onPrevious == "top") {
+        for (const auto &position: positions) {
+            if (!(position.on(*previous, "horizontal") == "top")) continue;
             result.push_back(position);
-        } else if (onPrevious == "top_center" && position.on(*previous, "horizontal") == "top" &&
-                   position.on(*previous, "vertical") == "center") {
+        }
+    } if(onPrevious == "down") {
+        for (const auto &position: positions) {
+            if (!(position.on(*previous, "horizontal") == "down")) continue;
             result.push_back(position);
-        } else if (onPrevious == "down" && position.on(*previous, "horizontal") == "down") {
+        }
+    } if(onPrevious == "top_center") {
+        for (const auto &position: positions) {
+            if (!(position.on(*previous, "horizontal") == "top")) continue;
+            if (!(position.on(*previous, "vertical") == "center")) continue;
             result.push_back(position);
-        } else if (onPrevious == "down_center" && position.on(*previous, "horizontal") == "down" &&
-                   position.on(*previous, "vertical") == "center") {
+        }
+    } if(onPrevious == "down_center") {
+        for (const auto &position: positions) {
+            if (!(position.on(*previous, "horizontal") == "down")) continue;
+            if (!(position.on(*previous, "vertical") == "center")) continue;
             result.push_back(position);
-        } else if (onPrevious == "inner" && position.on(*previous, "horizontal") == "center" &&
-                   position.on(*previous, "vertical") == "center") {
+        }
+    } if(onPrevious == "inner") {
+        for (const auto &position: positions) {
+            if (!(position.on(*previous, "horizontal") == "center")) continue;
+            if (!(position.on(*previous, "vertical") == "center")) continue;
             result.push_back(position);
         }
     }
+//    for (const auto &position: positions) {
+//        if (onPrevious == "left" && position.on(*previous, "vertical") == "left") {
+//            result.push_back(position);
+//        } else if (onPrevious == "right" && position.on(*previous, "vertical") == "right") {
+//            result.push_back(position);
+//        } else if (onPrevious == "top" && position.on(*previous, "horizontal") == "top") {
+//            result.push_back(position);
+//        } else if (
+//                onPrevious == "top_center"
+//                && position.on(*previous, "horizontal") == "top"
+//                && position.on(*previous, "vertical") == "center"
+//                ) {
+//            result.push_back(position);
+//        } else if (onPrevious == "down" && position.on(*previous, "horizontal") == "down") {
+//            result.push_back(position);
+//        } else if (onPrevious == "down_center" && position.on(*previous, "horizontal") == "down" &&
+//                   position.on(*previous, "vertical") == "center") {
+//            result.push_back(position);
+//        } else if (onPrevious == "inner" && position.on(*previous, "horizontal") == "center" &&
+//                   position.on(*previous, "vertical") == "center") {
+//            result.push_back(position);
+//        }
+//    }
     return result;
 }
 
@@ -277,4 +319,15 @@ void UntilIfAnyImage::loop(std::unique_ptr<Segment> &previous, int globalTimeout
 
 std::string UntilIfAnyImage::toString() const {
     return "[尝试等待任意图片 " + std::filesystem::path(imgPath).stem().string() + "]";
+}
+
+
+void clear_until(
+        std::vector<std::unique_ptr<Until>> &start_until,
+        std::vector<std::unique_ptr<Until>> &click_until,
+        std::vector<std::unique_ptr<Until>> &run_until
+) {
+    start_until.clear();
+    click_until.clear();
+    run_until.clear();
 }

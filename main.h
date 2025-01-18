@@ -18,7 +18,7 @@
 #include <QJsonObject>
 
 #include "state.h"
-#include "task/task.h"
+#include "task/battle.h"
 
 class MainWindow : public QWidget {
 Q_OBJECT
@@ -56,8 +56,9 @@ private slots:
 
 private:
     QJsonObject config;
-    QStringList commands;
-    QMap<QString, std::function<void()>> command_options;
+    QStringList command_battle;
+    QStringList command_daily;
+    QMap<QString, std::function<void()>> tasks;
     bool isWaitingForHwnd;
     HHOOK hook;
     QTextEdit *output_text;

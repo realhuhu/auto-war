@@ -1,6 +1,6 @@
 // task.h
-#ifndef QT_TASK_H
-#define QT_TASK_H
+#ifndef QT_BATTLE_H
+#define QT_BATTLE_H
 
 #include <vector>
 #include <memory>
@@ -12,12 +12,6 @@
 #include "../flow/until.h"
 #include "../flow/segment.h"
 #include "../flow/emitter.h"
-
-void clear_until(
-        std::vector<std::unique_ptr<Until>> &start_until,
-        std::vector<std::unique_ptr<Until>> &click_until,
-        std::vector<std::unique_ptr<Until>> &run_until
-);
 
 void guild_war();
 
@@ -31,6 +25,4 @@ void arms_compound();
 
 void exterminate_enemy();
 
-void guild_building_task();
-
-#endif // QT_TASK_H
+#endif // QT_BATTLE_H
