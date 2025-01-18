@@ -13,8 +13,6 @@
 #include "../flow/segment.h"
 #include "../flow/emitter.h"
 
-void guild_war();
-
 void country_war();
 
 void country_arena();

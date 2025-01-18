@@ -79,63 +79,46 @@ std::vector<Segment> Until::filter(const std::vector<Segment> &positions, std::u
             if (!(position.on(*previous, "vertical") == "left")) continue;
             result.push_back(position);
         }
-    }else if(onPrevious == "right") {
+    } else if (onPrevious == "right") {
         for (const auto &position: positions) {
             if (!(position.on(*previous, "vertical") == "right")) continue;
             result.push_back(position);
         }
-    } if(onPrevious == "top") {
+    }
+    if (onPrevious == "top") {
         for (const auto &position: positions) {
             if (!(position.on(*previous, "horizontal") == "top")) continue;
             result.push_back(position);
         }
-    } if(onPrevious == "down") {
+    }
+    if (onPrevious == "down") {
         for (const auto &position: positions) {
             if (!(position.on(*previous, "horizontal") == "down")) continue;
             result.push_back(position);
         }
-    } if(onPrevious == "top_center") {
+    }
+    if (onPrevious == "top_center") {
         for (const auto &position: positions) {
             if (!(position.on(*previous, "horizontal") == "top")) continue;
             if (!(position.on(*previous, "vertical") == "center")) continue;
             result.push_back(position);
         }
-    } if(onPrevious == "down_center") {
+    }
+    if (onPrevious == "down_center") {
         for (const auto &position: positions) {
             if (!(position.on(*previous, "horizontal") == "down")) continue;
             if (!(position.on(*previous, "vertical") == "center")) continue;
             result.push_back(position);
         }
-    } if(onPrevious == "inner") {
+    }
+    if (onPrevious == "inner") {
         for (const auto &position: positions) {
             if (!(position.on(*previous, "horizontal") == "center")) continue;
             if (!(position.on(*previous, "vertical") == "center")) continue;
             result.push_back(position);
         }
     }
-//    for (const auto &position: positions) {
-//        if (onPrevious == "left" && position.on(*previous, "vertical") == "left") {
-//            result.push_back(position);
-//        } else if (onPrevious == "right" && position.on(*previous, "vertical") == "right") {
-//            result.push_back(position);
-//        } else if (onPrevious == "top" && position.on(*previous, "horizontal") == "top") {
-//            result.push_back(position);
-//        } else if (
-//                onPrevious == "top_center"
-//                && position.on(*previous, "horizontal") == "top"
-//                && position.on(*previous, "vertical") == "center"
-//                ) {
-//            result.push_back(position);
-//        } else if (onPrevious == "down" && position.on(*previous, "horizontal") == "down") {
-//            result.push_back(position);
-//        } else if (onPrevious == "down_center" && position.on(*previous, "horizontal") == "down" &&
-//                   position.on(*previous, "vertical") == "center") {
-//            result.push_back(position);
-//        } else if (onPrevious == "inner" && position.on(*previous, "horizontal") == "center" &&
-//                   position.on(*previous, "vertical") == "center") {
-//            result.push_back(position);
-//        }
-//    }
+
     return result;
 }
 
@@ -294,6 +277,16 @@ std::string UntilImageStable::toString() const {
 }
 
 
+UntilIfImage::UntilIfImage(
+        const std::string &imgPath,
+        const std::string &onPrevious,
+        bool reverse, std::string mode,
+        double finishWait,
+        double threshold,
+        double interval,
+        double timeout
+) : UntilImage(imgPath, onPrevious, reverse, std::move(mode), finishWait, threshold, interval, timeout) {}
+
 void UntilIfImage::loop(std::unique_ptr<Segment> &previous, int globalTimeout) {
     this->fulfilled(previous);
 }
@@ -301,6 +294,7 @@ void UntilIfImage::loop(std::unique_ptr<Segment> &previous, int globalTimeout) {
 std::string UntilIfImage::toString() const {
     return "[尝试等待图片 " + std::filesystem::path(imgPath).stem().string() + "]";
 }
+
 
 UntilIfAnyImage::UntilIfAnyImage(
         const std::initializer_list<const std::string> &imgList,
@@ -318,7 +312,14 @@ void UntilIfAnyImage::loop(std::unique_ptr<Segment> &previous, int globalTimeout
 }
 
 std::string UntilIfAnyImage::toString() const {
-    return "[尝试等待任意图片 " + std::filesystem::path(imgPath).stem().string() + "]";
+    std::string img_stems;
+    for (const auto &currentImgPath: imgPathList) {
+        img_stems += std::filesystem::path(currentImgPath).stem().string() + "|";
+    }
+    if (!img_stems.empty()) {
+        img_stems.pop_back();
+    }
+    return "[尝试等待任意图片 " + img_stems + "]";
 }
 
 

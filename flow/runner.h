@@ -61,7 +61,7 @@ public:
     void _start(float startWait, const std::vector<std::unique_ptr<Until>> &startUntilList);
 
     void _click(
-            std::unique_ptr<Segment> position,
+            const Selector &selector,
             const std::vector<std::unique_ptr<Until>> &clickUntilList,
             int offset_x = 0,
             int offset_y = 0

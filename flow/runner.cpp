@@ -109,22 +109,23 @@ void ImageClicker::_start(
 }
 
 void ImageClicker::_click(
-        std::unique_ptr<Segment> position,
+        const Selector &selector,
         const std::vector<std::unique_ptr<Until>> &clickUntilList,
         int offset_x,
         int offset_y
 ) {
     auto start = std::chrono::high_resolution_clock::now();
-
     while (!state.stopFlag.load()) {
-        emit Emitter::instance()->log(QString::fromStdString("开始循环点击: " + position->toString()));
+        auto position = selector(targetSegmentList);
+
+        emit Emitter::instance()->log(QString::fromStdString("开始循环点击: " + position.toString()));
 
         auto now = std::chrono::high_resolution_clock::now();
         if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count() > globalTimeout) {
             throw std::runtime_error("超时，结束运行: " + this->toString());
         }
 
-        position->click(0, offset_x, offset_y);
+        position.click(0, offset_x, offset_y);
 
 
         if (clickUntilList.empty()) {
@@ -209,7 +210,7 @@ std::unique_ptr<ImageClicker> ImageClicker::click(
         previousSegment = std::make_unique<Segment>(segment.copy());
 
         _click(
-                std::make_unique<Segment>(segment.copy()),
+                selector,
                 clickUntilList,
                 offset_x,
                 offset_y
@@ -249,7 +250,7 @@ std::unique_ptr<ImageClicker> ImageClicker::clickIfFound(
         previousSegment = std::make_unique<Segment>(segment.copy());
 
         _click(
-                std::make_unique<Segment>(segment.copy()),
+                selector,
                 clickUntilList,
                 offset_x,
                 offset_y

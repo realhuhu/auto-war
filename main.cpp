@@ -153,18 +153,19 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     output_text->setReadOnly(true);
     mainLayout->addWidget(output_text);
 
-    tasks["公会报名"] = guild_war;
     tasks["军备获取"] = arms_compound;
     tasks["剿灭将领"] = exterminate_enemy;
     tasks["国家争霸"] = country_arena;
     tasks["世界争霸"] = world_arena;
     tasks["国家战争"] = country_war;
-    tasks["公会任务"] = guild_building_task;
-    tasks["预设1"] = daily_task;
-    tasks["预设2"] = daily_task;
-    tasks["预设3"] = daily_task;
-    command_battle = QStringList({"公会报名", "军备获取", "剿灭将领", "国家争霸", "世界争霸", "国家战争"});
-    command_daily = QStringList({"预设1", "预设2", "预设3"});
+    command_battle = QStringList({"国家争霸", "世界争霸", "剿灭将领", "军备获取", "国家战争"});
+
+    tasks["英雄中心"] = hero_center;
+    tasks["战争学院"] = war_center;
+    tasks["国家宝箱"] = country_chest;
+    tasks["公会领奖"] = guild;
+    tasks["公会建筑"] = guild_building;
+    command_daily = QStringList({"英雄中心", "战争学院", "国家宝箱", "公会领奖", "公会建筑"});
 
     // 初始时不安装钩子
     hook = nullptr;
@@ -372,7 +373,7 @@ void MainWindow::select_command() {
         }
     }
 
-    auto *dailyGroupBox = new QGroupBox("一键杂项", &selectDialog);
+    auto *dailyGroupBox = new QGroupBox("日常任务", &selectDialog);
 
     dailyGroupBox->setStyleSheet(style);
 
@@ -384,6 +385,9 @@ void MainWindow::select_command() {
         dailyLayout->setColumnMinimumWidth(i, 100);  // 设置每列的最小宽度为100
         dailyLayout->setColumnStretch(i, 1);  // 设置每列的伸缩比例为1
     }
+
+    row = 0;
+    col = 0;
 
     // 确保命令选项的顺序
     for (const auto &command: command_daily) {

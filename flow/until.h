@@ -114,6 +114,17 @@ public:
 
 class UntilIfImage : public UntilImage {
 public:
+    explicit UntilIfImage(
+            const std::string &imgPath,
+            const std::string &onPrevious = "none",
+            bool reverse = false,
+            std::string mode = "gray",
+            double finishWait = 0,
+            double threshold = 0.9,
+            double interval = 0.1,
+            double timeout = -1
+    );
+
     [[nodiscard]] std::string toString() const override;
 
     void loop(std::unique_ptr<Segment> &previous, int globalTimeout) override;

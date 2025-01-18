@@ -4,42 +4,6 @@
 #include "../state.h"
 #include "../flow/runner.h"
 
-void guild_war() {
-    std::unique_ptr<ImageClicker> clicker;
-
-    std::vector<std::unique_ptr<Until>> start_until;
-    std::vector<std::unique_ptr<Until>> click_until;
-    std::vector<std::unique_ptr<Until>> run_until;
-
-    clicker = std::make_unique<ImageClicker>("/res/公会战报名/参加公会战.png");
-
-    clear_until(start_until, click_until, run_until);
-    run_until.emplace_back(std::make_unique<UntilImage>("/res/公会战报名/领取奖励.png"));
-    clicker = clicker->clickIfFound(start_until, click_until, run_until);
-
-    clear_until(start_until, click_until, run_until);
-    run_until.emplace_back(std::make_unique<UntilImage>("/res/公会战报名/领取奖励.png", "right"));
-    clicker = clicker->clickIfFound(start_until, click_until, run_until);
-
-    clear_until(start_until, click_until, run_until);
-    run_until.emplace_back(std::make_unique<UntilImage>("/res/公会战报名/确定领取.png"));
-    clicker = clicker->clickIfFound(start_until, click_until, run_until);
-
-    clear_until(start_until, click_until, run_until);
-    run_until.emplace_back(std::make_unique<UntilImage>("/res/公会战报名/报名公会战.png"));
-    clicker = clicker->clickIfFound(start_until, click_until, run_until);
-
-    clear_until(start_until, click_until, run_until);
-    run_until.emplace_back(std::make_unique<UntilImage>("/res/公会战报名/确定报名.png"));
-    clicker = clicker->clickIfFound(start_until, click_until, run_until);
-
-    clear_until(start_until, click_until, run_until);
-    run_until.emplace_back(std::make_unique<UntilImage>("/res/公会战报名/关闭窗口.png"));
-    clicker = clicker->clickIfFound(start_until, click_until, run_until);
-
-    clicker->clickIfFound();
-}
-
 void country_war() {
     std::unique_ptr<ImageClicker> clicker;
 
@@ -124,12 +88,12 @@ void country_war() {
 
                 clear_until(start_until, click_until, run_until);
                 run_until.emplace_back(std::make_unique<UntilImage>("/res/国战/确定兑换.png"));
-                clicker = clicker->click(start_until, click_until, run_until, position_selector("x_center", "min"));
+                clicker = clicker->click(start_until, click_until, run_until);
             }
 
             clear_until(start_until, click_until, run_until);
             run_until.emplace_back(std::make_unique<UntilImage>("/res/国战/扫荡.png"));
-            clicker = clicker->click(start_until, click_until, run_until);
+            clicker = clicker->click(start_until, click_until, run_until, position_selector("x_center", "min"));
         }
 
         clear_until(start_until, click_until, run_until);
@@ -153,8 +117,9 @@ void country_war() {
             run_until.emplace_back(std::make_unique<UntilImage>("/res/国战/返回基地.png"));
             clicker = clicker->click(start_until, click_until, run_until);
 
-            clicker->click();
-
+            clear_until(start_until, click_until, run_until);
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/国战/国家.png"));
+            clicker->click(start_until, click_until, run_until);
             break;
         }
 
