@@ -24,6 +24,7 @@ public:
 
     explicit ImageClicker(
             const std::string &imgPath,
+            int wait = 0,
             float threshold = 0.9,
             int timeout = 60,
             const std::string &mode = "gray"

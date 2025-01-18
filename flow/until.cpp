@@ -253,15 +253,26 @@ std::string UntilImageStable::toString() const {
 
 
 void UntilIfImage::loop(std::unique_ptr<Segment> &previous, int globalTimeout) {
-    bool fulfilled = this->fulfilled(previous);
+    this->fulfilled(previous);
 }
 
 std::string UntilIfImage::toString() const {
     return "[尝试等待图片 " + std::filesystem::path(imgPath).stem().string() + "]";
 }
 
+UntilIfAnyImage::UntilIfAnyImage(
+        const std::initializer_list<const std::string> &imgList,
+        const std::string &onPrevious,
+        bool reverse,
+        std::string mode,
+        double finishWait,
+        double threshold,
+        double interval,
+        double timeout
+) : UntilAnyImage(imgList, onPrevious, reverse, std::move(mode), finishWait, threshold, interval, timeout) {}
+
 void UntilIfAnyImage::loop(std::unique_ptr<Segment> &previous, int globalTimeout) {
-    bool fulfilled = this->fulfilled(previous);
+    this->fulfilled(previous);
 }
 
 std::string UntilIfAnyImage::toString() const {

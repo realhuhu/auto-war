@@ -8,6 +8,7 @@
 
 struct State {
     HWND hwnd = nullptr;
+    float scale = 1;
     QThread *currentThread = nullptr;
     std::atomic<bool> stopFlag{false};
 };

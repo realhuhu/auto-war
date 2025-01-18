@@ -22,13 +22,13 @@ Segment::Segment(
 }
 
 void Segment::click(double wait, int offset_x, int offset_y) const {
-    int x = x_center + offset_x;
-    int y = y_center + offset_y;
+    int x = x_center + offset_x * state.scale;
+    int y = y_center + offset_y * state.scale;
     LPARAM lparam = (y << 16) | x;
     PostMessageW(state.hwnd, WM_LBUTTONDOWN, 0, lparam);
     PostMessageW(state.hwnd, WM_LBUTTONUP, 0, lparam);
 
-    emit Emitter::instance()->log(QString::fromStdString("点击: " + this->toString()));
+    emit Emitter::instance()->log(QString::fromStdString("点击: (%1,%2)").arg(QString::number(x), QString::number(y)));
 
     if (wait > 0) {
         std::this_thread::sleep_for(std::chrono::duration<float>(wait));

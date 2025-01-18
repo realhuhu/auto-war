@@ -10,6 +10,7 @@
 
 cv::Mat CV::get_screen(const std::string &mode) {
     SetProcessDPIAware();
+
     RECT rect;
     GetWindowRect(state.hwnd, &rect);
     int width = rect.right - rect.left;
@@ -96,7 +97,13 @@ std::vector<Segment> CV::find_positions(
         int w = templateImg.cols;
         int h = templateImg.rows;
         for (const auto &loc: locations) {
-            segments.emplace_back(templatePath, result.at<double>(loc.y, loc.x), w, h, loc.x, loc.y);
+            segments.emplace_back(
+                    templatePath,
+                    result.at<double>(loc.y, loc.x),
+                    w * state.scale,
+                    h * state.scale,
+                    loc.x * state.scale,
+                    loc.y * state.scale);
         }
         return segments;
     }

@@ -26,6 +26,17 @@
 #include "task/task.h"
 #include "flow/emitter.h"
 
+float getScale() {
+    MONITORINFOEX info = {};
+    POINT ptZero = {0, 0};
+    info.cbSize = sizeof(info);
+    GetMonitorInfo(MonitorFromPoint(ptZero, MONITOR_DEFAULTTOPRIMARY), &info);
+    DEVMODE devmode = {};
+    devmode.dmSize = sizeof(DEVMODE);
+    EnumDisplaySettings(info.szDevice, ENUM_CURRENT_SETTINGS, &devmode);
+    return static_cast<float>(devmode.dmPelsWidth) / (info.rcMonitor.right - info.rcMonitor.left);
+}
+
 auto configFile = "config.json";
 
 class CustomCommandButton : public QWidget {
@@ -118,7 +129,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     commands = QStringList({
                                    "公会报名", "军备获取", "剿灭将领",
                                    "国家争霸", "世界争霸", "国家战争",
-//                                   "公会任务"
+                                   "公会任务"
                            });
 
     // 初始时不安装钩子
@@ -130,17 +141,20 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     // 连接日志信号和槽函数
     connect(this, &MainWindow::logMessage, this, &MainWindow::onLogMessage);
     connect(Emitter::instance(), &Emitter::log, this, &MainWindow::onLogMessage);
-//
-//
-//    QFile file(configFile);
-//    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-//        onLogText("无法打开配置文件: config.json");
-//    } else {
-//        auto jsonData = file.readAll();
-//        auto doc = QJsonDocument::fromJson(jsonData);
-//        config = doc.object();
-//        file.close();
-//    }
+
+
+
+    onLogText(QString::fromStdString("当前缩放率: ") + QString::number(state.scale));
+
+    QFile file(configFile);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        onLogText("无法打开配置文件: config.json");
+    } else {
+        auto jsonData = file.readAll();
+        auto doc = QJsonDocument::fromJson(jsonData);
+        config = doc.object();
+        file.close();
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -544,6 +558,8 @@ LRESULT CALLBACK MainWindow::MouseHookProc(int nCode, WPARAM wParam, LPARAM lPar
 
 
 int main(int argc, char *argv[]) {
+    state.scale = getScale();
+
     qRegisterMetaType<QTextCursor>("QTextCursor");
     QApplication app(argc, argv);
     MainWindow window;

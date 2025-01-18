@@ -73,19 +73,45 @@ void country_war() {
     clicker->clickIfFound(start_until, click_until, run_until);
 
     while (!state.stopFlag.load()) {
+        clicker = std::make_unique<ImageClicker>("/res/国战/当前所在.png");
+
+        clear_until(start_until, click_until, run_until);
+        run_until.emplace_back(std::make_unique<UntilIfAnyImage>(std::initializer_list<const std::string>{
+                "/res/国战/纽约.png", "/res/国战/芝加哥.png", "/res/国战/波尔多.png", "/res/国战/马赛.png"
+        }, "right"));
+        clicker = clicker->locate(start_until, run_until);
+
+        if (!clicker->founded()) {
+            emit Emitter::instance()->log("请先移动到与摩多城相邻的城", "red");
+            break;
+        }
+        auto city = std::filesystem::path(clicker->templatePath).stem().string();
+        emit Emitter::instance()->log(QString::fromStdString("当前所在: " + city), "blue");
+
         clicker = std::make_unique<ImageClicker>("/res/国战/前往.png");
 
         clear_until(start_until, click_until, run_until);
-        run_until.emplace_back(std::make_unique<UntilImageStable>("/res/国战/摩多军团.png"));
+        run_until.emplace_back(std::make_unique<UntilImageStable>("/res/国战/" + city + "城.png"));
         clicker = clicker->click(start_until, click_until, run_until);
 
-//        clear_until(start_until, click_until, run_until);
-//        run_until.emplace_back(std::make_unique<UntilImageStable>("/res/国战/摩多军团旗帜.png"));
-//        clicker = clicker->locate(start_until, run_until);
-
+        int offset_x = 0;
+        int offset_y = 0;
+        if (city == "纽约") {
+            offset_x = -136;
+            offset_y = -120;
+        } else if (city == "芝加哥") {
+            offset_x = 91;
+            offset_y = -151;
+        } else if (city == "马赛") {
+            offset_x = -23;
+            offset_y = 41;
+        } else if (city == "波尔多") {
+            offset_x = -211;
+            offset_y = -89;
+        }
         clear_until(start_until, click_until, run_until);
         click_until.emplace_back(std::make_unique<UntilImage>("/res/国战/城市信息.png"));
-        clicker->click(start_until, click_until, run_until, similarity_selector, 0, 1, 15, -40);
+        clicker->click(start_until, click_until, run_until, similarity_selector, 0, 1, offset_x, offset_y);
 
         clicker = std::make_unique<ImageClicker>("/res/国战/扫荡.png");
 
@@ -113,10 +139,8 @@ void country_war() {
 
                 clear_until(start_until, click_until, run_until);
                 run_until.emplace_back(std::make_unique<UntilImage>("/res/国战/确定兑换.png"));
-                clicker->click(start_until, click_until, run_until);
+                clicker = clicker->click(start_until, click_until, run_until, position_selector("x_center", "min"));
             }
-
-            clicker = std::make_unique<ImageClicker>("/res/国战/确定兑换.png");
 
             clear_until(start_until, click_until, run_until);
             run_until.emplace_back(std::make_unique<UntilImage>("/res/国战/扫荡.png"));
@@ -224,11 +248,11 @@ void country_arena() {
         run_until.emplace_back(std::make_unique<UntilImage>("/res/国家争霸/争霸战标题.png"));
         clicker->click(start_until, click_until, run_until);
 
-        clicker = std::make_unique<ImageClicker>("/res/国家争霸/确认失败.png");
+        clicker = std::make_unique<ImageClicker>("/res/国家争霸/确认失败.png", 1);
 
         clear_until(start_until, click_until, run_until);
         run_until.emplace_back(std::make_unique<UntilImage>("/res/国家争霸/确认失败.png", "none", true));
-        clicker->clickIfFound(start_until, click_until, run_until, similarity_selector, 2);
+        clicker->clickIfFound(start_until, click_until, run_until, similarity_selector);
     }
 }
 
@@ -291,11 +315,11 @@ void world_arena() {
         run_until.emplace_back(std::make_unique<UntilImage>("/res/世界争霸/争霸战标题.png"));
         clicker->click(start_until, click_until, run_until);
 
-        clicker = std::make_unique<ImageClicker>("/res/世界争霸/确认失败.png");
+        clicker = std::make_unique<ImageClicker>("/res/世界争霸/确认失败.png", 1);
 
         clear_until(start_until, click_until, run_until);
         run_until.emplace_back(std::make_unique<UntilImage>("/res/世界争霸/确认失败.png", "none", true));
-        clicker->clickIfFound(start_until, click_until, run_until, similarity_selector, 1);
+        clicker->clickIfFound(start_until, click_until, run_until, similarity_selector);
     }
 }
 
@@ -471,7 +495,7 @@ void guild_building_task() {
 
         clear_until(start_until, click_until, run_until);
         run_until.emplace_back(std::make_unique<UntilImage>("/res/公会建筑/场景缩放.png"));
-        clicker = clicker->clickIfFound(start_until, click_until, run_until);
+        clicker = clicker->clickIfFound(start_until, click_until, run_until, similarity_selector, 0, 0, 15);
 
         clicker->clickIfFound(start_until, run_until, click_until, similarity_selector, 0, 1);
 

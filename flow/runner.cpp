@@ -13,12 +13,17 @@
 
 ImageClicker::ImageClicker(
         const std::string &imgPath,
+        int wait,
         float threshold,
         int timeout,
         const std::string &mode
 ) : templatePath(imgPath),
     globalThreshold(threshold),
     globalTimeout(timeout) {
+
+    if(wait){
+        std::this_thread::sleep_for(std::chrono::duration<float>(wait));
+    }
 
     targetSegmentList = CV::find_positions(CV::get_screen(mode), imgPath, globalThreshold, mode);
 }
