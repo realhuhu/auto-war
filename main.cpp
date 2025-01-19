@@ -164,8 +164,9 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     tasks["战争学院"] = war_center;
     tasks["国家宝箱"] = country_chest;
     tasks["公会领奖"] = guild;
+    tasks["将领抽奖"] = admiral;
     tasks["公会建筑"] = guild_building;
-    command_daily = QStringList({"英雄中心", "战争学院", "国家宝箱", "公会领奖", "公会建筑"});
+    command_daily = QStringList({"英雄中心", "战争学院", "国家宝箱", "公会领奖", "将领抽奖", "公会建筑"});
 
     // 初始时不安装钩子
     hook = nullptr;

@@ -7,6 +7,8 @@ void hero_center();
 
 void country_chest();
 
+void admiral();
+
 void guild();
 
 void guild_building();

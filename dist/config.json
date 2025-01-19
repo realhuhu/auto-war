@@ -1,90 +1,90 @@
 {
-  "公会战役": {
-    "input": [
-      {
-        "order": 0,
-        "text": "轮次",
-        "value": 1
-      }
-    ]
-  },
-  "军备获取": {
-    "checkbox": [
-    ],
-    "input": [
-    ],
-    "tips": "默认在碎甲弹、高爆弹、电磁炮、破甲弹、陶瓷复合装甲中随机选择一个，若要获取其它军备，请先打开该军备的的[合成材料]面板"
-  },
-  "剿灭将领": {
-    "checkbox": [
-      {
-        "order": 0,
-        "text": "紫色元",
-        "value": true
-      },
-      {
-        "order": 1,
-        "text": "紫色帜",
-        "value": true
-      },
-      {
-        "order": 2,
-        "text": "紫色番",
-        "value": true
-      },
-      {
-        "order": 3,
-        "text": "蓝色元",
-        "value": true
-      },
-      {
-        "order": 4,
-        "text": "蓝色帜",
-        "value": true
-      },
-      {
-        "order": 5,
-        "text": "蓝色番",
-        "value": true
-      },
-      {
-        "order": 6,
-        "text": "绿色元",
-        "value": false
-      },
-      {
-        "order": 7,
-        "text": "绿色帜",
-        "value": false
-      },
-      {
-        "order": 8,
-        "text": "绿色番",
-        "value": false
-      },
-      {
-        "order": 9,
-        "text": "自动买刷新令",
-        "value": false
-      },
-      {
-        "order": 10,
-        "text": "自动买次数",
-        "value": false
-      }
-    ],
-    "input": [
-      {
-        "order": 0,
-        "text": "轮次",
-        "value": 2
-      },
-      {
-        "order": 1,
-        "text": "轮次",
-        "value": 1
-      }
-    ],
-    "tips": "这是说明内容"
-  }
+    "公会战役": {
+        "input": [
+            {
+                "order": 0,
+                "text": "轮次",
+                "value": 1
+            }
+        ]
+    },
+    "军备获取": {
+        "checkbox": [
+        ],
+        "input": [
+        ],
+        "tips": "默认在碎甲弹、高爆弹、电磁炮、破甲弹、陶瓷复合装甲中随机选择一个，若要获取其它军备，请先打开该军备的的[合成材料]面板"
+    },
+    "剿灭将领": {
+        "checkbox": [
+            {
+                "order": 0,
+                "text": "紫色元",
+                "value": true
+            },
+            {
+                "order": 1,
+                "text": "紫色帜",
+                "value": true
+            },
+            {
+                "order": 2,
+                "text": "紫色番",
+                "value": true
+            },
+            {
+                "order": 3,
+                "text": "蓝色元",
+                "value": true
+            },
+            {
+                "order": 4,
+                "text": "蓝色帜",
+                "value": true
+            },
+            {
+                "order": 5,
+                "text": "蓝色番",
+                "value": true
+            },
+            {
+                "order": 6,
+                "text": "绿色元",
+                "value": false
+            },
+            {
+                "order": 7,
+                "text": "绿色帜",
+                "value": false
+            },
+            {
+                "order": 8,
+                "text": "绿色番",
+                "value": false
+            },
+            {
+                "order": 9,
+                "text": "自动买刷新令",
+                "value": false
+            },
+            {
+                "order": 10,
+                "text": "自动买次数",
+                "value": false
+            }
+        ],
+        "input": [
+            {
+                "order": 0,
+                "text": "轮次",
+                "value": 2
+            },
+            {
+                "order": 1,
+                "text": "轮次",
+                "value": 1
+            }
+        ],
+        "tips": "这是说明内容"
+    }
 }

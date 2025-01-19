@@ -281,6 +281,65 @@ void guild() {
     clicker->click(start_until, click_until, run_until);
 }
 
+void admiral() {
+    std::unique_ptr<ImageClicker> clicker;
+
+    std::vector<std::unique_ptr<Until>> start_until;
+    std::vector<std::unique_ptr<Until>> click_until;
+    std::vector<std::unique_ptr<Until>> run_until;
+
+    clicker = std::make_unique<ImageClicker>("/res/将领/将领.png");
+
+    clear_until(start_until, click_until, run_until);
+    run_until.emplace_back(std::make_unique<UntilImage>("/res/将领/将领面板.png"));
+    clicker->clickIfFound(start_until, click_until, run_until);
+
+    while (!state.stopFlag.load()) {
+        clicker = std::make_unique<ImageClicker>("/res/将领/将领免费.png");
+
+        if (!clicker->founded())break;
+
+        clear_until(start_until, click_until, run_until);
+        run_until.emplace_back(std::make_unique<UntilImage>("/res/将领/将领抽奖.png", "top_center"));
+        clicker = clicker->locate(start_until, run_until);
+
+        clear_until(start_until, click_until, run_until);
+        run_until.emplace_back(std::make_unique<UntilIfImage>("/res/将领/确定.png"));
+        clicker = clicker->click(start_until, click_until, run_until, similarity_selector, 0, 1);
+
+        clear_until(start_until, click_until, run_until);
+        run_until.emplace_back(std::make_unique<UntilIfImage>("/res/将领/确定.png", "inner", true));
+        clicker->click(start_until, click_until, run_until);
+    }
+
+    clicker = std::make_unique<ImageClicker>("/res/将领/将领技能.png");
+
+    clear_until(start_until, click_until, run_until);
+    run_until.emplace_back(std::make_unique<UntilImage>("/res/将领/将领列表.png"));
+    clicker->click(start_until, click_until, run_until);
+
+
+    clicker = std::make_unique<ImageClicker>("/res/将领/免费收集.png");
+
+    clear_until(start_until, click_until, run_until);
+    run_until.emplace_back(std::make_unique<UntilIfImage>("/res/将领/次数已用尽.png"));
+    clicker = clicker->click(start_until, click_until, run_until, similarity_selector, 0, 1);
+
+    if (clicker->founded()) {
+        clicker = std::make_unique<ImageClicker>("/res/将领/关闭窗口.png");
+
+        clear_until(start_until, click_until, run_until);
+        run_until.emplace_back(std::make_unique<UntilImage>("/res/将领/关闭窗口.png", "inner", true));
+        clicker->click(start_until, click_until, run_until, position_selector("x_center", "min"));
+    }
+
+    clicker = std::make_unique<ImageClicker>("/res/将领/关闭窗口.png");
+
+    clear_until(start_until, click_until, run_until);
+    run_until.emplace_back(std::make_unique<UntilImage>("/res/将领/关闭窗口.png", "inner", true));
+    clicker->click(start_until, click_until, run_until);
+}
+
 void guild_building() {
     std::unique_ptr<ImageClicker> clicker;
 
