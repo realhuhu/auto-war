@@ -55,7 +55,6 @@ private slots:
     static LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam);
 
 private:
-    QJsonObject config;
     QStringList command_battle;
     QStringList command_daily;
     QMap<QString, std::function<void()>> tasks;

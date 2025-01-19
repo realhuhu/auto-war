@@ -64,7 +64,8 @@ public:
             const Selector &selector,
             const std::vector<std::unique_ptr<Until>> &clickUntilList,
             int offset_x = 0,
-            int offset_y = 0
+            int offset_y = 0,
+            const std::string& position="center"
     );
 
     void _finish(float finishWait, const std::vector<std::unique_ptr<Until>> &runUntilList);
@@ -87,7 +88,8 @@ public:
             float startWait = 0,
             float finishWait = 0,
             int offset_x = 0,
-            int offset_y = 0
+            int offset_y = 0,
+            const std::string& position="center"
     );
 
     std::unique_ptr<ImageClicker> clickIfFound(
@@ -98,7 +100,8 @@ public:
             float startWait = 0,
             float finishWait = 0,
             int offset_x = 0,
-            int offset_y = 0
+            int offset_y = 0,
+            const std::string& position="center"
     );
 
     std::unique_ptr<ImageClicker> locate(

@@ -21,9 +21,27 @@ Segment::Segment(
     y_center = y1 + h / 2;
 }
 
-void Segment::click(double wait, int offset_x, int offset_y) const {
-    int x = x_center + offset_x * state.scale;
-    int y = y_center + offset_y * state.scale;
+void Segment::click(double wait, int offset_x, int offset_y, const std::string& position) const {
+    int x, y;
+    if (position == "left") {
+        x = x1;
+        y = y_center;
+    } else if (position == "top") {
+        x = x_center;
+        y = y1;
+    } else if (position == "down") {
+        x = x_center;
+        y = y2;
+    } else if (position == "right") {
+        x = x2;
+        y = y_center;
+    } else{
+        x = x_center;
+        y = y_center;
+    }
+
+    x += offset_x * state.scale;
+    y += offset_y * state.scale;
     LPARAM lparam = (y << 16) | x;
     PostMessageW(state.hwnd, WM_LBUTTONDOWN, 0, lparam);
     PostMessageW(state.hwnd, WM_LBUTTONUP, 0, lparam);

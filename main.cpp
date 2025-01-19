@@ -153,20 +153,27 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     output_text->setReadOnly(true);
     mainLayout->addWidget(output_text);
 
-    tasks["军备获取"] = arms_compound;
+    tasks["军备合成"] = arms_compound;
     tasks["剿灭将领"] = exterminate_enemy;
     tasks["国家争霸"] = country_arena;
     tasks["世界争霸"] = world_arena;
     tasks["国家战争"] = country_war;
-    command_battle = QStringList({"国家争霸", "世界争霸", "剿灭将领", "军备获取", "国家战争"});
+    command_battle = QStringList({"国家争霸", "世界争霸", "剿灭将领", "军备合成", "国家战争"});
 
     tasks["英雄中心"] = hero_center;
     tasks["战争学院"] = war_center;
     tasks["国家宝箱"] = country_chest;
     tasks["公会领奖"] = guild;
     tasks["将领抽奖"] = admiral;
+    tasks["参谋抽奖"] = adviser;
+    tasks["火炮抽奖"] = mortar;
+    tasks["配件抽奖"] = equipment;
+    tasks["军备抽奖"] = arms;
     tasks["公会建筑"] = guild_building;
-    command_daily = QStringList({"英雄中心", "战争学院", "国家宝箱", "公会领奖", "将领抽奖", "公会建筑"});
+    command_daily = QStringList({
+                                        "英雄中心", "战争学院", "国家宝箱", "公会领奖", "将领抽奖", "参谋抽奖",
+                                        "火炮抽奖", "配件抽奖", "军备抽奖", "公会建筑",
+                                });
 
     // 初始时不安装钩子
     hook = nullptr;
@@ -187,7 +194,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     } else {
         auto jsonData = file.readAll();
         auto doc = QJsonDocument::fromJson(jsonData);
-        config = doc.object();
+        state.config = doc.object();
         file.close();
     }
 }
@@ -346,7 +353,7 @@ void MainWindow::select_command() {
 
     // 确保命令选项的顺序
     for (const auto &command: command_battle) {
-        auto *customBtn = new ButtonWithSetting(command, config.contains(command));
+        auto *customBtn = new ButtonWithSetting(command, state.config.contains(command));
 
         // 连接文字按钮的点击事件
         connect(customBtn->getTextButton(), &QPushButton::clicked, [this, command, &selectDialog]() {
@@ -392,7 +399,7 @@ void MainWindow::select_command() {
 
     // 确保命令选项的顺序
     for (const auto &command: command_daily) {
-        auto *customBtn = new ButtonWithSetting(command, config.contains(command));
+        auto *customBtn = new ButtonWithSetting(command, state.config.contains(command));
 
         // 连接文字按钮的点击事件
         connect(customBtn->getTextButton(), &QPushButton::clicked, [this, command, &selectDialog]() {
@@ -435,7 +442,7 @@ void MainWindow::set_command(const QString &command) {
     settingDialog.setMinimumWidth(300);
 
     // 获取命令对应的配置
-    QJsonObject commandConfig = config[command].toObject();
+    QJsonObject commandConfig = state.config[command].toObject();
 
     // 创建主布局
     auto *mainLayout = new QVBoxLayout(&settingDialog);
@@ -575,12 +582,12 @@ void MainWindow::set_command(const QString &command) {
                 newCommandConfig["input"] = newInputArray;
                 newCommandConfig["tips"] = commandConfig["tips"].toString();
 
-                config[command] = newCommandConfig;
+                state.config[command] = newCommandConfig;
 
                 // 将 config 写回 config.json 文件
                 QFile file("config.json");
                 if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-                    QJsonDocument doc(config);
+                    QJsonDocument doc(state.config);
                     file.write(doc.toJson());
                     file.close();
                     onLogText("配置保存成功", "blue");

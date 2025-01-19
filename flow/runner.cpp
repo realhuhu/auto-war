@@ -112,20 +112,21 @@ void ImageClicker::_click(
         const Selector &selector,
         const std::vector<std::unique_ptr<Until>> &clickUntilList,
         int offset_x,
-        int offset_y
+        int offset_y,
+        const std::string &position
 ) {
     auto start = std::chrono::high_resolution_clock::now();
     while (!state.stopFlag.load()) {
-        auto position = selector(targetSegmentList);
+        auto segment = selector(targetSegmentList);
 
-        emit Emitter::instance()->log(QString::fromStdString("开始循环点击: " + position.toString()));
+        emit Emitter::instance()->log(QString::fromStdString("开始循环点击: " + segment.toString()));
 
         auto now = std::chrono::high_resolution_clock::now();
         if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count() > globalTimeout) {
             throw std::runtime_error("超时，结束运行: " + this->toString());
         }
 
-        position.click(0, offset_x, offset_y);
+        segment.click(0, offset_x, offset_y, position);
 
 
         if (clickUntilList.empty()) {
@@ -198,9 +199,10 @@ std::unique_ptr<ImageClicker> ImageClicker::click(
         float startWait,
         float finishWait,
         int offset_x,
-        int offset_y
+        int offset_y,
+        const std::string &position
 ) {
-    auto executor = [this, &selector, &clickUntilList, &offset_x, &offset_y]() -> bool {
+    auto executor = [this, &selector, &clickUntilList, &offset_x, &offset_y, &position]() -> bool {
         if (targetSegmentList.empty()) {
             throw std::runtime_error("图片列表为空: " + this->templatePath);
         }
@@ -213,7 +215,8 @@ std::unique_ptr<ImageClicker> ImageClicker::click(
                 selector,
                 clickUntilList,
                 offset_x,
-                offset_y
+                offset_y,
+                position
         );
 
         return false;
@@ -238,9 +241,10 @@ std::unique_ptr<ImageClicker> ImageClicker::clickIfFound(
         float startWait,
         float finishWait,
         int offset_x,
-        int offset_y
+        int offset_y,
+        const std::string &position
 ) {
-    auto executor = [this, &selector, &clickUntilList, &offset_x, &offset_y]() -> bool {
+    auto executor = [this, &selector, &clickUntilList, &offset_x, &offset_y, &position]() -> bool {
         if (targetSegmentList.empty()) {
             return true;
         }
@@ -253,7 +257,8 @@ std::unique_ptr<ImageClicker> ImageClicker::clickIfFound(
                 selector,
                 clickUntilList,
                 offset_x,
-                offset_y
+                offset_y,
+                position
         );
 
         return false;

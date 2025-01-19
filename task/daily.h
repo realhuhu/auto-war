@@ -9,6 +9,14 @@ void country_chest();
 
 void admiral();
 
+void adviser();
+
+void mortar();
+
+void equipment();
+
+void arms();
+
 void guild();
 
 void guild_building();

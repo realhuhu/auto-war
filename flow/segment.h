@@ -34,7 +34,7 @@ struct Segment {
             int x, int y
     );
 
-    void click(double wait = 0.1, int offset_x = 0, int offset_y = 0) const;
+    void click(double wait = 0.1, int offset_x = 0, int offset_y = 0, const std::string& position = "center") const;
 
     [[nodiscard]] std::string on(const Segment &segment, const std::string &basis) const;
 

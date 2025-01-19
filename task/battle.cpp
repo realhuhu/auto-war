@@ -11,22 +11,22 @@ void country_war() {
     std::vector<std::unique_ptr<Until>> click_until;
     std::vector<std::unique_ptr<Until>> run_until;
 
-    clicker = std::make_unique<ImageClicker>("/res/国战/国家.png");
+    clicker = std::make_unique<ImageClicker>("/res/国家战争/国家.png");
 
     clear_until(start_until, click_until, run_until);
-    click_until.emplace_back(std::make_unique<UntilImage>("/res/国战/世界地图.png"));
+    click_until.emplace_back(std::make_unique<UntilImage>("/res/国家战争/世界地图.png"));
     clicker = clicker->clickIfFound(start_until, click_until, run_until);
 
     clear_until(start_until, click_until, run_until);
-    run_until.emplace_back(std::make_unique<UntilImage>("/res/国战/前往.png"));
+    run_until.emplace_back(std::make_unique<UntilImage>("/res/国家战争/前往.png"));
     clicker->clickIfFound(start_until, click_until, run_until);
 
     while (!state.stopFlag.load()) {
-        clicker = std::make_unique<ImageClicker>("/res/国战/当前所在.png");
+        clicker = std::make_unique<ImageClicker>("/res/国家战争/当前所在.png");
 
         clear_until(start_until, click_until, run_until);
         run_until.emplace_back(std::make_unique<UntilIfAnyImage>(std::initializer_list<const std::string>{
-                "/res/国战/纽约.png", "/res/国战/芝加哥.png", "/res/国战/波尔多.png", "/res/国战/马赛.png"
+                "/res/国家战争/纽约.png", "/res/国家战争/芝加哥.png", "/res/国家战争/波尔多.png", "/res/国家战争/马赛.png"
         }, "right"));
         clicker = clicker->locate(start_until, run_until);
 
@@ -37,10 +37,10 @@ void country_war() {
         auto city = std::filesystem::path(clicker->templatePath).stem().string();
         emit Emitter::instance()->log(QString::fromStdString("当前所在: " + city), "blue");
 
-        clicker = std::make_unique<ImageClicker>("/res/国战/前往.png");
+        clicker = std::make_unique<ImageClicker>("/res/国家战争/前往.png");
 
         clear_until(start_until, click_until, run_until);
-        run_until.emplace_back(std::make_unique<UntilImageStable>("/res/国战/" + city + "城.png"));
+        run_until.emplace_back(std::make_unique<UntilImageStable>("/res/国家战争/" + city + "城.png"));
         clicker = clicker->click(start_until, click_until, run_until);
 
         int offset_x = 0;
@@ -59,76 +59,78 @@ void country_war() {
             offset_y = -89;
         }
         clear_until(start_until, click_until, run_until);
-        click_until.emplace_back(std::make_unique<UntilImage>("/res/国战/城市信息.png"));
+        click_until.emplace_back(std::make_unique<UntilImage>("/res/国家战争/城市信息.png"));
         clicker->click(start_until, click_until, run_until, similarity_selector, 0, 1, offset_x, offset_y);
 
-        clicker = std::make_unique<ImageClicker>("/res/国战/扫荡.png");
+        clicker = std::make_unique<ImageClicker>("/res/国家战争/扫荡.png");
 
         if (!clicker->founded()) {
-            clicker = std::make_unique<ImageClicker>("/res/国战/召唤支援兵.png");
+            clicker = std::make_unique<ImageClicker>("/res/国家战争/召唤支援兵.png");
 
             clear_until(start_until, click_until, run_until);
             run_until.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
-                    "/res/国战/去购买.png", "/res/国战/确定兑换.png"
+                    "/res/国家战争/去购买.png", "/res/国家战争/确定兑换.png"
             }));
             clicker = clicker->click(start_until, click_until, run_until);
 
-            if (clicker->templatePath == "/res/国战/去购买.png") {
+            if (clicker->templatePath == "/res/国家战争/去购买.png") {
                 clear_until(start_until, click_until, run_until);
-                run_until.emplace_back(std::make_unique<UntilImage>("/res/国战/兑换.png"));
+                run_until.emplace_back(std::make_unique<UntilImage>("/res/国家战争/兑换.png"));
                 clicker = clicker->click(start_until, click_until, run_until);
 
                 clear_until(start_until, click_until, run_until);
-                run_until.emplace_back(std::make_unique<UntilImage>("/res/国战/确定兑换.png"));
+                run_until.emplace_back(std::make_unique<UntilImage>("/res/国家战争/确定兑换.png"));
                 clicker = clicker->click(start_until, click_until, run_until);
 
                 clear_until(start_until, click_until, run_until);
-                run_until.emplace_back(std::make_unique<UntilImage>("/res/国战/召唤支援兵.png"));
-                clicker = clicker->click(start_until, click_until, run_until);
+                run_until.emplace_back(std::make_unique<UntilImage>("/res/国家战争/确定兑换.png", "inner", true));
+                run_until.emplace_back(std::make_unique<UntilImage>("/res/国家战争/召唤支援兵.png"));
+                clicker = clicker->click(start_until, click_until, run_until, similarity_selector);
 
                 clear_until(start_until, click_until, run_until);
-                run_until.emplace_back(std::make_unique<UntilImage>("/res/国战/确定兑换.png"));
+                run_until.emplace_back(std::make_unique<UntilImage>("/res/国家战争/确定兑换.png"));
                 clicker = clicker->click(start_until, click_until, run_until);
             }
 
             clear_until(start_until, click_until, run_until);
-            run_until.emplace_back(std::make_unique<UntilImage>("/res/国战/扫荡.png"));
-            clicker = clicker->click(start_until, click_until, run_until, position_selector("x_center", "min"));
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/国家战争/扫荡.png"));
+            clicker = clicker->click(start_until, click_until, run_until);
         }
 
         clear_until(start_until, click_until, run_until);
-        start_until.emplace_back(std::make_unique<UntilImage>("/res/国战/可战斗.png", "none", false, "gray", 1.5));
+        start_until.emplace_back(std::make_unique<UntilImage>("/res/国家战争/可战斗.png", "none", false, "rgb", 0.6));
         run_until.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
-                "/res/国战/恢复行动力.png", "/res/国战/跳过战斗.png"
+                "/res/国家战争/恢复行动力.png", "/res/国家战争/跳过战斗.png"
         }));
         clicker = clicker->click(start_until, click_until, run_until);
 
-        if (clicker->templatePath == "/res/国战/恢复行动力.png") {
+        if (clicker->templatePath == "/res/国家战争/恢复行动力.png") {
             clear_until(start_until, click_until, run_until);
-            run_until.emplace_back(std::make_unique<UntilImage>("/res/国战/关闭窗口.png", "right"));
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/国家战争/关闭窗口.png", "right"));
             clicker = clicker->locate(start_until, run_until);
 
             clear_until(start_until, click_until, run_until);
-            run_until.emplace_back(std::make_unique<UntilImage>("/res/国战/关闭窗口.png", "inner", true));
-            run_until.emplace_back(std::make_unique<UntilImage>("/res/国战/领取图纸.png"));
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/国家战争/关闭窗口.png", "inner", true));
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/国家战争/领取图纸.png"));
             clicker = clicker->clickIfFound(start_until, click_until, run_until);
 
             clear_until(start_until, click_until, run_until);
-            run_until.emplace_back(std::make_unique<UntilImage>("/res/国战/返回基地.png"));
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/国家战争/返回基地.png"));
             clicker = clicker->click(start_until, click_until, run_until);
 
             clear_until(start_until, click_until, run_until);
-            run_until.emplace_back(std::make_unique<UntilImage>("/res/国战/国家.png"));
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/国家战争/国家.png"));
             clicker->click(start_until, click_until, run_until);
             break;
         }
 
         clear_until(start_until, click_until, run_until);
-        click_until.emplace_back(std::make_unique<UntilImage>("/res/国战/结束战斗.png"));
+        click_until.emplace_back(std::make_unique<UntilImage>("/res/国家战争/结束战斗.png"));
         clicker = clicker->click(start_until, click_until, run_until);
 
         clear_until(start_until, click_until, run_until);
-        run_until.emplace_back(std::make_unique<UntilImage>("/res/国战/前往.png"));
+        click_until.emplace_back(std::make_unique<UntilImage>("/res/国家战争/结束战斗.png", "inner", true));
+        click_until.emplace_back(std::make_unique<UntilImage>("/res/国家战争/前往.png"));
         clicker->click(start_until, click_until, run_until);
     }
 }
