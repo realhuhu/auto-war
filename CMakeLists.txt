@@ -32,6 +32,8 @@ add_executable(qt
         ico.o
         task/daily.h
         task/daily.cpp
+        task/common.h
+        task/common.cpp
 )
 
 target_link_libraries(qt ${OpenCV_LIBS})

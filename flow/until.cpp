@@ -188,6 +188,21 @@ UntilAnyImage::UntilAnyImage(
     }
 }
 
+UntilAnyImage::UntilAnyImage(
+        const std::vector<std::string> &imgList,
+        const std::string &onPrevious,
+        bool reverse,
+        std::string mode,
+        double finishWait,
+        double threshold,
+        double interval,
+        double timeout
+) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, std::move(mode)) {
+    for (const auto &i: imgList) {
+        imgPathList.push_back(i);
+    }
+}
+
 bool UntilAnyImage::flag(std::unique_ptr<Segment> &previous) {
     cv::Mat screen = CV::get_screen(mode);
 
@@ -305,6 +320,17 @@ UntilIfAnyImage::UntilIfAnyImage(
         double threshold,
         double interval,
         double timeout
+) : UntilAnyImage(imgList, onPrevious, reverse, std::move(mode), finishWait, threshold, interval, timeout) {}
+
+UntilIfAnyImage::UntilIfAnyImage(
+        const std::vector<std::string> &imgList,
+        const std::string &onPrevious,
+        bool reverse,
+        std::string mode,
+        double finishWait,
+        double threshold,
+        double interval, double
+        timeout
 ) : UntilAnyImage(imgList, onPrevious, reverse, std::move(mode), finishWait, threshold, interval, timeout) {}
 
 void UntilIfAnyImage::loop(std::unique_ptr<Segment> &previous, int globalTimeout) {

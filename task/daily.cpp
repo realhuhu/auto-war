@@ -1,24 +1,10 @@
-#include <QJsonArray>
+#include "daily.h"
+
+#include "common.h"
 #include "../state.h"
 #include "../flow/cv.h"
 #include "../flow/runner.h"
 #include "../flow/emitter.h"
-
-std::map<std::string, bool> parse(const QString &category, const QString &key, const QJsonObject &jsonObject) {
-    std::map<std::string, bool> resultMap;
-    QJsonArray checkboxArray = jsonObject[category][key].toArray();
-
-    for (const auto &checkboxObj: checkboxArray) {
-        QJsonObject checkbox = checkboxObj.toObject();
-        QString text = checkbox["text"].toString();
-        bool value = checkbox["value"].toBool();
-
-        // 将 QString 转换为 std::string 并添加到 map 中
-        resultMap[text.toStdString()] = value;
-    }
-
-    return resultMap;
-}
 
 void hero_center() {
     auto config = parse("英雄中心", "checkbox", state.config);
@@ -46,12 +32,14 @@ void hero_center() {
             clicker = clicker->locate(start_until, run_until);
 
             clear_until(start_until, click_until, run_until);
-            run_until.emplace_back(std::make_unique<UntilImage>("/res/英雄中心/确定.png"));
-            clicker = clicker->clickIfFound(start_until, click_until, run_until, similarity_selector, 0, 1);
+            run_until.emplace_back(std::make_unique<UntilIfImage>("/res/英雄中心/确定.png"));
+            clicker = clicker->click(start_until, click_until, run_until, similarity_selector, 0, 1);
 
-            clear_until(start_until, click_until, run_until);
-            run_until.emplace_back(std::make_unique<UntilImage>("/res/英雄中心/确定.png", "inner", true));
-            clicker->clickIfFound(start_until, click_until, run_until);
+            if (clicker->founded()) {
+                clear_until(start_until, click_until, run_until);
+                run_until.emplace_back(std::make_unique<UntilImage>("/res/英雄中心/确定.png", "inner", true));
+                clicker->click(start_until, click_until, run_until);
+            }
         }
     }
 
@@ -92,7 +80,6 @@ void hero_center() {
 
 void war_center() {
     auto config = parse("战争学院", "checkbox", state.config);
-
 
     std::unique_ptr<ImageClicker> clicker;
 
@@ -220,7 +207,7 @@ void country_chest() {
     clicker->click(start_until, click_until, run_until);
 }
 
-void guild() {
+void guild() { //TODO
     auto config = parse("公会领奖", "checkbox", state.config);
 
     std::unique_ptr<ImageClicker> clicker;
@@ -264,12 +251,11 @@ void guild() {
 
     }
 
-
     clicker = std::make_unique<ImageClicker>("/res/公会领奖/公会.png");
 
     clear_until(start_until, click_until, run_until);
     run_until.emplace_back(std::make_unique<UntilImage>("/res/公会领奖/公会福利.png"));
-    clicker->clickIfFound(start_until, click_until, run_until);
+    clicker->click(start_until, click_until, run_until);
 
     if (config["领取活跃度奖励"]) {
         clicker = std::make_unique<ImageClicker>("/res/公会领奖/活跃任务.png");
@@ -282,26 +268,19 @@ void guild() {
         run_until.emplace_back(std::make_unique<UntilImage>("/res/公会领奖/今日公会活跃.png"));
         clicker->click(start_until, click_until, run_until);
 
-        for (const auto &i: std::vector<std::string>{"第一档", "第二档", "第三档", "第四档", "第五档"}) { //TODO 更新图片
+        for (const auto &i: std::vector<std::string>{"第一档", "第二档", "第三档", "第四档", "第五档"}) { //TODO
             clicker = std::make_unique<ImageClicker>("/res/公会领奖/" + i + ".png");
 
-            if (!clicker->founded()) {
-                continue;
-            }
-
-            clear_until(start_until, click_until, run_until);
-            run_until.emplace_back(std::make_unique<UntilImage>("/res/公会领奖/今日公会活跃.png"));
-            clicker = clicker->click(start_until, click_until, run_until);
+            if (!clicker->founded()) continue;
 
             clear_until(start_until, click_until, run_until);
             run_until.emplace_back(std::make_unique<UntilIfAnyImage>(std::initializer_list<const std::string>{
                     "/res/公会领奖/确定领取活跃奖励.png", "/res/公会领奖/确定任务数不够.png"
             }));
-            clicker = clicker->click(start_until, click_until, run_until);
 
-            if (!clicker->founded()) {
-                continue;
-            }
+            clicker = clicker->click(start_until, click_until, run_until, similarity_selector, 0, 1);
+
+            if (!clicker->founded()) continue;
 
             clear_until(start_until, click_until, run_until);
             run_until.emplace_back(std::make_unique<UntilImage>("/res/公会领奖/确定领取活跃奖励.png", "none", true));
@@ -384,12 +363,12 @@ void admiral() {
             clicker = clicker->locate(start_until, run_until);
 
             clear_until(start_until, click_until, run_until);
-            run_until.emplace_back(std::make_unique<UntilIfImage>("/res/将领抽奖/确定.png"));
-            clicker = clicker->clickIfFound(start_until, click_until, run_until, similarity_selector, 0, 1);
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/将领抽奖/确定.png"));
+            clicker = clicker->click(start_until, click_until, run_until, similarity_selector, 0, 1);
 
             clear_until(start_until, click_until, run_until);
-            run_until.emplace_back(std::make_unique<UntilIfImage>("/res/将领抽奖/确定.png", "inner", true));
-            clicker->clickIfFound(start_until, click_until, run_until);
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/将领抽奖/确定.png", "inner", true));
+            clicker->click(start_until, click_until, run_until);
         }
     }
 
@@ -449,11 +428,11 @@ void adviser() {
             clicker = clicker->locate(start_until, run_until);
 
             clear_until(start_until, click_until, run_until);
-            run_until.emplace_back(std::make_unique<UntilIfImage>("/res/参谋抽奖/确定.png"));
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/参谋抽奖/确定.png"));
             clicker = clicker->click(start_until, click_until, run_until, similarity_selector, 0, 1);
 
             clear_until(start_until, click_until, run_until);
-            run_until.emplace_back(std::make_unique<UntilIfImage>("/res/参谋抽奖/确定.png", "inner", true));
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/参谋抽奖/确定.png", "inner", true));
             clicker->click(start_until, click_until, run_until);
         }
 
@@ -492,9 +471,9 @@ void mortar() {
 
     clear_until(start_until, click_until, run_until);
     run_until.emplace_back(std::make_unique<UntilImage>("/res/火炮抽奖/远程火炮.png"));
-    clicker->click(start_until, click_until, run_until, similarity_selector, 0, 1);
+    clicker->clickIfFound(start_until, click_until, run_until, similarity_selector, 0, 1);
 
-    for (const auto &i: std::vector<std::string>{"绿", "蓝"}) { //TODO 紫色火炮派遣
+    for (const auto &i: std::vector<std::string>{"绿"}) { //TODO 蓝、紫色火炮派遣
         while (!state.stopFlag.load()) {
             clicker = std::make_unique<ImageClicker>("/res/火炮抽奖/" + i + "色免费派遣.png", 0, 0.9, 60, "rgb");
 

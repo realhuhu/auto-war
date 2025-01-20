@@ -21,7 +21,7 @@ Segment::Segment(
     y_center = y1 + h / 2;
 }
 
-void Segment::click(double wait, int offset_x, int offset_y, const std::string& position) const {
+void Segment::click(double wait, int offset_x, int offset_y, const std::string &position) const {
     int x, y;
     if (position == "left") {
         x = x1;
@@ -35,7 +35,7 @@ void Segment::click(double wait, int offset_x, int offset_y, const std::string& 
     } else if (position == "right") {
         x = x2;
         y = y_center;
-    } else{
+    } else {
         x = x_center;
         y = y_center;
     }
@@ -111,8 +111,10 @@ Selector position_selector(const std::string &attribute, const std::string &opti
 
         std::vector<Segment> sorted_segments = segments;
 
+        emit Emitter::instance()->log("候选点: ");
+
         for (const auto &i: segments) {
-            emit Emitter::instance()->log(QString::fromStdString(i.toString()));
+            emit Emitter::instance()->log("- " + QString::fromStdString(i.toString()));
         }
 
         auto compare = [&](const Segment &a, const Segment &b) {
@@ -131,7 +133,7 @@ Selector position_selector(const std::string &attribute, const std::string &opti
             std::reverse(sorted_segments.begin(), sorted_segments.end());
         }
 
-        emit Emitter::instance()->log(QString::fromStdString(sorted_segments[0].toString()) + "selected");
+        emit Emitter::instance()->log("选择: " + QString::fromStdString(sorted_segments[0].toString()));
 
         return sorted_segments[0];
     };

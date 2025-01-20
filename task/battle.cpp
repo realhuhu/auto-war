@@ -1,6 +1,7 @@
 // task.cpp
 #include "battle.h"
 
+#include "common.h"
 #include "../state.h"
 #include "../flow/runner.h"
 
@@ -343,6 +344,7 @@ void arms_compound() {
             clicker = clicker->click(start_until, click_until, run_until);
 
             clear_until(start_until, click_until, run_until);
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/军备合成/关闭窗口.png", "inner", true));
             run_until.emplace_back(std::make_unique<UntilImage>("/res/军备合成/关闭窗口.png"));
             clicker = clicker->click(start_until, click_until, run_until);
 
@@ -364,29 +366,44 @@ void arms_compound() {
 }
 
 void exterminate_enemy() {
+    auto config = parse("剿灭将领", "checkbox", state.config);
+
     std::unique_ptr<ImageClicker> clicker;
 
     std::vector<std::unique_ptr<Until>> start_until;
     std::vector<std::unique_ptr<Until>> click_until;
     std::vector<std::unique_ptr<Until>> run_until;
 
-    clicker = std::make_unique<ImageClicker>("/res/剿灭将领/剿灭将领.png");
+    clicker = std::make_unique<ImageClicker>("/res/剿灭将领/剿灭将领标题.png");
 
-    clear_until(start_until, click_until, run_until);
-    run_until.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
-            "/res/剿灭将领/剿灭将领标题.png", "/res/剿灭将领/等级不足.png"
-    }));
-    clicker = clicker->clickIfFound(start_until, click_until, run_until);
-
-    if (clicker->templatePath == "/res/剿灭将领/等级不足.png") {
-        clear_until(start_until, click_until, run_until);
-        run_until.emplace_back(std::make_unique<UntilImage>("/res/剿灭将领/确定.png", "down"));
-        clicker = clicker->locate(start_until, run_until);
+    if (!clicker->founded()) {
+        clicker = std::make_unique<ImageClicker>("/res/剿灭将领/剿灭将领.png");
 
         clear_until(start_until, click_until, run_until);
-        run_until.emplace_back(std::make_unique<UntilImage>("/res/剿灭将领/确定.png", "inner", true));
-        clicker->click(start_until, click_until, run_until);
-        return;
+        run_until.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+                "/res/剿灭将领/剿灭将领标题.png", "/res/剿灭将领/等级不足.png"
+        }));
+        clicker = clicker->click(start_until, click_until, run_until);
+
+        if (clicker->templatePath == "/res/剿灭将领/等级不足.png") {
+            clear_until(start_until, click_until, run_until);
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/剿灭将领/确定关闭.png", "down"));
+            clicker = clicker->locate(start_until, run_until);
+
+            clear_until(start_until, click_until, run_until);
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/剿灭将领/确定关闭.png", "inner", true));
+            clicker->click(start_until, click_until, run_until);
+            return;
+        }
+    }
+
+    std::vector<std::string> chosen;
+
+    // 遍历std::map
+    for (const auto &pair: config) {
+        if (pair.second) { // 如果值为true
+            chosen.emplace_back("/res/剿灭将领/" + pair.first + ".png"); // 将键添加到trueKeys中
+        }
     }
 
     while (!state.stopFlag.load()) {
@@ -394,42 +411,68 @@ void exterminate_enemy() {
 
         clear_until(start_until, click_until, run_until);
         run_until.emplace_back(std::make_unique<UntilImage>("/res/剿灭将领/合成.png"));
-        run_until.emplace_back(std::make_unique<UntilImage>("/res/剿灭将领/战斗进行中.png", "none", true));
-
-        clear_until(start_until, click_until, run_until);
-        run_until.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
-                "/res/剿灭将领/紫色元.png", "/res/剿灭将领/紫色帜.png", "/res/剿灭将领/紫色番.png",
-                "/res/剿灭将领/蓝色元.png", "/res/剿灭将领/蓝色帜.png", "/res/剿灭将领/蓝色番.png",
-                "/res/剿灭将领/绿色元.png", "/res/剿灭将领/绿色帜.png", "/res/剿灭将领/绿色番.png"
-        }, "right", false, "rgb"));
+        run_until.emplace_back(std::make_unique<UntilIfAnyImage>(chosen, "right", false, "rgb"));
         clicker = clicker->locate(start_until, run_until);
 
+        if (!clicker->founded()) {
+            clicker = std::make_unique<ImageClicker>("/res/剿灭将领/刷新.png");
+
+            clear_until(start_until, click_until, run_until);
+            click_until.emplace_back(std::make_unique<UntilImage>("/res/剿灭将领/确定刷新.png"));
+            clicker = clicker->click(start_until, click_until, run_until);
+
+            clear_until(start_until, click_until, run_until);
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/剿灭将领/确定刷新.png", "inner", true));
+            clicker->click(start_until, click_until, run_until);
+            continue;
+        }
+
         clear_until(start_until, click_until, run_until);
+        run_until.emplace_back(std::make_unique<UntilImage>("/res/剿灭将领/战斗进行中.png", "none", true));
         run_until.emplace_back(std::make_unique<UntilImage>("/res/剿灭将领/进攻.png", "down_center"));
         clicker = clicker->locate(start_until, run_until);
 
         clear_until(start_until, click_until, run_until);
-        click_until.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+        run_until.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
                 "/res/剿灭将领/确认胜利.png", "/res/剿灭将领/已集齐.png", "/res/剿灭将领/次数不足.png"
         }));
         clicker = clicker->click(start_until, click_until, run_until);
 
-        if (clicker->templatePath == "/res/剿灭将领/已集齐.png" ||
-            clicker->templatePath == "/res/剿灭将领/次数不足.png") {
+        if (clicker->templatePath == "/res/剿灭将领/次数不足.png") {
             clear_until(start_until, click_until, run_until);
             run_until.emplace_back(std::make_unique<UntilImage>("/res/剿灭将领/关闭窗口.png", "right"));
-            clicker = clicker->locate(start_until, run_until);
+            clicker = clicker->locate(start_until, run_until, position_selector("y_center", "max"));
 
             clear_until(start_until, click_until, run_until);
-            run_until.emplace_back(std::make_unique<UntilImage>("/res/剿灭将领/合成.png"));
-            clicker = clicker->click(start_until, click_until, run_until, position_selector("y_center", "max"));
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/剿灭将领/关闭窗口.png", "inner", true));
+            clicker = clicker->click(start_until, click_until, run_until);
 
             clear_until(start_until, click_until, run_until);
             run_until.emplace_back(std::make_unique<UntilImage>("/res/剿灭将领/关闭窗口.png"));
             clicker = clicker->click(start_until, click_until, run_until);
 
-            clicker->click();
+            clear_until(start_until, click_until, run_until);
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/剿灭将领/关闭窗口.png", "inner", true));
+            clicker->click(start_until, click_until, run_until);
             break;
+        } else if (clicker->templatePath == "/res/剿灭将领/已集齐.png") {
+            clear_until(start_until, click_until, run_until);
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/剿灭将领/关闭窗口.png", "right"));
+            clicker = clicker->locate(start_until, run_until, position_selector("y_center", "max"));
+
+            clear_until(start_until, click_until, run_until);
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/剿灭将领/关闭窗口.png", "inner", true));
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/剿灭将领/合成.png"));
+            clicker = clicker->click(start_until, click_until, run_until);
+
+            clear_until(start_until, click_until, run_until);
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/剿灭将领/确定奖励.png"));
+            clicker = clicker->click(start_until, click_until, run_until);
+
+            clear_until(start_until, click_until, run_until);
+            run_until.emplace_back(std::make_unique<UntilImage>("/res/剿灭将领/确定奖励.png", "inner", true));
+            clicker->click(start_until, click_until, run_until);
+            continue;
         }
 
         clear_until(start_until, click_until, run_until);

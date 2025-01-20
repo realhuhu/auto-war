@@ -77,22 +77,22 @@
             {
                 "order": 6,
                 "text": "绿色元",
-                "value": false
+                "value": true
             },
             {
                 "order": 7,
                 "text": "绿色帜",
-                "value": false
+                "value": true
             },
             {
                 "order": 8,
                 "text": "绿色番",
-                "value": false
+                "value": true
             }
         ],
         "input": [
         ],
-        "tips": ""
+        "tips": "没有对应敌人会使用刷新令，请提前准备刷新令\n会一直攻击到次数结束，打多轮时请提前购买次数"
     },
     "参谋抽奖": {
         "checkbox": [
