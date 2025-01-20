@@ -375,7 +375,7 @@ void country_war() {
                 "/国家战争/纽约.png", "/国家战争/芝加哥.png", "/国家战争/波尔多.png",
                 "/国家战争/马赛.png", "/国家战争/慕尼黑.png", "/国家战争/法兰克福.png",
                 "/国家战争/列宁格勒.png", "/国家战争/叶卡捷琳堡.png", "/国家战争/都灵.png",
-                "/国家战争/米兰.png",
+                "/国家战争/米兰.png", "/国家战争/伯明翰.png", "/国家战争/曼彻斯特.png"
         }, "right"));
         clicker = clicker->locate(start_until, run_until);
 
@@ -429,7 +429,7 @@ void country_war() {
             offset_y = 54;
         } else if (city == "曼彻斯特") {
             offset_x = 89;
-            offset_y = -260;
+            offset_y = -206;
         }
 
         clear_until(start_until, click_until, run_until);
@@ -504,7 +504,7 @@ void country_war() {
 
         clear_until(start_until, click_until, run_until);
         click_until.emplace_back(std::make_unique<UntilImage>("/国家战争/结束战斗.png", "inner", true));
-        click_until.emplace_back(std::make_unique<UntilImage>("/国家战争/前往.png"));
+        run_until.emplace_back(std::make_unique<UntilImage>("/国家战争/前往.png"));
         clicker->click(start_until, click_until, run_until);
     }
 }

@@ -227,7 +227,7 @@ bool UntilAnyImage::flag(std::unique_ptr<Segment> &previous) {
 }
 
 std::string UntilAnyImage::toString() const {
-    auto start = QString("等待任意|");
+    auto start = QString("等待|");
 
     for (const auto &currentImgPath: imgPathList) {
         start += QString("<img src='%1' alt='%2' height='14'>|").arg(
@@ -356,7 +356,7 @@ void UntilIfAnyImage::loop(std::unique_ptr<Segment> &previous, int globalTimeout
 }
 
 std::string UntilIfAnyImage::toString() const {
-    auto start = QString("尝试等待任意|");
+    auto start = QString("尝试等待|");
 
     for (const auto &currentImgPath: imgPathList) {
         start += QString("<img src='%1' alt='%2' height='14'>|").arg(

@@ -18,7 +18,7 @@
             {
                 "order": 1,
                 "text": "领取活跃度奖励",
-                "value": false
+                "value": true
             },
             {
                 "order": 2,

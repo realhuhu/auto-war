@@ -38,10 +38,9 @@
         <file>resources/segment/公会领奖/查看成员排名.png</file>
         <file>resources/segment/公会领奖/活跃任务.png</file>
         <file>resources/segment/公会领奖/活跃任务按钮.png</file>
-        <file>resources/segment/公会领奖/确定任务数不够.png</file>
         <file>resources/segment/公会领奖/确定报名.png</file>
         <file>resources/segment/公会领奖/确定领取公会战奖励.png</file>
-        <file>resources/segment/公会领奖/确定领取活跃奖励.png</file>
+        <file>resources/segment/公会领奖/确定活跃奖励.png</file>
         <file>resources/segment/公会领奖/第一档.png</file>
         <file>resources/segment/公会领奖/第三档.png</file>
         <file>resources/segment/公会领奖/第二档.png</file>
@@ -107,6 +106,7 @@
         <file>resources/segment/参谋抽奖/参谋抽奖.png</file>
         <file>resources/segment/参谋抽奖/参谋面板.png</file>
         <file>resources/segment/参谋抽奖/确定.png</file>
+        <file>resources/segment/参谋抽奖/确定未开启.png</file>
         <file>resources/segment/国家争霸/争霸战图标.png</file>
         <file>resources/segment/国家争霸/争霸战标题.png</file>
         <file>resources/segment/国家争霸/关闭窗口.png</file>
@@ -127,9 +127,11 @@
         <file>resources/segment/国家宝箱/战功进度宝箱.png</file>
         <file>resources/segment/国家宝箱/月卡宝箱.png</file>
         <file>resources/segment/国家宝箱/波尔多.png</file>
-        <file>resources/segment/国家宝箱/确定没有月卡.png</file>
+        <file>resources/segment/国家宝箱/确定.png</file>
         <file>resources/segment/国家宝箱/领取排名奖励.png</file>
         <file>resources/segment/国家战争/世界地图.png</file>
+        <file>resources/segment/国家战争/伯明翰.png</file>
+        <file>resources/segment/国家战争/伯明翰城.png</file>
         <file>resources/segment/国家战争/兑换.png</file>
         <file>resources/segment/国家战争/关闭窗口.png</file>
         <file>resources/segment/国家战争/列宁格勒.png</file>
@@ -148,6 +150,8 @@
         <file>resources/segment/国家战争/慕尼黑城.png</file>
         <file>resources/segment/国家战争/扫荡.png</file>
         <file>resources/segment/国家战争/摩多军团.png</file>
+        <file>resources/segment/国家战争/曼彻斯特.png</file>
+        <file>resources/segment/国家战争/曼彻斯特城.png</file>
         <file>resources/segment/国家战争/法兰克福.png</file>
         <file>resources/segment/国家战争/法兰克福城.png</file>
         <file>resources/segment/国家战争/波尔多.png</file>
@@ -189,6 +193,7 @@
         <file>resources/segment/火炮抽奖/关闭窗口.png</file>
         <file>resources/segment/火炮抽奖/派遣.png</file>
         <file>resources/segment/火炮抽奖/确定.png</file>
+        <file>resources/segment/火炮抽奖/确定未开启.png</file>
         <file>resources/segment/火炮抽奖/绿色免费派遣.png</file>
         <file>resources/segment/火炮抽奖/蓝色免费派遣.png</file>
         <file>resources/segment/火炮抽奖/远程火炮.png</file>

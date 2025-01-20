@@ -84,7 +84,6 @@ private:
     QToolButton *settingButton;
 };
 
-
 class LabeledSpinBox : public QWidget {
 public:
     LabeledSpinBox(const QString &text, int value, QWidget *parent = nullptr)
@@ -169,10 +168,10 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     tasks["火炮抽奖"] = mortar;
     tasks["配件抽奖"] = equipment;
     tasks["军备抽奖"] = arms;
-    tasks["公会建筑"] = guild_building;
+//    tasks["公会建筑"] = guild_building;
     command_daily = QStringList({
                                         "英雄中心", "战争学院", "国家宝箱", "公会领奖", "将领抽奖", "参谋抽奖",
-                                        "火炮抽奖", "配件抽奖", "军备抽奖", "公会建筑",
+                                        "火炮抽奖", "配件抽奖", "军备抽奖"
                                 });
 
     // 初始时不安装钩子
@@ -237,7 +236,7 @@ void MainWindow::onLogMessage(const QString &text, const QString &color) const {
                 <div>
                 <span style="color:white;background-color:green;">&nbsp;%1&nbsp;</span>
                 <span style="color:%2;">%3</span>
-                <img src=":/resources/ui/transparent.png" height='14'>
+                <img src=":/resources/ui/transparent.png" height='14' width='1'>
                 </div>
                 )"
     ).arg(timeString, color, text);
