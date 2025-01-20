@@ -77,17 +77,17 @@
             {
                 "order": 6,
                 "text": "绿色元",
-                "value": false
+                "value": true
             },
             {
                 "order": 7,
                 "text": "绿色帜",
-                "value": false
+                "value": true
             },
             {
                 "order": 8,
                 "text": "绿色番",
-                "value": false
+                "value": true
             }
         ],
         "input": [

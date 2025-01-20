@@ -102,9 +102,9 @@ void ImageClicker::_start(
 
     for (const auto &startUntil: startUntilList) {
 
-        emit Emitter::instance()->log(QString::fromStdString("start条件判断: " + startUntil->toString()));
+        emit Emitter::instance()->log(QString::fromStdString("START判断: " + startUntil->toString()));
         (*startUntil).loop(previousSegment, globalTimeout);
-        emit Emitter::instance()->log(QString::fromStdString("start条件满足: " + startUntil->toString()));
+        emit Emitter::instance()->log(QString::fromStdString("START满足: " + startUntil->toString()));
     }
 }
 
@@ -142,10 +142,10 @@ void ImageClicker::_click(
         }
 
         if (allFulfilled) {
-            emit Emitter::instance()->log("所有click条件已满足，结束循环点击");
+            emit Emitter::instance()->log("所有CLICK满足，结束循环点击");
             break;
         }
-        emit Emitter::instance()->log("click条件不满足，继续循环点击");
+        emit Emitter::instance()->log("CLICK不满足，继续循环点击");
 
         std::this_thread::sleep_for(std::chrono::duration<float>(0.5));
     }
@@ -159,9 +159,9 @@ void ImageClicker::_finish(
     }
 
     for (const auto &runUntil: runUntilList) {
-        emit Emitter::instance()->log(QString::fromStdString("run条件判断: " + runUntil->toString()));
+        emit Emitter::instance()->log(QString::fromStdString("RUN判断: " + runUntil->toString()));
         (*runUntil).loop(previousSegment, globalTimeout);
-        emit Emitter::instance()->log(QString::fromStdString("run条件满足: " + runUntil->toString()));
+        emit Emitter::instance()->log(QString::fromStdString("RUN满足: " + runUntil->toString()));
     }
 }
 
@@ -187,7 +187,6 @@ std::unique_ptr<ImageClicker> ImageClicker::_execute(
     auto clicker = _createChain(clickUntilList, runUntilList);
 
     emit Emitter::instance()->log(QString::fromStdString(this->toString() + "结束" + name + "流程"), "green");
-    emit Emitter::instance()->log(QString::fromStdString("下一调用链: " + (clicker ? clicker->toString() : "无")));
     return clicker;
 }
 
