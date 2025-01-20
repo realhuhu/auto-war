@@ -9,8 +9,11 @@ set(OpenCV_DIR "D:/opencv/dist/install")
 set(CMAKE_PREFIX_PATH "C:/Qt/Qt5.14.2/5.14.2/mingw73_64")
 set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
 
+
 find_package(OpenCV REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets REQUIRED)
+
+qt5_add_resources(qrc_FILES resources.qrc)
 
 add_executable(qt
         WIN32
@@ -34,6 +37,7 @@ add_executable(qt
         task/daily.cpp
         task/common.h
         task/common.cpp
+        ${qrc_FILES}
 )
 
 target_link_libraries(qt ${OpenCV_LIBS})

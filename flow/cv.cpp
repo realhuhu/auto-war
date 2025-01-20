@@ -52,11 +52,11 @@ std::vector<Segment> CV::find_positions(
 ) {
     cv::Mat templateImg;
     cv::Mat Image1;
-    auto absolutePath = QCoreApplication::applicationDirPath() + QString::fromStdString(templatePath);
-    QFile file(absolutePath);
+
+    QFile file(":/resources/segment" + QString::fromStdString(templatePath));
 
     if (!file.open(QIODevice::ReadOnly)) {
-        throw std::runtime_error("文件不存在: " + absolutePath.toStdString());
+        throw std::runtime_error("文件不存在: " + templatePath);
     }
 
     QByteArray byteArray = file.readAll();
