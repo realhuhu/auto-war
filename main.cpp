@@ -435,7 +435,6 @@ void MainWindow::select_command() {
     }
 }
 
-
 void MainWindow::set_command(const QString &command) {
     QDialog settingDialog(this);
     settingDialog.setWindowTitle("设置 " + command);
