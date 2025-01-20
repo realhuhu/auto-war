@@ -169,7 +169,12 @@ bool UntilImage::flag(std::unique_ptr<Segment> &previous) {
 }
 
 std::string UntilImage::toString() const {
-    return "[等待图片 " + std::filesystem::path(imgPath).stem().string() + "]";
+    return QString(
+            "等待图片<img src='%1' alt='%2' height='14'>"
+    ).arg(
+            ":/resources/segment" + QString::fromStdString(imgPath),
+            QString::fromStdString(std::filesystem::path(imgPath).stem().string())
+    ).toStdString();
 }
 
 
@@ -221,14 +226,16 @@ bool UntilAnyImage::flag(std::unique_ptr<Segment> &previous) {
 }
 
 std::string UntilAnyImage::toString() const {
-    std::string img_stems;
+    auto start = QString("等待任意图片|");
+
     for (const auto &currentImgPath: imgPathList) {
-        img_stems += std::filesystem::path(currentImgPath).stem().string() + "|";
+        start += QString("<img src='%1' alt='%2' height='14'>|").arg(
+                ":/resources/segment" + QString::fromStdString(currentImgPath),
+                QString::fromStdString(std::filesystem::path(currentImgPath).stem().string())
+        );
     }
-    if (!img_stems.empty()) {
-        img_stems.pop_back();
-    }
-    return "[等待任意图片 " + img_stems + "]";
+
+    return start.toStdString();
 }
 
 
@@ -288,7 +295,12 @@ bool UntilImageStable::flag(std::unique_ptr<Segment> &previous) {
 }
 
 std::string UntilImageStable::toString() const {
-    return "[等待图片稳定 " + std::filesystem::path(imgPath).stem().string() + "]";
+    return QString(
+            "等待图片稳定<img src='%1' alt='%2' height='14'>"
+    ).arg(
+            ":/resources/segment" + QString::fromStdString(imgPath),
+            QString::fromStdString(std::filesystem::path(imgPath).stem().string())
+    ).toStdString();
 }
 
 
@@ -307,7 +319,12 @@ void UntilIfImage::loop(std::unique_ptr<Segment> &previous, int globalTimeout) {
 }
 
 std::string UntilIfImage::toString() const {
-    return "[尝试等待图片 " + std::filesystem::path(imgPath).stem().string() + "]";
+    return QString(
+            "尝试等待图片<img src='%1' alt='%2' height='14'>"
+    ).arg(
+            ":/resources/segment" + QString::fromStdString(imgPath),
+            QString::fromStdString(std::filesystem::path(imgPath).stem().string())
+    ).toStdString();
 }
 
 
@@ -338,14 +355,16 @@ void UntilIfAnyImage::loop(std::unique_ptr<Segment> &previous, int globalTimeout
 }
 
 std::string UntilIfAnyImage::toString() const {
-    std::string img_stems;
+    auto start = QString("尝试等待任意图片|");
+
     for (const auto &currentImgPath: imgPathList) {
-        img_stems += std::filesystem::path(currentImgPath).stem().string() + "|";
+        start += QString("<img src='%1' alt='%2' height='14'>|").arg(
+                ":/resources/segment" + QString::fromStdString(currentImgPath),
+                QString::fromStdString(std::filesystem::path(currentImgPath).stem().string())
+        );
     }
-    if (!img_stems.empty()) {
-        img_stems.pop_back();
-    }
-    return "[尝试等待任意图片 " + img_stems + "]";
+
+    return start.toStdString();
 }
 
 

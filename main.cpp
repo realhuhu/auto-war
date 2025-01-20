@@ -117,7 +117,7 @@ private:
 
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     setWindowTitle("红警自动");
-    resize(420, 280);
+    resize(480, 320);
 
     // 获取主屏幕
     QScreen *screen = QApplication::primaryScreen();
@@ -235,8 +235,9 @@ void MainWindow::onLogMessage(const QString &text, const QString &color) const {
     QString html = QString(
             R"(
                 <div>
-                <span style="color:white;background-color:green;margin_right 5px">&nbsp;%1&nbsp;</span>
+                <span style="color:white;background-color:green;">&nbsp;%1&nbsp;</span>
                 <span style="color:%2;">%3</span>
+                <img src=":/resources/ui/transparent.png" height='14'>
                 </div>
                 )"
     ).arg(timeString, color, text);

@@ -84,11 +84,15 @@ Segment Segment::copy() const {
 
 std::string Segment::toString() const {
     std::filesystem::path p(this->path);
-    return "[" + p.stem().string() +
-           "(" + std::to_string(this->x_center) + ", " + std::to_string(this->y_center) +
-           ")]";
+    return QString(
+            "(%3, %4)<img src='%1' alt='%2' height='14'>"
+    ).arg(
+            QString::fromStdString(this->path),
+            QString::fromStdString(p.stem().string()),
+            QString::number(this->x_center),
+            QString::number(this->y_center)
+    ).toStdString();
 }
-
 
 Segment similarity_selector(const std::vector<Segment> &segments) {
     if (segments.empty()) {
@@ -111,11 +115,11 @@ Selector position_selector(const std::string &attribute, const std::string &opti
 
         std::vector<Segment> sorted_segments = segments;
 
-        emit Emitter::instance()->log("候选点: ");
-
-        for (const auto &i: segments) {
-            emit Emitter::instance()->log("- " + QString::fromStdString(i.toString()));
-        }
+//        emit Emitter::instance()->log("候选点: ");
+//
+//        for (const auto &i: segments) {
+//            emit Emitter::instance()->log("- " + QString::fromStdString(i.toString()));
+//        }
 
         auto compare = [&](const Segment &a, const Segment &b) {
             if (attribute == "x1") return a.x1 < b.x1;
@@ -133,7 +137,7 @@ Selector position_selector(const std::string &attribute, const std::string &opti
             std::reverse(sorted_segments.begin(), sorted_segments.end());
         }
 
-        emit Emitter::instance()->log("选择: " + QString::fromStdString(sorted_segments[0].toString()));
+//        emit Emitter::instance()->log("选择: " + QString::fromStdString(sorted_segments[0].toString()));
 
         return sorted_segments[0];
     };

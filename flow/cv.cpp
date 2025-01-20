@@ -52,8 +52,8 @@ std::vector<Segment> CV::find_positions(
 ) {
     cv::Mat templateImg;
     cv::Mat Image1;
-
-    QFile file(":/resources/segment" + QString::fromStdString(templatePath));
+    auto fullPath = ":/resources/segment" + templatePath;
+    QFile file(QString::fromStdString(fullPath));
 
     if (!file.open(QIODevice::ReadOnly)) {
         throw std::runtime_error("文件不存在: " + templatePath);
@@ -82,7 +82,7 @@ std::vector<Segment> CV::find_positions(
         int w = templateImg.cols;
         int h = templateImg.rows;
         for (const auto &loc: locations) {
-            segments.emplace_back(templatePath, result.at<double>(loc.y, loc.x), w, h, loc.x, loc.y);
+            segments.emplace_back(fullPath, result.at<double>(loc.y, loc.x), w, h, loc.x, loc.y);
         }
         return segments;
     } else {
@@ -98,7 +98,7 @@ std::vector<Segment> CV::find_positions(
         int h = templateImg.rows;
         for (const auto &loc: locations) {
             segments.emplace_back(
-                    templatePath,
+                    fullPath,
                     result.at<double>(loc.y, loc.x),
                     w * state.scale,
                     h * state.scale,
