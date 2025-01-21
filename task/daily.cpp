@@ -265,12 +265,12 @@ void guild() {
         clicker->click(start_until, click_until, run_until);
 
         for (const auto &i: std::vector<std::string>{"第一档", "第二档", "第三档", "第四档", "第五档"}) {
-            clicker = std::make_unique<ImageClicker>("/公会领奖/" + i + ".png", 0, 0.9, 60, "rgb");
+            clicker = std::make_unique<ImageClicker>("/公会领奖/" + i + ".png", 0, 0.95, 60, "rgb");
 
             if (!clicker->founded()) continue;
 
             clear_until(start_until, click_until, run_until);
-            run_until.emplace_back(std::make_unique<UntilImage>("/公会领奖/确定活跃奖励.png"));
+            click_until.emplace_back(std::make_unique<UntilImage>("/公会领奖/确定活跃奖励.png"));
             clicker = clicker->click(start_until, click_until, run_until, similarity_selector, 0, 1);
 
             clear_until(start_until, click_until, run_until);
@@ -480,9 +480,9 @@ void mortar() {
         return;
     }
 
-    for (const auto &i: std::vector<std::string>{"绿", "蓝"}) { //TODO 紫色火炮派遣
+    for (const auto &i: std::vector<std::string>{"绿", "蓝", "紫"}) {
         while (!state.stopFlag.load()) {
-            clicker = std::make_unique<ImageClicker>("/火炮抽奖/" + i + "色免费派遣.png", 0, 0.9, 60, "rgb");
+            clicker = std::make_unique<ImageClicker>("/火炮抽奖/" + i + "色免费派遣.png", 0, 0.95, 60, "rgb");
 
             if (!clicker->founded())break;
 

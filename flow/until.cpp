@@ -119,6 +119,11 @@ std::vector<Segment> Until::filter(const std::vector<Segment> &positions, std::u
         }
     }
 
+    emit Emitter::instance()->log(
+            "筛选前: " + QString::number(positions.size()) +
+            ", 筛选后: " + QString::number(result.size())
+    );
+
     return result;
 }
 
@@ -164,6 +169,7 @@ bool UntilImage::flag(std::unique_ptr<Segment> &previous) {
         targetSegmentList = filteredPositions;
         return true;
     }
+
 
     return false;
 }

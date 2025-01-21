@@ -21,9 +21,7 @@ ImageClicker::ImageClicker(
     globalThreshold(threshold),
     globalTimeout(timeout) {
 
-    if (wait) {
-        std::this_thread::sleep_for(std::chrono::duration<float>(wait));
-    }
+    if (wait) std::this_thread::sleep_for(std::chrono::duration<float>(wait));
 
     targetSegmentList = CV::find_positions(CV::get_screen(mode), imgPath, globalThreshold, mode);
 }
@@ -54,7 +52,6 @@ ImageClicker::ImageClicker(
 ) : templatePath(std::move(imgPath)),
     globalThreshold(threshold),
     globalTimeout(timeout) {
-
     targetSegmentList.push_back(segment);
 }
 
@@ -72,15 +69,13 @@ std::unique_ptr<ImageClicker> ImageClicker::_createChain(
         const std::vector<std::unique_ptr<Until>> &clickUntilList,
         const std::vector<std::unique_ptr<Until>> &runUntilList
 ) {
-    const Until *until = nullptr;
+    const Until *until;
 
     if (!runUntilList.empty()) {
         until = runUntilList.back().get();
     } else if (!clickUntilList.empty()) {
         until = clickUntilList.back().get();
-    }
-
-    if (!until) {
+    }else{
         return nullptr;
     }
 
@@ -96,12 +91,9 @@ void ImageClicker::_start(
         float startWait,
         const std::vector<std::unique_ptr<Until>> &startUntilList
 ) {
-    if (startWait > 0) {
-        std::this_thread::sleep_for(std::chrono::duration<float>(startWait));
-    }
+    if (startWait > 0) std::this_thread::sleep_for(std::chrono::duration<float>(startWait));
 
     for (const auto &startUntil: startUntilList) {
-
         emit Emitter::instance()->log(QString::fromStdString("START判断: " + startUntil->toString()));
         (*startUntil).loop(previousSegment, globalTimeout);
         emit Emitter::instance()->log(QString::fromStdString("START满足: " + startUntil->toString()));
@@ -128,10 +120,7 @@ void ImageClicker::_click(
 
         segment.click(0, offset_x, offset_y, position);
 
-
-        if (clickUntilList.empty()) {
-            break;
-        }
+        if (clickUntilList.empty()) break;
 
         bool allFulfilled = true;
         for (const auto &clickUntil: clickUntilList) {
