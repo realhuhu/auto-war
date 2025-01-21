@@ -257,7 +257,7 @@ void guild() {
         clicker = std::make_unique<ImageClicker>("/公会领奖/活跃任务.png");
 
         clear_until(start_until, click_until, run_until);
-        run_until.emplace_back(std::make_unique<UntilImage>("/公会领奖/活跃任务按钮.png"));
+        click_until.emplace_back(std::make_unique<UntilImage>("/公会领奖/活跃任务按钮.png"));
         clicker = clicker->click(start_until, click_until, run_until);
 
         clear_until(start_until, click_until, run_until);
@@ -417,7 +417,9 @@ void adviser() {
 
     if (config["免费抽奖"]) {
         while (!state.stopFlag.load()) {
-            clicker = std::make_unique<ImageClicker>("/参谋抽奖/参谋免费.png");
+            clicker = std::make_unique<ImageClicker>(
+                    std::vector<std::string>{"/参谋抽奖/参谋免费.png", "/参谋抽奖/必得免费.png"}
+            );
 
             if (!clicker->founded())break;
 

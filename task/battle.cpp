@@ -471,10 +471,10 @@ void country_war() {
             clicker = clicker->click(start_until, click_until, run_until);
         }
 
-        clear_until(start_until, click_until, run_until); //TODO反向过滤
+        clear_until(start_until, click_until, run_until);
         start_until.emplace_back(std::make_unique<UntilImage>("/国家战争/可战斗.png", "none", false, "rgb", 0.6));
         run_until.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
-                "/国家战争/恢复行动力.png", "/国家战争/跳过战斗.png"
+                "/国家战争/恢复行动力.png", "/国家战争/跳过战斗.png", "/国家战争/请稍后.png"
         }));
         clicker = clicker->click(start_until, click_until, run_until);
 
@@ -496,6 +496,20 @@ void country_war() {
             run_until.emplace_back(std::make_unique<UntilImage>("/国家战争/国家.png"));
             clicker->click(start_until, click_until, run_until);
             break;
+        }
+
+        if (clicker->templatePath == "/国家战争/请稍后.png") {
+            clear_until(start_until, click_until, run_until);
+            run_until.emplace_back(std::make_unique<UntilImage>("/国家战争/确定稍后.png", "down"));
+            clicker = clicker->locate(start_until, run_until);
+
+            clear_until(start_until, click_until, run_until);
+            run_until.emplace_back(std::make_unique<UntilImage>("/国家战争/扫荡.png"));
+            clicker = clicker->click(start_until, click_until, run_until);
+
+            clear_until(start_until, click_until, run_until);
+            run_until.emplace_back(std::make_unique<UntilImage>("/国家战争/跳过战斗.png"));
+            clicker->click(start_until, click_until, run_until, similarity_selector, 2);
         }
 
         clear_until(start_until, click_until, run_until);
