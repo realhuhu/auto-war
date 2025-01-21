@@ -5,6 +5,8 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-std::map<std::string, bool> parse(const QString &category, const QString &key, const QJsonObject &jsonObject) ;
+std::map<std::string, bool> parseBoolConfig(const QString &category, const QString &key, const QJsonObject &jsonObject);
+
+std::map<std::string, int> parseIntConfig(const QString &category, const QString &key, const QJsonObject &jsonObject);
 
 #endif //QT_COMMON_H

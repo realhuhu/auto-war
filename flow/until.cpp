@@ -179,7 +179,7 @@ std::string UntilImage::toString() const {
             "等待%1<img src='%2' alt='%3' height='14'>"
     ).arg(
             QString(reverse ? "消失" : ""),
-            ":/resources/segment" + QString::fromStdString(imgPath),
+            QCoreApplication::applicationDirPath() + QString::fromStdString("/res" + imgPath),
             QString::fromStdString(std::filesystem::path(imgPath).stem().string())
     ).toStdString();
 }
@@ -237,7 +237,7 @@ std::string UntilAnyImage::toString() const {
 
     for (const auto &currentImgPath: imgPathList) {
         start += QString("<img src='%1' alt='%2' height='14'>|").arg(
-                ":/resources/segment" + QString::fromStdString(currentImgPath),
+                QCoreApplication::applicationDirPath() + QString::fromStdString("/res" + currentImgPath),
                 QString::fromStdString(std::filesystem::path(currentImgPath).stem().string())
         );
     }
@@ -305,7 +305,7 @@ std::string UntilImageStable::toString() const {
     return QString(
             "等待稳定<img src='%1' alt='%2' height='14'>"
     ).arg(
-            ":/resources/segment" + QString::fromStdString(imgPath),
+            QCoreApplication::applicationDirPath() + QString::fromStdString("/res" + imgPath),
             QString::fromStdString(std::filesystem::path(imgPath).stem().string())
     ).toStdString();
 }
@@ -329,7 +329,7 @@ std::string UntilIfImage::toString() const {
     return QString(
             "尝试等待<img src='%1' alt='%2' height='14'>"
     ).arg(
-            ":/resources/segment" + QString::fromStdString(imgPath),
+            QCoreApplication::applicationDirPath() + QString::fromStdString("/res" + imgPath),
             QString::fromStdString(std::filesystem::path(imgPath).stem().string())
     ).toStdString();
 }
@@ -366,7 +366,7 @@ std::string UntilIfAnyImage::toString() const {
 
     for (const auto &currentImgPath: imgPathList) {
         start += QString("<img src='%1' alt='%2' height='14'>|").arg(
-                ":/resources/segment" + QString::fromStdString(currentImgPath),
+                QCoreApplication::applicationDirPath() + QString::fromStdString("/res" + currentImgPath),
                 QString::fromStdString(std::filesystem::path(currentImgPath).stem().string())
         );
     }

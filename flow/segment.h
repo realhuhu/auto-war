@@ -34,7 +34,7 @@ struct Segment {
             int x, int y
     );
 
-    void click(double wait = 0.1, int offset_x = 0, int offset_y = 0, const std::string& position = "center") const;
+    void click(double wait = 0.1, int offset_x = 0, int offset_y = 0, const std::string &position = "center") const;
 
     [[nodiscard]] std::string on(const Segment &segment, const std::string &basis) const;
 
@@ -64,5 +64,7 @@ Segment similarity_selector(const std::vector<Segment> &segments);
 Selector position_selector(const std::string &attribute, const std::string &option);
 
 Segment random_selector(const std::vector<Segment> &segments);
+
+Selector ordered_random_selector(const std::string &attribute, const std::string &option, size_t top);
 
 #endif // QT_SEGMENT_H

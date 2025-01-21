@@ -6,6 +6,8 @@
 #include "../flow/runner.h"
 
 void country_arena() {
+    auto config = parseIntConfig("国家争霸", "input", state.config);
+
     std::unique_ptr<ImageClicker> clicker;
 
     std::vector<std::unique_ptr<Until>> start_until;
@@ -46,7 +48,8 @@ void country_arena() {
         run_until.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
                 "/国家争霸/跳过战斗.png", "/国家争霸/购买次数.png"
         }));
-        clicker = clicker->click(start_until, click_until, run_until, random_selector);
+        clicker = clicker->click(start_until, click_until, run_until,
+                                 ordered_random_selector("y_center", "min", config["打前"]));
 
         if (clicker->templatePath == "/国家争霸/购买次数.png") {
             clear_until(start_until, click_until, run_until);
@@ -79,6 +82,8 @@ void country_arena() {
 }
 
 void world_arena() {
+    auto config = parseIntConfig("世界争霸", "input", state.config);
+
     std::unique_ptr<ImageClicker> clicker;
 
     std::vector<std::unique_ptr<Until>> start_until;
@@ -113,7 +118,8 @@ void world_arena() {
         run_until.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
                 "/世界争霸/跳过战斗.png", "/世界争霸/购买次数.png"
         }));
-        clicker = clicker->click(start_until, click_until, run_until, random_selector);
+        clicker = clicker->click(start_until, click_until, run_until,
+                                 ordered_random_selector("y_center", "min", config["打前"]));
 
         if (clicker->templatePath == "/世界争霸/购买次数.png") {
             clear_until(start_until, click_until, run_until);
@@ -146,7 +152,7 @@ void world_arena() {
 }
 
 void exterminate_enemy() {
-    auto config = parse("剿灭将领", "checkbox", state.config);
+    auto config = parseBoolConfig("剿灭将领", "checkbox", state.config);
 
     std::unique_ptr<ImageClicker> clicker;
 
@@ -209,12 +215,15 @@ void exterminate_enemy() {
             clicker = std::make_unique<ImageClicker>("/剿灭将领/刷新.png");
 
             clear_until(start_until, click_until, run_until);
-            click_until.emplace_back(std::make_unique<UntilImage>("/剿灭将领/确定刷新.png"));
-            clicker = clicker->click(start_until, click_until, run_until);
+            clicker->click(start_until, click_until, run_until, similarity_selector, 0, 0.5);
 
-            clear_until(start_until, click_until, run_until);
-            run_until.emplace_back(std::make_unique<UntilImage>("/剿灭将领/确定刷新.png", "inner", true));
-            clicker->click(start_until, click_until, run_until);
+            clicker = std::make_unique<ImageClicker>("/剿灭将领/确定刷新.png");
+
+            if (clicker->founded()) {
+                clear_until(start_until, click_until, run_until);
+                run_until.emplace_back(std::make_unique<UntilImage>("/剿灭将领/确定刷新.png", "inner", true));
+                clicker->click(start_until, click_until, run_until);
+            }
             continue;
         }
 

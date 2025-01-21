@@ -87,7 +87,7 @@ std::string Segment::toString() const {
     return QString(
             "(%3, %4)<img src='%1' alt='%2' height='14'>"
     ).arg(
-            QString::fromStdString(this->path),
+            QCoreApplication::applicationDirPath() + QString::fromStdString("/res" + this->path),
             QString::fromStdString(p.stem().string()),
             QString::number(this->x_center),
             QString::number(this->y_center)
@@ -115,12 +115,6 @@ Selector position_selector(const std::string &attribute, const std::string &opti
 
         std::vector<Segment> sorted_segments = segments;
 
-//        emit Emitter::instance()->log("候选点: ");
-//
-//        for (const auto &i: segments) {
-//            emit Emitter::instance()->log("- " + QString::fromStdString(i.toString()));
-//        }
-
         auto compare = [&](const Segment &a, const Segment &b) {
             if (attribute == "x1") return a.x1 < b.x1;
             if (attribute == "y1") return a.y1 < b.y1;
@@ -137,8 +131,6 @@ Selector position_selector(const std::string &attribute, const std::string &opti
             std::reverse(sorted_segments.begin(), sorted_segments.end());
         }
 
-//        emit Emitter::instance()->log("选择: " + QString::fromStdString(sorted_segments[0].toString()));
-
         return sorted_segments[0];
     };
     return selector_func;
@@ -150,4 +142,43 @@ Segment random_selector(const std::vector<Segment> &segments) {
     }
 
     return choice(segments);
+}
+
+Selector ordered_random_selector(
+        const std::string &attribute,
+        const std::string &option,
+        size_t top
+) {
+    auto selector_func = [attribute, option, top](const std::vector<Segment> &segments) {
+        if (segments.empty()) {
+            throw std::runtime_error("random_selector: 列表为空");
+        }
+
+        auto compare = [&](const Segment &a, const Segment &b) {
+            if (attribute == "x1") return a.x1 < b.x1;
+            if (attribute == "y1") return a.y1 < b.y1;
+            if (attribute == "x2") return a.x2 < b.x2;
+            if (attribute == "y2") return a.y2 < b.y2;
+            if (attribute == "x_center") return a.x_center < b.x_center;
+            if (attribute == "y_center") return a.y_center < b.y_center;
+            throw std::invalid_argument("Unknown attribute");
+        };
+
+        std::vector<Segment> sorted_segments = segments;
+
+        std::sort(sorted_segments.begin(), sorted_segments.end(), compare);
+
+        if (option == "max") {
+            std::reverse(sorted_segments.begin(), sorted_segments.end());
+        }
+
+        std::vector<Segment> new_vector(
+                sorted_segments.begin(),
+                sorted_segments.begin() + std::min(top, sorted_segments.size())
+        );
+
+        return choice(new_vector);
+    };
+
+    return selector_func;
 }

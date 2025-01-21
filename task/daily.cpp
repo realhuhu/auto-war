@@ -7,7 +7,7 @@
 #include "../flow/emitter.h"
 
 void hero_center() {
-    auto config = parse("英雄中心", "checkbox", state.config);
+    auto config = parseBoolConfig("英雄中心", "checkbox", state.config);
 
     std::unique_ptr<ImageClicker> clicker;
 
@@ -79,7 +79,7 @@ void hero_center() {
 }
 
 void war_center() {
-    auto config = parse("战争学院", "checkbox", state.config);
+    auto config = parseBoolConfig("战争学院", "checkbox", state.config);
 
     std::unique_ptr<ImageClicker> clicker;
 
@@ -141,7 +141,7 @@ void war_center() {
 }
 
 void country_chest() {
-    auto config = parse("国家宝箱", "checkbox", state.config);
+    auto config = parseBoolConfig("国家宝箱", "checkbox", state.config);
 
     std::unique_ptr<ImageClicker> clicker;
 
@@ -204,7 +204,7 @@ void country_chest() {
 }
 
 void guild() {
-    auto config = parse("公会领奖", "checkbox", state.config);
+    auto config = parseBoolConfig("公会领奖", "checkbox", state.config);
 
     std::unique_ptr<ImageClicker> clicker;
 
@@ -328,7 +328,7 @@ void guild() {
 }
 
 void admiral() {
-    auto config = parse("将领抽奖", "checkbox", state.config);
+    auto config = parseBoolConfig("将领抽奖", "checkbox", state.config);
 
     std::unique_ptr<ImageClicker> clicker;
 
@@ -392,7 +392,7 @@ void admiral() {
 }
 
 void adviser() {
-    auto config = parse("参谋抽奖", "checkbox", state.config);
+    auto config = parseBoolConfig("参谋抽奖", "checkbox", state.config);
 
     std::unique_ptr<ImageClicker> clicker;
 

@@ -75,7 +75,7 @@ std::unique_ptr<ImageClicker> ImageClicker::_createChain(
         until = runUntilList.back().get();
     } else if (!clickUntilList.empty()) {
         until = clickUntilList.back().get();
-    }else{
+    } else {
         return nullptr;
     }
 
@@ -234,6 +234,12 @@ std::unique_ptr<ImageClicker> ImageClicker::clickIfFound(
 ) {
     auto executor = [this, &selector, &clickUntilList, &offset_x, &offset_y, &position]() -> bool {
         if (targetSegmentList.empty()) {
+            emit Emitter::instance()->log(
+                    QString("未找到图片<img src='%2' alt='%3' height='14'>，开始下一流程").arg(
+                            QCoreApplication::applicationDirPath() + QString::fromStdString("/res" + templatePath),
+                            QString::fromStdString(templatePath)
+                    )
+            );
             return true;
         }
 
