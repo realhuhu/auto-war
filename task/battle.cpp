@@ -515,7 +515,7 @@ void countryWar() {
         clicker = clicker->click(startUntil, clickUntil, runUntil);
 
         clearUntil(startUntil, clickUntil, runUntil);
-        clickUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/结束战斗.png", "inner", true));
+        runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/结束战斗.png", "inner", true));
         runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/前往.png"));
         clicker->click(startUntil, clickUntil, runUntil);
     }
