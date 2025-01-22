@@ -1,14 +1,13 @@
-// until.h
 #ifndef QT_UNTIL_H
 #define QT_UNTIL_H
 
 #include <vector>
 #include <chrono>
-#include <iostream>
 #include <string>
-#include <filesystem>
 #include <memory>
 #include <thread>
+#include <iostream>
+#include <filesystem>
 
 #include <QCoreApplication>
 
@@ -45,7 +44,7 @@ public:
 
     Until operator~();
 
-    virtual void pre_hook(std::unique_ptr<Segment> &previous);
+    virtual void preHook(std::unique_ptr<Segment> &previous);
 
     virtual bool flag(std::unique_ptr<Segment> &previous);
 
@@ -116,7 +115,7 @@ public:
             double timeout = -1
     );
 
-    void pre_hook(std::unique_ptr<Segment> &previous) override;
+    void preHook(std::unique_ptr<Segment> &previous) override;
 
     bool flag(std::unique_ptr<Segment> &previous) override;
 
@@ -171,10 +170,10 @@ public:
 };
 
 
-void clear_until(
-        std::vector<std::unique_ptr<Until>> &start_until,
-        std::vector<std::unique_ptr<Until>> &click_until,
-        std::vector<std::unique_ptr<Until>> &run_until
+void clearUntil(
+        std::vector<std::unique_ptr<Until>> &startUntil,
+        std::vector<std::unique_ptr<Until>> &clickUntil,
+        std::vector<std::unique_ptr<Until>> &runUntil
 );
 
 #endif // QT_UNTIL_H

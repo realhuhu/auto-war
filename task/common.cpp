@@ -8,8 +8,6 @@ std::map<std::string, bool> parseBoolConfig(const QString &category, const QStri
         QJsonObject checkbox = checkboxObj.toObject();
         QString text = checkbox["text"].toString();
         bool value = checkbox["value"].toBool();
-
-        // 将 QString 转换为 std::string 并添加到 map 中
         resultMap[text.toStdString()] = value;
     }
 

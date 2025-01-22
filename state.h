@@ -1,10 +1,10 @@
-// state.h
 #ifndef QT_STATE_H
 #define QT_STATE_H
 
-#include <windows.h>
-#include <QThread>
 #include <atomic>
+#include <windows.h>
+
+#include <QThread>
 #include <QJsonObject>
 
 struct State {

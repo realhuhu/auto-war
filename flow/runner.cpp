@@ -1,9 +1,8 @@
-// runner.cpp
 #include "runner.h"
-#include <stdexcept>
 #include <chrono>
 #include <thread>
 #include <utility>
+#include <stdexcept>
 
 #include "../state.h"
 #include "cv.h"
@@ -23,7 +22,7 @@ ImageClicker::ImageClicker(
 
     if (wait) std::this_thread::sleep_for(std::chrono::duration<float>(wait));
 
-    targetSegmentList = CV::find_positions(CV::get_screen(mode), imgPath, globalThreshold, mode);
+    targetSegmentList = CV::findPositions(CV::getScreen(mode), imgPath, globalThreshold, mode);
 }
 
 
@@ -35,7 +34,7 @@ ImageClicker::ImageClicker(
 ) : globalThreshold(threshold),
     globalTimeout(timeout) {
     for (const auto &imgPath: imgPathList) {
-        auto ps = CV::find_positions(CV::get_screen(mode), imgPath, globalThreshold, mode);
+        auto ps = CV::findPositions(CV::getScreen(mode), imgPath, globalThreshold, mode);
         if (!ps.empty()) {
             templatePath = imgPath;
             targetSegmentList = ps;
@@ -103,8 +102,8 @@ void ImageClicker::_start(
 void ImageClicker::_click(
         const Selector &selector,
         const std::vector<std::unique_ptr<Until>> &clickUntilList,
-        int offset_x,
-        int offset_y,
+        int offsetX,
+        int offsetY,
         const std::string &position
 ) {
     auto start = std::chrono::high_resolution_clock::now();
@@ -118,7 +117,7 @@ void ImageClicker::_click(
             throw std::runtime_error("超时，结束运行: " + this->toString());
         }
 
-        segment.click(0, offset_x, offset_y, position);
+        segment.click(0, offsetX, offsetY, position);
 
         if (clickUntilList.empty()) break;
 
@@ -143,9 +142,7 @@ void ImageClicker::_click(
 void ImageClicker::_finish(
         float finishWait, const std::vector<std::unique_ptr<Until>> &runUntilList
 ) {
-    if (finishWait > 0) {
-        std::this_thread::sleep_for(std::chrono::duration<float>(finishWait));
-    }
+    if (finishWait > 0) std::this_thread::sleep_for(std::chrono::duration<float>(finishWait));
 
     for (const auto &runUntil: runUntilList) {
         emit Emitter::instance()->log(QString::fromStdString("RUN判断: " + runUntil->toString()));
@@ -169,9 +166,7 @@ std::unique_ptr<ImageClicker> ImageClicker::_execute(
 
     bool skipFinish = executor();
 
-    if (!skipFinish) {
-        _finish(finishWait, runUntilList);
-    }
+    if (!skipFinish) _finish(finishWait, runUntilList);
 
     auto clicker = _createChain(clickUntilList, runUntilList);
 
@@ -186,14 +181,12 @@ std::unique_ptr<ImageClicker> ImageClicker::click(
         const Selector &selector,
         float startWait,
         float finishWait,
-        int offset_x,
-        int offset_y,
+        int offsetX,
+        int offsetY,
         const std::string &position
 ) {
-    auto executor = [this, &selector, &clickUntilList, &offset_x, &offset_y, &position]() -> bool {
-        if (targetSegmentList.empty()) {
-            throw std::runtime_error("图片列表为空: " + this->templatePath);
-        }
+    auto executor = [this, &selector, &clickUntilList, &offsetX, &offsetY, &position]() -> bool {
+        if (targetSegmentList.empty()) throw std::runtime_error("未匹配到图像: " + this->templatePath);
 
         auto segment = selector(targetSegmentList);
 
@@ -202,8 +195,8 @@ std::unique_ptr<ImageClicker> ImageClicker::click(
         _click(
                 selector,
                 clickUntilList,
-                offset_x,
-                offset_y,
+                offsetX,
+                offsetY,
                 position
         );
 
@@ -228,11 +221,11 @@ std::unique_ptr<ImageClicker> ImageClicker::clickIfFound(
         const Selector &selector,
         float startWait,
         float finishWait,
-        int offset_x,
-        int offset_y,
+        int offsetX,
+        int offsetY,
         const std::string &position
 ) {
-    auto executor = [this, &selector, &clickUntilList, &offset_x, &offset_y, &position]() -> bool {
+    auto executor = [this, &selector, &clickUntilList, &offsetX, &offsetY, &position]() -> bool {
         if (targetSegmentList.empty()) {
             emit Emitter::instance()->log(
                     QString("未找到图片<img src='%2' alt='%3' height='14'>，开始下一流程").arg(
@@ -250,8 +243,8 @@ std::unique_ptr<ImageClicker> ImageClicker::clickIfFound(
         _click(
                 selector,
                 clickUntilList,
-                offset_x,
-                offset_y,
+                offsetX,
+                offsetY,
                 position
         );
 
@@ -277,9 +270,7 @@ std::unique_ptr<ImageClicker> ImageClicker::locate(
         float finishWait
 ) {
     auto executor = [this, &selector]() -> bool {
-        if (targetSegmentList.empty()) {
-            throw std::runtime_error("图片列表为空: " + this->templatePath);
-        }
+        if (targetSegmentList.empty()) throw std::runtime_error("图片列表为空: " + this->templatePath);
 
         auto segment = selector(targetSegmentList);
 
@@ -302,9 +293,8 @@ std::unique_ptr<ImageClicker> ImageClicker::locate(
 }
 
 std::string ImageClicker::toString() const {
-    if (templatePath.empty()) {
-        return "无";
-    }
+    if (templatePath.empty()) return "无";
+
     return "[" + std::filesystem::path(templatePath).stem().string() + "]";
 }
 

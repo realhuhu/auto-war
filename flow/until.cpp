@@ -1,11 +1,10 @@
-// until.cpp
 #include "until.h"
 
 #include <chrono>
 #include <thread>
+#include <utility>
 #include <stdexcept>
 #include <algorithm>
-#include <utility>
 
 
 #include "../state.h"
@@ -37,15 +36,11 @@ void Until::loop(std::unique_ptr<Segment> &previous, int globalTimeout) {
         auto now = std::chrono::high_resolution_clock::now();
         auto elapsed = std::chrono::duration<double>(now - start).count();
 
-        if (elapsed > maxTime) {
-            throw std::runtime_error("超时，结束运行: " + this->toString());
-        }
+        if (elapsed > maxTime) throw std::runtime_error("超时，结束运行: " + this->toString());
 
         bool fulfilled = this->fulfilled(previous);
         if (fulfilled) {
-            if (finishWait > 0) {
-                std::this_thread::sleep_for(std::chrono::duration<float>(finishWait));
-            }
+            if (finishWait > 0) std::this_thread::sleep_for(std::chrono::duration<float>(finishWait));
             break;
         }
 
@@ -54,21 +49,17 @@ void Until::loop(std::unique_ptr<Segment> &previous, int globalTimeout) {
 }
 
 bool Until::fulfilled(std::unique_ptr<Segment> &previous) {
-    pre_hook(previous);
-    bool is_fulfilled = reverse == !flag(previous);
+    preHook(previous);
+    bool isFulfilled = reverse == !flag(previous);
     emit Emitter::instance()->log(
-            QString::fromStdString((is_fulfilled ? "条件满足: " : "条件未满足: ") + this->toString()));
-    return is_fulfilled;
+            QString::fromStdString((isFulfilled ? "条件满足: " : "条件未满足: ") + this->toString()));
+    return isFulfilled;
 }
 
 std::vector<Segment> Until::filter(const std::vector<Segment> &positions, std::unique_ptr<Segment> &previous) const {
-    if (onPrevious == "none") {
-        return positions;
-    }
+    if (onPrevious == "none") return positions;
 
-    if (!previous) {
-        throw std::runtime_error("Previous segment为空" + this->toString());
-    }
+    if (!previous) throw std::runtime_error("Previous segment为空" + this->toString());
 
     std::vector<Segment> result;
 
@@ -132,7 +123,7 @@ Until Until::operator~() {
     return *this;
 }
 
-void Until::pre_hook(std::unique_ptr<Segment> &previous) {}
+void Until::preHook(std::unique_ptr<Segment> &previous) {}
 
 bool Until::flag(std::unique_ptr<Segment> &previous) {
     return false;
@@ -156,8 +147,8 @@ UntilImage::UntilImage(
 }
 
 bool UntilImage::flag(std::unique_ptr<Segment> &previous) {
-    std::vector<Segment> matchedPositions = CV::find_positions(
-            CV::get_screen(mode),
+    std::vector<Segment> matchedPositions = CV::findPositions(
+            CV::getScreen(mode),
             imgPath,
             threshold,
             mode
@@ -216,10 +207,10 @@ UntilAnyImage::UntilAnyImage(
 }
 
 bool UntilAnyImage::flag(std::unique_ptr<Segment> &previous) {
-    cv::Mat screen = CV::get_screen(mode);
+    cv::Mat screen = CV::getScreen(mode);
 
     for (const auto &currentImgPath: imgPathList) {
-        std::vector<Segment> matchedPositions = CV::find_positions(screen, currentImgPath, threshold, mode);
+        std::vector<Segment> matchedPositions = CV::findPositions(screen, currentImgPath, threshold, mode);
 
         std::vector<Segment> filteredPositions = filter(matchedPositions, previous);
 
@@ -259,37 +250,31 @@ UntilImageStable::UntilImageStable(
     this->imgPath = std::move(imgPath);
 }
 
-void UntilImageStable::pre_hook(std::unique_ptr<Segment> &previous) {
-    std::vector<Segment> matchedPositions = CV::find_positions(
-            CV::get_screen(mode),
+void UntilImageStable::preHook(std::unique_ptr<Segment> &previous) {
+    std::vector<Segment> matchedPositions = CV::findPositions(
+            CV::getScreen(mode),
             imgPath,
             threshold,
             mode
     );
     std::vector<Segment> filteredPositions = filter(matchedPositions, previous);
 
-    if (filteredPositions.empty()) {
-        return;
-    }
+    if (filteredPositions.empty()) return;
 
-    Segment position = similarity_selector(filteredPositions);
+    Segment position = similaritySelector(filteredPositions);
     positions.push_back(position);
 
-    if (positions.size() > 3) {
-        positions.erase(positions.begin());
-    }
+    if (positions.size() > 3) positions.erase(positions.begin());
 }
 
 bool UntilImageStable::flag(std::unique_ptr<Segment> &previous) {
-    if (positions.size() != 3) {
-        return false;
-    }
+    if (positions.size() != 3) return false;
 
     std::vector<int> x;
     std::vector<int> y;
     for (const auto &pos: positions) {
-        x.push_back(pos.x_center);
-        y.push_back(pos.y_center);
+        x.push_back(pos.xCenter);
+        y.push_back(pos.yCenter);
     }
 
     if (*std::max_element(x.begin(), x.end()) != *std::min_element(x.begin(), x.end()) ||
@@ -375,12 +360,12 @@ std::string UntilIfAnyImage::toString() const {
 }
 
 
-void clear_until(
-        std::vector<std::unique_ptr<Until>> &start_until,
-        std::vector<std::unique_ptr<Until>> &click_until,
-        std::vector<std::unique_ptr<Until>> &run_until
+void clearUntil(
+        std::vector<std::unique_ptr<Until>> &startUntil,
+        std::vector<std::unique_ptr<Until>> &clickUntil,
+        std::vector<std::unique_ptr<Until>> &runUntil
 ) {
-    start_until.clear();
-    click_until.clear();
-    run_until.clear();
+    startUntil.clear();
+    clickUntil.clear();
+    runUntil.clear();
 }

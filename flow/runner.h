@@ -1,14 +1,14 @@
-// runner.h
 #ifndef QT_RUNNER_H
 #define QT_RUNNER_H
 
 #include <vector>
 #include <chrono>
-#include <iostream>
-#include <filesystem>
-#include <memory>
 #include <thread>
+#include <memory>
+#include <iostream>
 #include <functional>
+#include <filesystem>
+
 #include <QString>
 
 #include "until.h"
@@ -63,8 +63,8 @@ public:
     void _click(
             const Selector &selector,
             const std::vector<std::unique_ptr<Until>> &clickUntilList,
-            int offset_x = 0,
-            int offset_y = 0,
+            int offsetX = 0,
+            int offsetY = 0,
             const std::string& position="center"
     );
 
@@ -84,11 +84,11 @@ public:
             const std::vector<std::unique_ptr<Until>> &startUntilList = {},
             const std::vector<std::unique_ptr<Until>> &clickUntilList = {},
             const std::vector<std::unique_ptr<Until>> &runUntilList = {},
-            const Selector &selector = similarity_selector,
+            const Selector &selector = similaritySelector,
             float startWait = 0,
             float finishWait = 0,
-            int offset_x = 0,
-            int offset_y = 0,
+            int offsetX = 0,
+            int offsetY = 0,
             const std::string& position="center"
     );
 
@@ -96,18 +96,18 @@ public:
             const std::vector<std::unique_ptr<Until>> &startUntilList = {},
             const std::vector<std::unique_ptr<Until>> &clickUntilList = {},
             const std::vector<std::unique_ptr<Until>> &runUntilList = {},
-            const Selector &selector = similarity_selector,
+            const Selector &selector = similaritySelector,
             float startWait = 0,
             float finishWait = 0,
-            int offset_x = 0,
-            int offset_y = 0,
+            int offsetX = 0,
+            int offsetY = 0,
             const std::string& position="center"
     );
 
     std::unique_ptr<ImageClicker> locate(
             const std::vector<std::unique_ptr<Until>> &startUntilList = {},
             const std::vector<std::unique_ptr<Until>> &runUntilList = {},
-            const Selector &selector = similarity_selector,
+            const Selector &selector = similaritySelector,
             float startWait = 0,
             float finishWait = 0
     );

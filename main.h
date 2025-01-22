@@ -1,21 +1,22 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <Windows.h>
+#include <functional>
+
+#include <QMap>
 #include <QWidget>
-#include <QTextEdit>
-#include <QVBoxLayout>
-#include <QPushButton>
 #include <QDialog>
 #include <QThread>
-#include <QApplication>
 #include <QScreen>
 #include <QDateTime>
+#include <QTextEdit>
 #include <QHBoxLayout>
 #include <QGridLayout>
-#include <Windows.h>
-#include <QMap>
-#include <functional>
+#include <QVBoxLayout>
+#include <QPushButton>
 #include <QJsonObject>
+#include <QApplication>
 
 #include "state.h"
 #include "task/battle.h"
@@ -39,30 +40,29 @@ private slots:
 
     void onLogMessage(const QString &text, const QString &color = "black") const;
 
-    void start_hwnd_capture();
+    void startCapture();
 
-    void run_command(const QString &command);
+    void selectCommand();
 
-    void set_command(const QString &command);
+    void stopCommand();
 
-    void stop_command();
+    void clearText();
 
-    void select_command();
+    void setCommand(const QString &command);
 
-    void clear_text();
+    void runCommand(const QString &command);
 
+    void closeEvent(QCloseEvent *event) override;
 
     static LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam);
 
 private:
-    QStringList command_battle;
-    QStringList command_daily;
+    QStringList commandBattle;
+    QStringList commandDaily;
     QMap<QString, std::function<void()>> tasks;
-    bool isWaitingForHwnd;
+    bool isWaiting;
     HHOOK hook;
-    QTextEdit *output_text;
-
-    void closeEvent(QCloseEvent *event) override;
+    QTextEdit *outputText;
 };
 
 #endif // MAINWINDOW_H

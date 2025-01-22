@@ -1,14 +1,14 @@
-// qt_cv.cpp
 #include "cv.h"
-#include <QFile>
-#include <QCoreApplication>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
+
+#include <QFile>
+#include <QCoreApplication>
 
 #include "../state.h"
 #include "segment.h"
 
-cv::Mat CV::get_screen(const std::string &mode) {
+cv::Mat CV::getScreen(const std::string &mode) {
     SetProcessDPIAware();
 
     RECT rect;
@@ -44,21 +44,18 @@ cv::Mat CV::get_screen(const std::string &mode) {
     }
 }
 
-std::vector<Segment> CV::find_positions(
+std::vector<Segment> CV::findPositions(
         const cv::Mat &rawImg,
         const std::string &templatePath,
         double threshold,
         const std::string &mode
 ) {
     cv::Mat templateImg;
-    cv::Mat Image1;
     auto absolutePath = QCoreApplication::applicationDirPath() + "/res" + QString::fromStdString(templatePath);
     QFile file(absolutePath);
 
 
-    if (!file.open(QIODevice::ReadOnly)) {
-        throw std::runtime_error("文件不存在: " + absolutePath.toStdString());
-    }
+    if (!file.open(QIODevice::ReadOnly)) throw std::runtime_error("文件不存在: " + absolutePath.toStdString());
 
     QByteArray byteArray = file.readAll();
     std::vector<char> data(byteArray.data(), byteArray.data() + byteArray.size());

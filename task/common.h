@@ -2,8 +2,9 @@
 #define QT_COMMON_H
 
 #include <map>
-#include <QJsonObject>
+
 #include <QJsonArray>
+#include <QJsonObject>
 
 std::map<std::string, bool> parseBoolConfig(const QString &category, const QString &key, const QJsonObject &jsonObject);
 

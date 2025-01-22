@@ -1,4 +1,3 @@
-// task.h
 #ifndef QT_BATTLE_H
 #define QT_BATTLE_H
 
@@ -7,20 +6,21 @@
 #include <chrono>
 #include <thread>
 #include <functional>
+
 #include <QString>
 
 #include "../flow/until.h"
 #include "../flow/segment.h"
 #include "../flow/emitter.h"
 
-void country_war();
+void countryWar();
 
-void country_arena();
+void countryArena();
 
-void world_arena();
+void worldArena();
 
-void arms_compound();
+void armsCompound();
 
-void exterminate_enemy();
+void exterminateEnemy();
 
 #endif // QT_BATTLE_H

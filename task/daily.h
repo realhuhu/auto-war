@@ -1,11 +1,11 @@
 #ifndef QT_DAILY_H
 #define QT_DAILY_H
 
-void war_center();
+void warCenter();
 
-void hero_center();
+void heroCenter();
 
-void country_chest();
+void countryChest();
 
 void admiral();
 
@@ -19,6 +19,6 @@ void arms();
 
 void guild();
 
-void guild_building();
+void guildBuilding();
 
 #endif //QT_DAILY_H

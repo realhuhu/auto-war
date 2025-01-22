@@ -1,4 +1,3 @@
-// segment.cpp
 #include "segment.h"
 #include <random>
 #include <algorithm>
@@ -17,40 +16,38 @@ Segment::Segment(
 ) : path(std::move(p)), similarity(sim), w(width), h(height), x1(x), y1(y) {
     x2 = x1 + w;
     y2 = y1 + h;
-    x_center = x1 + w / 2;
-    y_center = y1 + h / 2;
+    xCenter = x1 + w / 2;
+    yCenter = y1 + h / 2;
 }
 
-void Segment::click(double wait, int offset_x, int offset_y, const std::string &position) const {
+void Segment::click(double wait, int offsetX, int offsetY, const std::string &position) const {
     int x, y;
     if (position == "left") {
         x = x1;
-        y = y_center;
+        y = yCenter;
     } else if (position == "top") {
-        x = x_center;
+        x = xCenter;
         y = y1;
     } else if (position == "down") {
-        x = x_center;
+        x = xCenter;
         y = y2;
     } else if (position == "right") {
         x = x2;
-        y = y_center;
+        y = yCenter;
     } else {
-        x = x_center;
-        y = y_center;
+        x = xCenter;
+        y = yCenter;
     }
 
-    x += offset_x * state.scale;
-    y += offset_y * state.scale;
+    x += offsetX * state.scale;
+    y += offsetY * state.scale;
     LPARAM lparam = (y << 16) | x;
     PostMessageW(state.hwnd, WM_LBUTTONDOWN, 0, lparam);
     PostMessageW(state.hwnd, WM_LBUTTONUP, 0, lparam);
 
     emit Emitter::instance()->log(QString::fromStdString("点击: (%1,%2)").arg(QString::number(x), QString::number(y)));
 
-    if (wait > 0) {
-        std::this_thread::sleep_for(std::chrono::duration<float>(wait));
-    }
+    if (wait > 0) std::this_thread::sleep_for(std::chrono::duration<float>(wait));
 }
 
 std::string Segment::on(const Segment &segment, const std::string &basis) const {
@@ -89,15 +86,13 @@ std::string Segment::toString() const {
     ).arg(
             QCoreApplication::applicationDirPath() + QString::fromStdString("/res" + this->path),
             QString::fromStdString(p.stem().string()),
-            QString::number(this->x_center),
-            QString::number(this->y_center)
+            QString::number(this->xCenter),
+            QString::number(this->yCenter)
     ).toStdString();
 }
 
-Segment similarity_selector(const std::vector<Segment> &segments) {
-    if (segments.empty()) {
-        throw std::runtime_error("similarity_selector: 列表为空");
-    }
+Segment similaritySelector(const std::vector<Segment> &segments) {
+    if (segments.empty()) throw std::runtime_error("similaritySelector: 列表为空");
 
     auto result = segments;
     std::sort(result.begin(), result.end(), [](const Segment &a, const Segment &b) {
@@ -107,78 +102,70 @@ Segment similarity_selector(const std::vector<Segment> &segments) {
     return result[0];
 }
 
-Selector position_selector(const std::string &attribute, const std::string &option) {
-    auto selector_func = [attribute, option](const std::vector<Segment> &segments) {
-        if (segments.empty()) {
-            throw std::runtime_error("position_selector: 列表为空");
-        }
+Selector positionSelector(const std::string &attribute, const std::string &option) {
+    auto selectorFunc = [attribute, option](const std::vector<Segment> &segments) {
+        if (segments.empty()) throw std::runtime_error("positionSelector: 列表为空");
 
-        std::vector<Segment> sorted_segments = segments;
+        std::vector<Segment> sortedSegments = segments;
 
         auto compare = [&](const Segment &a, const Segment &b) {
             if (attribute == "x1") return a.x1 < b.x1;
             if (attribute == "y1") return a.y1 < b.y1;
             if (attribute == "x2") return a.x2 < b.x2;
             if (attribute == "y2") return a.y2 < b.y2;
-            if (attribute == "x_center") return a.x_center < b.x_center;
-            if (attribute == "y_center") return a.y_center < b.y_center;
+            if (attribute == "xCenter") return a.xCenter < b.xCenter;
+            if (attribute == "yCenter") return a.yCenter < b.yCenter;
             throw std::invalid_argument("Unknown attribute");
         };
 
-        std::sort(sorted_segments.begin(), sorted_segments.end(), compare);
+        std::sort(sortedSegments.begin(), sortedSegments.end(), compare);
 
-        if (option == "max") {
-            std::reverse(sorted_segments.begin(), sorted_segments.end());
-        }
+        if (option == "max") std::reverse(sortedSegments.begin(), sortedSegments.end());
 
-        return sorted_segments[0];
+        return sortedSegments[0];
     };
-    return selector_func;
+    return selectorFunc;
 }
 
-Segment random_selector(const std::vector<Segment> &segments) {
-    if (segments.empty()) {
-        throw std::runtime_error("random_selector: 列表为空");
-    }
+Segment randomSelector(const std::vector<Segment> &segments) {
+    if (segments.empty()) throw std::runtime_error("randomSelector: 列表为空");
 
     return choice(segments);
 }
 
-Selector ordered_random_selector(
+Selector orderedRandomSelector(
         const std::string &attribute,
         const std::string &option,
         size_t top
 ) {
-    auto selector_func = [attribute, option, top](const std::vector<Segment> &segments) {
-        if (segments.empty()) {
-            throw std::runtime_error("random_selector: 列表为空");
-        }
+    auto selectorFunc = [attribute, option, top](const std::vector<Segment> &segments) {
+        if (segments.empty()) throw std::runtime_error("randomSelector: 列表为空");
 
         auto compare = [&](const Segment &a, const Segment &b) {
             if (attribute == "x1") return a.x1 < b.x1;
             if (attribute == "y1") return a.y1 < b.y1;
             if (attribute == "x2") return a.x2 < b.x2;
             if (attribute == "y2") return a.y2 < b.y2;
-            if (attribute == "x_center") return a.x_center < b.x_center;
-            if (attribute == "y_center") return a.y_center < b.y_center;
+            if (attribute == "xCenter") return a.xCenter < b.xCenter;
+            if (attribute == "yCenter") return a.yCenter < b.yCenter;
             throw std::invalid_argument("Unknown attribute");
         };
 
-        std::vector<Segment> sorted_segments = segments;
+        std::vector<Segment> sortedSegments = segments;
 
-        std::sort(sorted_segments.begin(), sorted_segments.end(), compare);
+        std::sort(sortedSegments.begin(), sortedSegments.end(), compare);
 
         if (option == "max") {
-            std::reverse(sorted_segments.begin(), sorted_segments.end());
+            std::reverse(sortedSegments.begin(), sortedSegments.end());
         }
 
         std::vector<Segment> new_vector(
-                sorted_segments.begin(),
-                sorted_segments.begin() + std::min(top, sorted_segments.size())
+                sortedSegments.begin(),
+                sortedSegments.begin() + std::min(top, sortedSegments.size())
         );
 
         return choice(new_vector);
     };
 
-    return selector_func;
+    return selectorFunc;
 }

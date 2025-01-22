@@ -1,14 +1,13 @@
-// segment.h
 #ifndef QT_SEGMENT_H
 #define QT_SEGMENT_H
 
 #include <random>
 #include <vector>
+#include <thread>
+#include <chrono>
 #include <string>
 #include <iostream>
 #include <filesystem>
-#include <chrono>
-#include <thread>
 #include <functional>
 #include <opencv2/opencv.hpp>
 
@@ -23,8 +22,8 @@ struct Segment {
     int y1;
     int x2;
     int y2;
-    int x_center;
-    int y_center;
+    int xCenter;
+    int yCenter;
 
     Segment(
             std::string p,
@@ -34,7 +33,7 @@ struct Segment {
             int x, int y
     );
 
-    void click(double wait = 0.1, int offset_x = 0, int offset_y = 0, const std::string &position = "center") const;
+    void click(double wait = 0.1, int offsetX = 0, int offsetY = 0, const std::string &position = "center") const;
 
     [[nodiscard]] std::string on(const Segment &segment, const std::string &basis) const;
 
@@ -45,26 +44,24 @@ struct Segment {
 
 template<typename T>
 T choice(const std::vector<T> &vec) {
-    if (vec.empty()) {
-        throw std::runtime_error("向量不能为空");
-    }
+    if (vec.empty()) throw std::runtime_error("向量不能为空");
 
-    std::random_device rd;  // 非确定性随机数生成器
-    std::mt19937 gen(rd()); // 以随机设备作为种子的Mersenne Twister伪随机数生成器
-    std::uniform_int_distribution<> dis(0, vec.size() - 1); // 均匀分布
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, vec.size() - 1);
 
-    int index = dis(gen); // 生成随机索引
-    return vec[index]; // 返回随机选择的元素
+    int index = dis(gen);
+    return vec[index];
 }
 
 using Selector = std::function<Segment(const std::vector<Segment> &)>;
 
-Segment similarity_selector(const std::vector<Segment> &segments);
+Segment similaritySelector(const std::vector<Segment> &segments);
 
-Selector position_selector(const std::string &attribute, const std::string &option);
+Selector positionSelector(const std::string &attribute, const std::string &option);
 
-Segment random_selector(const std::vector<Segment> &segments);
+Segment randomSelector(const std::vector<Segment> &segments);
 
-Selector ordered_random_selector(const std::string &attribute, const std::string &option, size_t top);
+Selector orderedRandomSelector(const std::string &attribute, const std::string &option, size_t top);
 
 #endif // QT_SEGMENT_H
