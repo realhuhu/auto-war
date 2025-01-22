@@ -293,16 +293,18 @@ void guild() {
     run_until.emplace_back(std::make_unique<UntilImage>("/公会领奖/公会争霸标题.png"));
     clicker->click(start_until, click_until, run_until);
 
-    if (config["领取夺城战奖励"]) { //TODO
-//        clear_until(start_until, click_until, run_until);
-//        run_until.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
-//                "/公会领奖/夺城战已领取.png"
-//        }));
-//        clicker = clicker->click(start_until, click_until, run_until);
-//
-//        if (clicker->templatePath == "/公会领奖/夺城战未领取.png") {
-//
-//        }
+    if (config["领取夺城战奖励"]) {
+        clear_until(start_until, click_until, run_until);
+        run_until.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+                "/公会领奖/夺城战已领取.png", "/公会领奖/领取夺城战奖励.png"
+        }));
+        clicker = clicker->click(start_until, click_until, run_until);
+
+        if (clicker->templatePath == "/公会领奖/领取夺城战奖励.png") {
+            clear_until(start_until, click_until, run_until);
+            run_until.emplace_back(std::make_unique<UntilImage>("/公会领奖/领取夺城战奖励.png", "inner", true));
+            clicker->click(start_until, click_until, run_until);
+        }
     }
 
     if (config["领取公会战役宝箱"]) {
