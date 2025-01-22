@@ -19,6 +19,10 @@ void arms();
 
 void guild();
 
+void dailyTask();
+
+void weeklyTask();
+
 void guildBuilding();
 
 #endif //QT_DAILY_H

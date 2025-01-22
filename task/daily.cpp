@@ -577,7 +577,7 @@ void arms() {
 
     clearUntil(startUntil, clickUntil, runUntil);
     runUntil.emplace_back(std::make_unique<UntilImage>("/军备抽奖/军备研究提示.png"));
-    clicker->click(startUntil, clickUntil, runUntil, similaritySelector);
+    clicker->click(startUntil, clickUntil, runUntil);
 
     for (const auto &i: std::vector<std::string>{"机械", "自动化"}) {
         clicker = std::make_unique<ImageClicker>("/军备抽奖/" + i + "制造厂.png");
@@ -607,6 +607,83 @@ void arms() {
     clicker->click(startUntil, clickUntil, runUntil);
 }
 
+void dailyTask() {
+    std::unique_ptr<ImageClicker> clicker;
+
+    std::vector<std::unique_ptr<Until>> startUntil;
+    std::vector<std::unique_ptr<Until>> clickUntil;
+    std::vector<std::unique_ptr<Until>> runUntil;
+
+    clicker = std::make_unique<ImageClicker>("/每日任务/每日任务.png");
+
+    clearUntil(startUntil, clickUntil, runUntil);
+    runUntil.emplace_back(std::make_unique<UntilImage>("/每日任务/奖励.png"));
+    clicker->click(startUntil, clickUntil, runUntil);
+
+    for (const auto &i: std::vector<std::string>{"1", "3", "5", "8", "10"}) {
+        clicker = std::make_unique<ImageClicker>("/每日任务/" + i + "0活跃度.png", 0, 0.98, 60, "rgb");
+
+        if (!clicker->founded())continue;
+
+        clearUntil(startUntil, clickUntil, runUntil);
+        runUntil.emplace_back(std::make_unique<UntilImage>("/每日任务/领取活跃度奖励.png"));
+        clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+        clearUntil(startUntil, clickUntil, runUntil);
+        runUntil.emplace_back(std::make_unique<UntilImage>("/每日任务/领取活跃度奖励.png", "inner", true));
+        clicker->click(startUntil, clickUntil, runUntil);
+    }
+
+    clicker = std::make_unique<ImageClicker>("/每日任务/每日激战.png");
+
+    clearUntil(startUntil, clickUntil, runUntil);
+    runUntil.emplace_back(std::make_unique<UntilImage>("/每日任务/领取积分奖励.png"));
+    clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+    clearUntil(startUntil, clickUntil, runUntil);
+    runUntil.emplace_back(std::make_unique<UntilImage>("/每日任务/领取积分奖励.png"));
+    clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+    clearUntil(startUntil, clickUntil, runUntil);
+    runUntil.emplace_back(std::make_unique<UntilImage>("/每日任务/关闭窗口.png"));
+    clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+    clearUntil(startUntil, clickUntil, runUntil);
+    runUntil.emplace_back(std::make_unique<UntilImage>("/每日任务/关闭窗口.png", "inner", true));
+    clicker->click(startUntil, clickUntil, runUntil);
+}
+
+
+void weeklyTask() {
+    std::unique_ptr<ImageClicker> clicker;
+
+    std::vector<std::unique_ptr<Until>> startUntil;
+    std::vector<std::unique_ptr<Until>> clickUntil;
+    std::vector<std::unique_ptr<Until>> runUntil;
+
+    clicker = std::make_unique<ImageClicker>("/周任务/周任务.png");
+
+    clearUntil(startUntil, clickUntil, runUntil);
+    runUntil.emplace_back(std::make_unique<UntilImage>("/周任务/任务进度.png"));
+    clicker->click(startUntil, clickUntil, runUntil);
+
+    while (!state.stopFlag.load()) {
+        clicker = std::make_unique<ImageClicker>("/周任务/领取.png", 0, 0.9, 60, "rgb");
+
+        if (!clicker->founded()) break;
+
+        clearUntil(startUntil, clickUntil, runUntil);
+        runUntil.emplace_back(std::make_unique<UntilImage>("/周任务/领取.png", "inner", true));
+        clicker->click(startUntil, clickUntil, runUntil);
+    }
+
+    clicker = std::make_unique<ImageClicker>("/周任务/关闭窗口.png");
+
+    clearUntil(startUntil, clickUntil, runUntil);
+    runUntil.emplace_back(std::make_unique<UntilImage>("/周任务/关闭窗口.png", "inner", true));
+    clicker->click(startUntil, clickUntil, runUntil);
+}
+
 void guildBuilding() {
     std::unique_ptr<ImageClicker> clicker;
 
@@ -621,7 +698,7 @@ void guildBuilding() {
 
         clearUntil(startUntil, clickUntil, runUntil);
         runUntil.emplace_back(std::make_unique<UntilImage>("/公会建筑/场景缩放.png"));
-        clicker = clicker->clickIfFound(startUntil, clickUntil, runUntil, similaritySelector, 0, 0, 15);
+        clicker = clicker->clickIfFound(startUntil, clickUntil, runUntil, similaritySelector, 0, 0, 0, 0, "right");
 
         clicker->clickIfFound(startUntil, runUntil, clickUntil, similaritySelector, 0, 1);
 
@@ -650,7 +727,9 @@ void guildBuilding() {
     runUntil.emplace_back(std::make_unique<UntilImage>("/公会建筑/参与任务.png"));
     clicker = clicker->click(startUntil, clickUntil, runUntil);
 
-    clicker->click();
+    clearUntil(startUntil, clickUntil, runUntil);
+    runUntil.emplace_back(std::make_unique<UntilImage>("/公会建筑/参与.png", "none", true));
+    clicker->click(startUntil, clickUntil, runUntil);
 
     auto iterator = CV::findPositions(CV::getScreen(), "/公会建筑/需要人数.png");
 
