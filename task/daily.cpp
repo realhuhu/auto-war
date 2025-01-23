@@ -159,6 +159,12 @@ void countryChest() {
     runUntil.emplace_back(std::make_unique<UntilImage>("/国家宝箱/国家宝箱标题.png"));
     clicker->clickIfFound(startUntil, clickUntil, runUntil);
 
+    if (config["开一个战功宝箱"]) {
+        clicker = std::make_unique<ImageClicker>("/国家宝箱/开启.png");
+
+        clicker->click();
+    }
+
     if (config["领取排名奖励"]) {
         clicker = std::make_unique<ImageClicker>("/国家宝箱/领取排名奖励.png");
 
@@ -621,13 +627,15 @@ void dailyTask() {
     clicker->click(startUntil, clickUntil, runUntil);
 
     for (const auto &i: std::vector<std::string>{"1", "3", "5", "8", "10"}) {
-        clicker = std::make_unique<ImageClicker>("/每日任务/" + i + "0活跃度.png", 0, 0.98, 60, "rgb");
+        clicker = std::make_unique<ImageClicker>("/每日任务/" + i + "0活跃度.png", 0, 0.9, 60, "rgb");
 
         if (!clicker->founded())continue;
 
         clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilImage>("/每日任务/领取活跃度奖励.png"));
-        clicker = clicker->click(startUntil, clickUntil, runUntil);
+        runUntil.emplace_back(std::make_unique<UntilIfImage>("/每日任务/领取活跃度奖励.png"));
+        clicker = clicker->click(startUntil, clickUntil, runUntil, similaritySelector, 0, 1);
+
+        if (!clicker->founded())continue;
 
         clearUntil(startUntil, clickUntil, runUntil);
         runUntil.emplace_back(std::make_unique<UntilImage>("/每日任务/领取活跃度奖励.png", "inner", true));
@@ -652,7 +660,6 @@ void dailyTask() {
     runUntil.emplace_back(std::make_unique<UntilImage>("/每日任务/关闭窗口.png", "inner", true));
     clicker->click(startUntil, clickUntil, runUntil);
 }
-
 
 void weeklyTask() {
     std::unique_ptr<ImageClicker> clicker;
@@ -682,6 +689,125 @@ void weeklyTask() {
     clearUntil(startUntil, clickUntil, runUntil);
     runUntil.emplace_back(std::make_unique<UntilImage>("/周任务/关闭窗口.png", "inner", true));
     clicker->click(startUntil, clickUntil, runUntil);
+}
+
+void signIn() {
+    std::unique_ptr<ImageClicker> clicker;
+
+    std::vector<std::unique_ptr<Until>> startUntil;
+    std::vector<std::unique_ptr<Until>> clickUntil;
+    std::vector<std::unique_ptr<Until>> runUntil;
+
+    clicker = std::make_unique<ImageClicker>("/每日签到/每日签到.png");
+
+    clearUntil(startUntil, clickUntil, runUntil);
+    clickUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+            "/每日签到/签到.png", "/每日签到/已签到.png"
+    }, "none", false, "rgb"));
+    clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+    if (clicker->templatePath == "/每日签到/签到.png") {
+        clearUntil(startUntil, clickUntil, runUntil);
+        runUntil.emplace_back(std::make_unique<UntilImage>("/每日签到/签到.png", "inner", true));
+        clicker->click(startUntil, clickUntil, runUntil);
+    }
+
+    clicker = std::make_unique<ImageClicker>("/每日签到/关闭窗口.png");
+
+    clearUntil(startUntil, clickUntil, runUntil);
+    runUntil.emplace_back(std::make_unique<UntilImage>("/每日签到/关闭窗口.png", "inner", true));
+    clicker->click(startUntil, clickUntil, runUntil);
+}
+
+void oreField() {
+    std::unique_ptr<ImageClicker> clicker;
+
+    std::vector<std::unique_ptr<Until>> startUntil;
+    std::vector<std::unique_ptr<Until>> clickUntil;
+    std::vector<std::unique_ptr<Until>> runUntil;
+
+    clicker = std::make_unique<ImageClicker>("/矿区争夺/矿区争夺战.png");
+
+    clearUntil(startUntil, clickUntil, runUntil);
+    runUntil.emplace_back(std::make_unique<UntilImage>("/矿区争夺/矿区争夺.png"));
+    clicker->click(startUntil, clickUntil, runUntil);
+
+    clicker = std::make_unique<ImageClicker>("/矿区争夺/撤军.png");
+
+    if (clicker->founded()) {
+        emit Emitter::instance()->log("已有占领的矿区", "red");
+
+        clicker = std::make_unique<ImageClicker>("/矿区争夺/关闭窗口.png");
+
+        clearUntil(startUntil, clickUntil, runUntil);
+        runUntil.emplace_back(std::make_unique<UntilImage>("/矿区争夺/关闭窗口.png", "inner", true));
+        clicker->click(startUntil, clickUntil, runUntil);
+        return;
+    }
+
+    while (!state.stopFlag.load()) {
+        clicker = std::make_unique<ImageClicker>("/矿区争夺/刷新次数.png");
+
+        if (!clicker->founded()) {
+            emit Emitter::instance()->log("免费次数已用完", "red");
+
+            clicker = std::make_unique<ImageClicker>("/矿区争夺/关闭窗口.png");
+
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/矿区争夺/关闭窗口.png", "inner", true));
+            clicker->click(startUntil, clickUntil, runUntil);
+
+            return;
+        }
+
+        clearUntil(startUntil, clickUntil, runUntil);
+        runUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+                "/矿区争夺/确定次数不足.png", "/矿区争夺/抢占.png"
+        }));
+        clicker = clicker->click(startUntil, clickUntil, runUntil, positionSelector("xCenter", "max"), 0, 1, 0, -26);
+
+        if (clicker->templatePath == "/矿区争夺/确定次数不足.png") {
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/矿区争夺/确定次数不足.png", "inner", true));
+            runUntil.emplace_back(std::make_unique<UntilImage>("/矿区争夺/关闭窗口.png"));
+            clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/矿区争夺/关闭窗口.png", "inner", true));
+            clicker->click(startUntil, clickUntil, runUntil);
+
+            return;
+        }
+
+        auto ps = CV::findPositions(CV::getScreen(), "/矿区争夺/抢占.png");
+
+        for (const auto &p: ps) {
+            clicker = std::make_unique<ImageClicker>("/矿区争夺/抢占.png", p);
+
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/矿区争夺/跳过.png"));
+            clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+            clearUntil(startUntil, clickUntil, runUntil);
+            clickUntil.emplace_back(std::make_unique<UntilImage>("/矿区争夺/确定跳过.png"));
+            clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/矿区争夺/矿区争夺.png"));
+            clicker->click(startUntil, clickUntil, runUntil);
+
+            clicker = std::make_unique<ImageClicker>("/矿区争夺/撤军.png");
+
+            if (clicker->founded()) {
+                clicker = std::make_unique<ImageClicker>("/矿区争夺/关闭窗口.png");
+
+                clearUntil(startUntil, clickUntil, runUntil);
+                runUntil.emplace_back(std::make_unique<UntilImage>("/矿区争夺/关闭窗口.png", "inner", true));
+                clicker->click(startUntil, clickUntil, runUntil);
+                return;
+            }
+        }
+    }
 }
 
 void guildBuilding() {

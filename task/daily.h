@@ -23,6 +23,10 @@ void dailyTask();
 
 void weeklyTask();
 
+void signIn();
+
+void oreField();
+
 void guildBuilding();
 
 #endif //QT_DAILY_H

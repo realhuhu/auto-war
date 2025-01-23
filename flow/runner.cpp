@@ -135,7 +135,7 @@ void ImageClicker::_click(
         }
         emit Emitter::instance()->log("CLICK不满足，继续循环点击");
 
-        std::this_thread::sleep_for(std::chrono::duration<float>(0.5));
+        std::this_thread::sleep_for(std::chrono::duration<float>(1));
     }
 }
 

@@ -349,11 +349,52 @@ void armsCompound() {
 }
 
 void countryWar() {
+    auto config = parseBoolConfig("国家战争", "checkbox", state.config);
+
     std::unique_ptr<ImageClicker> clicker;
 
     std::vector<std::unique_ptr<Until>> startUntil;
     std::vector<std::unique_ptr<Until>> clickUntil;
     std::vector<std::unique_ptr<Until>> runUntil;
+
+    if (config["8点时自动领体力"]) {
+        std::time_t now = std::time(nullptr);
+        std::tm *local_time = std::localtime(&now);
+
+        int hour = local_time->tm_hour;
+
+        // 判断是否在晚上8点到9点之间
+        if ((hour >= 20 && hour < 21)) {
+            clicker = std::make_unique<ImageClicker>("/国家战争/返回基地.png");
+
+            if (clicker->founded()) {
+                clearUntil(startUntil, clickUntil, runUntil);
+                runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/活动及公告.png"));
+                clicker->click(startUntil, clickUntil, runUntil);
+            }
+
+            clicker = std::make_unique<ImageClicker>("/国家战争/活动及公告.png");
+
+            clearUntil(startUntil, clickUntil, runUntil);
+            clickUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/连续登录.png"));
+            clicker->click(startUntil, clickUntil, runUntil);
+
+            clicker = std::make_unique<ImageClicker>("/国家战争/领取连续登录奖励.png", 0, 0.9, 60, "rgb");
+
+            if (clicker->founded()) {
+                clearUntil(startUntil, clickUntil, runUntil);
+                runUntil.emplace_back(
+                        std::make_unique<UntilImage>("/国家战争/领取连续登录奖励.png", "inner", true, "rgb"));
+                clicker->click(startUntil, clickUntil, runUntil);
+            }
+
+            clicker = std::make_unique<ImageClicker>("/国家战争/关闭窗口.png");
+
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/关闭窗口.png", "inner", true));
+            clicker->click(startUntil, clickUntil, runUntil);
+        }
+    }
 
     clicker = std::make_unique<ImageClicker>("/国家战争/国家.png");
 
@@ -457,11 +498,11 @@ void countryWar() {
                 clearUntil(startUntil, clickUntil, runUntil);
                 runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/确定兑换.png", "inner", true));
                 runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/召唤支援兵.png"));
-                clicker = clicker->click(startUntil, clickUntil, runUntil, similaritySelector);
+                clicker = clicker->click(startUntil, clickUntil, runUntil);
 
                 clearUntil(startUntil, clickUntil, runUntil);
                 runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/确定兑换.png"));
-                clicker = clicker->click(startUntil, clickUntil, runUntil);
+                clicker = clicker->click(startUntil, clickUntil, runUntil, similaritySelector, 0, 0.5);
             }
 
             clearUntil(startUntil, clickUntil, runUntil);

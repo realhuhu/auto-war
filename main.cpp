@@ -166,10 +166,13 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     tasks["军备抽奖"] = arms;
     tasks["每日任务"] = dailyTask;
     tasks["周任务"] = weeklyTask;
+    tasks["今日签到"] = signIn;
+    tasks["矿区争夺"] = oreField;
     tasks["公会建筑"] = guildBuilding;
     commandDaily = QStringList({
                                        "英雄中心", "战争学院", "国家宝箱", "公会领奖", "将领抽奖", "参谋抽奖",
-                                       "火炮抽奖", "配件抽奖", "军备抽奖", "每日任务", "周任务", "公会建筑"
+                                       "火炮抽奖", "配件抽奖", "军备抽奖", "每日任务", "周任务", "今日签到",
+                                       "矿区争夺", "公会建筑"
                                });
 
     hook = nullptr;
