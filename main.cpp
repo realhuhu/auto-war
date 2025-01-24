@@ -10,6 +10,7 @@
 #include <QWidget>
 #include <QScreen>
 #include <QSpinBox>
+#include <QComboBox>
 #include <QGroupBox>
 #include <QCheckBox>
 #include <QDateTime>
@@ -110,6 +111,42 @@ private:
     QLabel *label;
     QSpinBox *spinBox;
 };
+
+class LabeledComboBox : public QWidget {
+public:
+    LabeledComboBox(const QString &text, const QJsonArray &options, const QString &initialValue = "") {
+        auto *layout = new QHBoxLayout(this);
+        layout->setContentsMargins(0, 0, 0, 0);
+
+        label = new QLabel(text + ":");
+        comboBox = new QComboBox();
+        comboBox->setFixedWidth(100);
+
+        label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        comboBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+        for (const auto &option: options) {
+            comboBox->addItem(option.toString());
+        }
+
+        if (!initialValue.isEmpty()) {
+            comboBox->setCurrentText(initialValue);
+        }
+
+        layout->addWidget(label);
+        layout->addWidget(comboBox);
+        layout->addStretch(1);
+    }
+
+    QComboBox *getComboBox() {
+        return comboBox;
+    }
+
+private:
+    QLabel *label;
+    QComboBox *comboBox;
+};
+
 
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     setWindowTitle("红警自动");
@@ -307,6 +344,7 @@ void MainWindow::stopCommand() {
 void MainWindow::selectCommand() {
     QDialog selectDialog(this);
     selectDialog.setWindowTitle("选择命令");
+    selectDialog.setWindowFlags(selectDialog.windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
     auto *layout = new QVBoxLayout(&selectDialog);
 
@@ -415,10 +453,12 @@ void MainWindow::setCommand(const QString &command) {
     QDialog settingDialog(this);
     settingDialog.setWindowTitle("设置 " + command);
     settingDialog.setMinimumWidth(300);
+    settingDialog.setWindowFlags(settingDialog.windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
     QJsonObject commandConfig = state.config[command].toObject();
 
     auto *mainLayout = new QVBoxLayout(&settingDialog);
+    mainLayout->setSpacing(15);
 
     auto *checkboxLayout = new QGridLayout();
     checkboxLayout->setSpacing(5);
@@ -451,7 +491,7 @@ void MainWindow::setCommand(const QString &command) {
 
         connect(checkBox, &QCheckBox::toggled, [&checkboxItems, order, text](bool checked) {
             for (auto &item: checkboxItems) {
-                if (std::get<0>(item) == order && std::get<1>(item) == text) {
+                if (std::get<0>(item) == order) {
                     std::get<2>(item) = checked;
                     break;
                 }
@@ -462,7 +502,7 @@ void MainWindow::setCommand(const QString &command) {
     mainLayout->addLayout(checkboxLayout);
 
     auto *inputLayout = new QGridLayout();
-    inputLayout->setSpacing(10);
+    inputLayout->setSpacing(5);
 
     QJsonArray inputArray = commandConfig["input"].toArray();
     std::vector<std::tuple<int, QString, int>> inputItems;
@@ -487,12 +527,12 @@ void MainWindow::setCommand(const QString &command) {
 
         auto *labeledSpinBox = new LabeledSpinBox(text, value);
 
-        inputLayout->addWidget(labeledSpinBox, std::floor(order / 2), 2 * (order % 3), 1, 2);
+        inputLayout->addWidget(labeledSpinBox, std::floor(order / 2), order % 3);
 
         connect(labeledSpinBox->getSpinBox(), QOverload<int>::of(&QSpinBox::valueChanged),
-                [this, &inputItems, order, text](int newValue) {
+                [&inputItems, order, text](int newValue) {
                     for (auto &item: inputItems) {
-                        if (std::get<0>(item) == order && std::get<1>(item) == text) {
+                        if (std::get<0>(item) == order) {
                             std::get<2>(item) = newValue;
                             break;
                         }
@@ -501,6 +541,49 @@ void MainWindow::setCommand(const QString &command) {
     }
 
     mainLayout->addLayout(inputLayout);
+
+    auto *comboBoxLayout = new QGridLayout();
+    comboBoxLayout->setSpacing(5);
+
+    QJsonArray selectArray = commandConfig["select"].toArray();
+    std::vector<std::tuple<int, QString, QString, QJsonArray>> selectItems;
+
+    for (const auto &select: selectArray) {
+        QJsonObject selectObj = select.toObject();
+        selectItems.emplace_back(
+                selectObj["order"].toInt(),
+                selectObj["text"].toString(),
+                selectObj["value"].toString(),
+                selectObj["options"].toArray()
+        );
+    }
+
+    std::sort(selectItems.begin(), selectItems.end(), [](const auto &a, const auto &b) {
+        return std::get<0>(a) < std::get<0>(b);
+    });
+
+    for (const auto &item: selectItems) {
+        int order = std::get<0>(item);
+        QString text = std::get<1>(item);
+        QString value = std::get<2>(item);
+        QJsonArray options = std::get<3>(item);
+
+        auto *labeledComboBox = new LabeledComboBox(text, options, value);
+
+        comboBoxLayout->addWidget(labeledComboBox, std::floor(order / 2), order % 2);
+
+        connect(labeledComboBox->getComboBox(), QOverload<int>::of(&QComboBox::currentIndexChanged),
+                [&selectItems, order, text](int index) {
+                    for (auto &item: selectItems) {
+                        if (std::get<0>(item) == order) {
+                            std::get<2>(item) = std::get<3>(item)[index].toString();
+                            break;
+                        }
+                    }
+                });
+    }
+
+    mainLayout->addLayout(comboBoxLayout);
 
     QString tips = commandConfig["tips"].toString();
     auto *tipsLabel = new QLabel(tips);
@@ -517,33 +600,43 @@ void MainWindow::setCommand(const QString &command) {
     connect(
             saveButton,
             &QPushButton::clicked,
-            [this, command, &checkboxItems, &inputItems, &settingDialog, commandConfig]() {
+            [this, command, &checkboxItems, &inputItems, &settingDialog, &selectItems, commandConfig]() {
 
                 QJsonArray newCheckboxArray;
                 for (const auto &item: checkboxItems) {
-                    int order = std::get<0>(item);
-                    QString text = std::get<1>(item);
-                    bool value = std::get<2>(item);
-                    QJsonObject obj = {{"text",  text},
-                                       {"value", value},
-                                       {"order", order}};
+                    QJsonObject obj = {
+                            {"order", std::get<0>(item)},
+                            {"text",  std::get<1>(item)},
+                            {"value", std::get<2>(item)}
+                    };
                     newCheckboxArray.append(obj);
                 }
 
                 QJsonArray newInputArray;
                 for (const auto &item: inputItems) {
-                    int order = std::get<0>(item);
-                    QString text = std::get<1>(item);
-                    int value = std::get<2>(item);
-                    QJsonObject obj = {{"text",  text},
-                                       {"value", value},
-                                       {"order", order}};
+                    QJsonObject obj = {
+                            {"order", std::get<0>(item)},
+                            {"text",  std::get<1>(item)},
+                            {"value", std::get<2>(item)}
+                    };
                     newInputArray.append(obj);
+                }
+
+                QJsonArray newSelectArray;
+                for (const auto &item: selectItems) {
+                    QJsonObject obj = {
+                            {"order",   std::get<0>(item)},
+                            {"text",    std::get<1>(item)},
+                            {"value",   std::get<2>(item)},
+                            {"options", std::get<3>(item)}
+                    };
+                    newSelectArray.append(obj);
                 }
 
                 QJsonObject newCommandConfig;
                 newCommandConfig["checkbox"] = newCheckboxArray;
                 newCommandConfig["input"] = newInputArray;
+                newCommandConfig["select"] = newSelectArray;
                 newCommandConfig["tips"] = commandConfig["tips"].toString();
 
                 state.config[command] = newCommandConfig;

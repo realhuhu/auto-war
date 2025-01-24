@@ -9,6 +9,8 @@
                 "value": 10
             }
         ],
+        "select": [
+        ],
         "tips": "例如'打前5'就是在前五个里随机挑一个打"
     },
     "公会领奖": {
@@ -36,12 +38,16 @@
         ],
         "input": [
         ],
+        "select": [
+        ],
         "tips": ""
     },
     "军备合成": {
         "checkbox": [
         ],
         "input": [
+        ],
+        "select": [
         ],
         "tips": "默认在碎甲弹、高爆弹、电磁炮、破甲弹、陶瓷复合装甲中随机选择一个，若要获取其它军备，请先打开该军备的的[合成材料]面板"
     },
@@ -65,35 +71,37 @@
             {
                 "order": 3,
                 "text": "蓝色元",
-                "value": false
+                "value": true
             },
             {
                 "order": 4,
                 "text": "蓝色帜",
-                "value": false
+                "value": true
             },
             {
                 "order": 5,
                 "text": "蓝色番",
-                "value": false
+                "value": true
             },
             {
                 "order": 6,
                 "text": "绿色元",
-                "value": false
+                "value": true
             },
             {
                 "order": 7,
                 "text": "绿色帜",
-                "value": false
+                "value": true
             },
             {
                 "order": 8,
                 "text": "绿色番",
-                "value": false
+                "value": true
             }
         ],
         "input": [
+        ],
+        "select": [
         ],
         "tips": "没有对应敌人会使用刷新令，请提前准备刷新令\n会一直攻击到次数为0，打多轮请提前购买次数"
     },
@@ -112,6 +120,8 @@
         ],
         "input": [
         ],
+        "select": [
+        ],
         "tips": ""
     },
     "国家争霸": {
@@ -123,6 +133,8 @@
                 "text": "打前",
                 "value": 10
             }
+        ],
+        "select": [
         ],
         "tips": "例如'打前5'就是在前五个里随机挑一个打"
     },
@@ -151,6 +163,8 @@
         ],
         "input": [
         ],
+        "select": [
+        ],
         "tips": ""
     },
     "国家战争": {
@@ -160,6 +174,10 @@
                 "text": "8点时自动领体力",
                 "value": true
             }
+        ],
+        "input": [
+        ],
+        "select": [
         ],
         "tips": "如果在晚上8-9点运行，自动领取签到与vip福利体力"
     },
@@ -178,6 +196,8 @@
         ],
         "input": [
         ],
+        "select": [
+        ],
         "tips": ""
     },
     "战争学院": {
@@ -195,6 +215,50 @@
         ],
         "input": [
         ],
+        "select": [
+            {
+                "options": [
+                    "天启",
+                    "猛犸",
+                    "T系列",
+                    "帝王"
+                ],
+                "order": 0,
+                "text": "改造",
+                "value": "天启"
+            },
+            {
+                "options": [
+                    "火炮",
+                    "装甲",
+                    "履带"
+                ],
+                "order": 1,
+                "text": "项目",
+                "value": "火炮"
+            },
+            {
+                "options": [
+                    "天启",
+                    "猛犸",
+                    "T系列",
+                    "帝王"
+                ],
+                "order": 2,
+                "text": "干扰",
+                "value": "天启"
+            },
+            {
+                "options": [
+                    "火炮",
+                    "装甲",
+                    "履带"
+                ],
+                "order": 3,
+                "text": "项目",
+                "value": "火炮"
+            }
+        ],
         "tips": "技能训练随机选择技能升级"
     },
     "英雄中心": {
@@ -211,6 +275,8 @@
             }
         ],
         "input": [
+        ],
+        "select": [
         ],
         "tips": ""
     }
