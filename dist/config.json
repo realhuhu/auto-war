@@ -71,32 +71,32 @@
             {
                 "order": 3,
                 "text": "蓝色元",
-                "value": true
+                "value": false
             },
             {
                 "order": 4,
                 "text": "蓝色帜",
-                "value": true
+                "value": false
             },
             {
                 "order": 5,
                 "text": "蓝色番",
-                "value": true
+                "value": false
             },
             {
                 "order": 6,
                 "text": "绿色元",
-                "value": true
+                "value": false
             },
             {
                 "order": 7,
                 "text": "绿色帜",
-                "value": true
+                "value": false
             },
             {
                 "order": 8,
                 "text": "绿色番",
-                "value": true
+                "value": false
             }
         ],
         "input": [
@@ -235,7 +235,7 @@
                 ],
                 "order": 0,
                 "text": "改造",
-                "value": "天启"
+                "value": "猛犸"
             },
             {
                 "options": [
@@ -245,7 +245,7 @@
                 ],
                 "order": 1,
                 "text": "改造项目",
-                "value": "火炮"
+                "value": "履带"
             },
             {
                 "options": [
@@ -266,7 +266,7 @@
                 ],
                 "order": 3,
                 "text": "干扰项目",
-                "value": "火炮"
+                "value": "履带"
             }
         ],
         "tips": "技能训练随机选择技能升级"
@@ -289,5 +289,332 @@
         "select": [
         ],
         "tips": ""
+    },
+    "预设1": {
+        "checkbox": [
+            {
+                "order": 0,
+                "text": "国家争霸",
+                "value": true
+            },
+            {
+                "order": 1,
+                "text": "世界争霸",
+                "value": true
+            },
+            {
+                "order": 2,
+                "text": "剿灭将领",
+                "value": true
+            },
+            {
+                "order": 3,
+                "text": "军备合成",
+                "value": true
+            },
+            {
+                "order": 4,
+                "text": "国家战争",
+                "value": false
+            },
+            {
+                "order": 6,
+                "text": "英雄中心",
+                "value": true
+            },
+            {
+                "order": 7,
+                "text": "战争学院",
+                "value": true
+            },
+            {
+                "order": 8,
+                "text": "国家宝箱",
+                "value": true
+            },
+            {
+                "order": 9,
+                "text": "将领抽奖",
+                "value": true
+            },
+            {
+                "order": 10,
+                "text": "参谋抽奖",
+                "value": true
+            },
+            {
+                "order": 11,
+                "text": "火炮抽奖",
+                "value": true
+            },
+            {
+                "order": 12,
+                "text": "配件抽奖",
+                "value": true
+            },
+            {
+                "order": 13,
+                "text": "军备抽奖",
+                "value": true
+            },
+            {
+                "order": 14,
+                "text": "今日签到",
+                "value": true
+            },
+            {
+                "order": 15,
+                "text": "矿区争夺",
+                "value": true
+            },
+            {
+                "order": 16,
+                "text": "月卡领取",
+                "value": true
+            },
+            {
+                "order": 17,
+                "text": "每日任务",
+                "value": true
+            },
+            {
+                "order": 18,
+                "text": "周任务",
+                "value": true
+            },
+            {
+                "order": 19,
+                "text": "公会领奖",
+                "value": true
+            },
+            {
+                "order": 20,
+                "text": "公会建筑",
+                "value": true
+            }
+        ],
+        "input": [
+        ],
+        "select": [
+        ],
+        "tips": "按顺序执行选择的功能"
+    },
+    "预设2": {
+        "checkbox": [
+            {
+                "order": 0,
+                "text": "国家争霸",
+                "value": true
+            },
+            {
+                "order": 1,
+                "text": "世界争霸",
+                "value": true
+            },
+            {
+                "order": 2,
+                "text": "剿灭将领",
+                "value": true
+            },
+            {
+                "order": 3,
+                "text": "军备合成",
+                "value": true
+            },
+            {
+                "order": 4,
+                "text": "国家战争",
+                "value": true
+            },
+            {
+                "order": 6,
+                "text": "英雄中心",
+                "value": false
+            },
+            {
+                "order": 7,
+                "text": "战争学院",
+                "value": false
+            },
+            {
+                "order": 8,
+                "text": "国家宝箱",
+                "value": false
+            },
+            {
+                "order": 9,
+                "text": "将领抽奖",
+                "value": false
+            },
+            {
+                "order": 10,
+                "text": "参谋抽奖",
+                "value": false
+            },
+            {
+                "order": 11,
+                "text": "火炮抽奖",
+                "value": false
+            },
+            {
+                "order": 12,
+                "text": "配件抽奖",
+                "value": false
+            },
+            {
+                "order": 13,
+                "text": "军备抽奖",
+                "value": false
+            },
+            {
+                "order": 14,
+                "text": "今日签到",
+                "value": false
+            },
+            {
+                "order": 15,
+                "text": "矿区争夺",
+                "value": false
+            },
+            {
+                "order": 16,
+                "text": "月卡领取",
+                "value": false
+            },
+            {
+                "order": 17,
+                "text": "每日任务",
+                "value": false
+            },
+            {
+                "order": 18,
+                "text": "周任务",
+                "value": false
+            },
+            {
+                "order": 19,
+                "text": "公会领奖",
+                "value": false
+            },
+            {
+                "order": 20,
+                "text": "公会建筑",
+                "value": false
+            }
+        ],
+        "input": [
+        ],
+        "select": [
+        ],
+        "tips": "按顺序执行选择的功能"
+    },
+    "预设3": {
+        "checkbox": [
+            {
+                "order": 0,
+                "text": "国家争霸",
+                "value": false
+            },
+            {
+                "order": 1,
+                "text": "世界争霸",
+                "value": false
+            },
+            {
+                "order": 2,
+                "text": "剿灭将领",
+                "value": false
+            },
+            {
+                "order": 3,
+                "text": "军备合成",
+                "value": false
+            },
+            {
+                "order": 4,
+                "text": "国家战争",
+                "value": false
+            },
+            {
+                "order": 6,
+                "text": "英雄中心",
+                "value": true
+            },
+            {
+                "order": 7,
+                "text": "战争学院",
+                "value": true
+            },
+            {
+                "order": 8,
+                "text": "国家宝箱",
+                "value": true
+            },
+            {
+                "order": 9,
+                "text": "将领抽奖",
+                "value": true
+            },
+            {
+                "order": 10,
+                "text": "参谋抽奖",
+                "value": true
+            },
+            {
+                "order": 11,
+                "text": "火炮抽奖",
+                "value": true
+            },
+            {
+                "order": 12,
+                "text": "配件抽奖",
+                "value": true
+            },
+            {
+                "order": 13,
+                "text": "军备抽奖",
+                "value": true
+            },
+            {
+                "order": 14,
+                "text": "今日签到",
+                "value": true
+            },
+            {
+                "order": 15,
+                "text": "矿区争夺",
+                "value": true
+            },
+            {
+                "order": 16,
+                "text": "月卡领取",
+                "value": true
+            },
+            {
+                "order": 17,
+                "text": "每日任务",
+                "value": true
+            },
+            {
+                "order": 18,
+                "text": "周任务",
+                "value": true
+            },
+            {
+                "order": 19,
+                "text": "公会领奖",
+                "value": true
+            },
+            {
+                "order": 20,
+                "text": "公会建筑",
+                "value": true
+            }
+        ],
+        "input": [
+        ],
+        "select": [
+        ],
+        "tips": "按顺序执行选择的功能"
     }
 }

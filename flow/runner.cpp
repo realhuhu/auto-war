@@ -107,17 +107,18 @@ void ImageClicker::_click(
         Click position
 ) {
     auto start = std::chrono::high_resolution_clock::now();
+    auto segment = selector(targetSegmentList);
+
+    emit Emitter::instance()->log(QString::fromStdString("开始循环点击: " + segment.toString()));
+
+    segment.click(0, offsetX, offsetY, position);
+    std::this_thread::sleep_for(std::chrono::duration<float>(0.2));
+
     while (!state.stopFlag.load()) {
-        auto segment = selector(targetSegmentList);
-
-        emit Emitter::instance()->log(QString::fromStdString("开始循环点击: " + segment.toString()));
-
         auto now = std::chrono::high_resolution_clock::now();
         if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count() > globalTimeout) {
             throw std::runtime_error("超时，结束运行: " + this->toString());
         }
-
-        segment.click(0, offsetX, offsetY, position);
 
         if (clickUntilList.empty()) break;
 
@@ -133,6 +134,9 @@ void ImageClicker::_click(
             emit Emitter::instance()->log("所有CLICK满足，结束循环点击");
             break;
         }
+
+        segment.click(0, offsetX, offsetY, position);
+
         emit Emitter::instance()->log("CLICK不满足，继续循环点击");
 
         std::this_thread::sleep_for(std::chrono::duration<float>(1));

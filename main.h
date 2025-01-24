@@ -30,7 +30,7 @@ public:
 
 signals:
 
-    void logMessage(const QString &message, const QString &color = "black");
+    void logMessage(const QString &message, const QString &color = "black", bool force = false);
 
     void logText(const QString &message, const QString &color = "red");
 
@@ -38,7 +38,7 @@ private slots:
 
     void onLogText(const QString &text, const QString &color = "red") const;
 
-    void onLogMessage(const QString &text, const QString &color = "black");
+    void onLogMessage(const QString &text, const QString &color = "black", bool force = false);
 
     void startCapture();
 
@@ -52,18 +52,22 @@ private slots:
 
     void runCommand(const QString &command);
 
+    void batchRunCommand(const QString &command);
+
     void closeEvent(QCloseEvent *event) override;
 
     static LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam);
 
 private:
+    HHOOK hook;
+    bool isWaiting;
+
     QStringList commandBattle;
     QStringList commandDaily;
     QMap<QString, std::function<void()>> tasks;
-    bool isWaiting;
-    HHOOK hook;
-    QTextEdit *outputText;
+
     QString previousLog;
+    QTextEdit *outputText;
 };
 
 #endif // MAINWINDOW_H

@@ -25,8 +25,8 @@
 
 
 #include "state.h"
-#include "task/battle.h"
 #include "task/daily.h"
+#include "task/battle.h"
 #include "flow/emitter.h"
 
 auto configFile = "config.json";
@@ -41,7 +41,6 @@ float getScale() {
     EnumDisplaySettings(info.szDevice, ENUM_CURRENT_SETTINGS, &devMode);
     return static_cast<float>(devMode.dmPelsWidth) / (info.rcMonitor.right - info.rcMonitor.left);
 }
-
 
 class ButtonWithSetting : public QWidget {
 Q_OBJECT
@@ -147,7 +146,6 @@ private:
     QComboBox *comboBox;
 };
 
-
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     setWindowTitle("红警自动");
     resize(480, 320);
@@ -251,8 +249,8 @@ void MainWindow::onLogText(const QString &text, const QString &color) const {
     outputText->append(QString("<div style=\"color:%1;\">%2</div>").arg(color, text));
 }
 
-void MainWindow::onLogMessage(const QString &text, const QString &color) {
-    if (state.stopFlag.load()) return;
+void MainWindow::onLogMessage(const QString &text, const QString &color, bool force) {
+    if (state.stopFlag.load() && !force) return;
 
     if (previousLog == text)return;
 
@@ -300,20 +298,21 @@ void MainWindow::runCommand(const QString &command) {
     state.currentThread = new QThread(this);
 
     auto func = tasks[command];
-    QObject::connect(state.currentThread, &QThread::started, [func, this]() {
+    QObject::connect(state.currentThread, &QThread::started, [this, func, &command]() {
         try {
+            emit logMessage("开始运行: " + command, "blue", true);
             func();
-            emit logMessage("运行完成", "red");
+            emit logMessage("运行完成: " + command, "blue", true);
             if (state.currentThread) {
                 state.currentThread->quit();
                 state.currentThread = nullptr;
             }
         } catch (const std::exception &e) {
             if (!state.stopFlag.load()) {
-                emit logMessage("出错了: " + QString(e.what()), "red");
-                emit logMessage("运行结束", "red");
+                emit logMessage("出错了: " + QString(e.what()), "red", true);
+                emit logMessage(command + "运行错误", "red", true);
             } else {
-                emit logMessage("运行完成", "red");
+                emit logMessage(command + "运行完成", "red", true);
             }
 
             if (state.currentThread) {
@@ -325,8 +324,84 @@ void MainWindow::runCommand(const QString &command) {
 
     QObject::connect(state.currentThread, &QThread::finished, state.currentThread, &QThread::deleteLater);
     state.currentThread->start();
+}
 
-    onLogText("开始执行命令: " + command, "blue");
+void MainWindow::batchRunCommand(const QString &command) {
+    if (!state.hwnd) {
+        onLogText("请先获取游戏窗口!");
+        return;
+    }
+
+    if (state.currentThread) {
+        state.stopFlag.store(true);
+        state.currentThread->quit();
+        state.currentThread->wait();
+        state.currentThread = nullptr;
+        return;
+    }
+
+    state.stopFlag.store(false);
+    state.currentThread = new QThread(this);
+
+    QObject::connect(state.currentThread, &QThread::started, [this, &command]() {
+        try {
+            emit logMessage("开始一键执行", "red", true);
+
+            auto checkboxArray = state.config[command].toObject()["checkbox"].toArray();
+
+            std::vector<QJsonObject> checkboxes;
+            for (const auto &item: checkboxArray) {
+                checkboxes.push_back(item.toObject());
+            }
+
+            std::sort(checkboxes.begin(), checkboxes.end(), [](const QJsonObject &a, const QJsonObject &b) {
+                return a["order"].toInt() < b["order"].toInt();
+            });
+
+            for (const auto &checkbox: checkboxes) {
+                if (state.stopFlag.load()) break;
+
+                if (checkbox["value"].toBool()) {
+                    auto subCommand = checkbox["text"].toString();
+
+                    try {
+                        emit logMessage("开始运行: " + subCommand, "blue", true);
+                        tasks[subCommand]();
+                        emit logMessage("运行完成: " + subCommand, "blue", true);
+                    } catch (const std::exception &e) {
+                        if (!state.stopFlag.load()) {
+                            emit logMessage("出错了: " + QString::fromStdString(e.what()), "red");
+                            emit logMessage(subCommand + "运行错误", "red", true);
+                        } else {
+                            emit logMessage(subCommand + "运行结束", "red", true);
+                        }
+                    }
+                }
+            }
+
+            emit logMessage("一键执行完成", "red", true);
+
+            if (state.currentThread) {
+                state.currentThread->quit();
+                state.currentThread = nullptr;
+            }
+        } catch (const std::exception &e) {
+            if (!state.stopFlag.load()) {
+                emit logMessage("出错了: " + QString(e.what()), "red");
+                emit logMessage("一键执行错误", "red", true);
+            } else {
+                emit logMessage("一键执行结束", "red", true);
+            }
+
+            if (state.currentThread) {
+                state.currentThread->quit();
+                state.currentThread = nullptr;
+            }
+        }
+    });
+
+    QObject::connect(state.currentThread, &QThread::finished, state.currentThread, &QThread::deleteLater);
+    state.currentThread->start();
 }
 
 void MainWindow::stopCommand() {
@@ -362,35 +437,46 @@ void MainWindow::selectCommand() {
     )";
 
     auto *battleGroupBox = new QGroupBox("自动战斗", &selectDialog);
+    auto *dailyGroupBox = new QGroupBox("日常任务", &selectDialog);
+    auto *autoRunBox = new QGroupBox("一键执行", &selectDialog);
 
     battleGroupBox->setStyleSheet(style);
+    dailyGroupBox->setStyleSheet(style);
+    autoRunBox->setStyleSheet(style);
 
     auto *battleLayout = new QGridLayout(battleGroupBox);
+    auto *dailyLayout = new QGridLayout(dailyGroupBox);
+    auto *autoRunLayout = new QGridLayout(autoRunBox);
+
     battleLayout->setSpacing(5);
+    dailyLayout->setSpacing(5);
+    autoRunLayout->setSpacing(5);
 
     for (int i = 0; i < 3; ++i) {
         battleLayout->setColumnMinimumWidth(i, 100);
+        dailyLayout->setColumnMinimumWidth(i, 100);
+        autoRunLayout->setColumnMinimumWidth(i, 100);
+
         battleLayout->setColumnStretch(i, 1);
+        dailyLayout->setColumnStretch(i, 1);
+        autoRunLayout->setColumnStretch(i, 1);
     }
 
-    int row = 0;
-    int col = 0;
+    int row, col;
 
+    row = col = 0;
     for (const auto &command: commandBattle) {
         auto *customBtn = new ButtonWithSetting(command, state.config.contains(command));
+        customBtn->getTextButton()->setAutoDefault(false);
+        customBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
         connect(customBtn->getTextButton(), &QPushButton::clicked, [this, command, &selectDialog]() {
             selectDialog.accept();
             runCommand(command);
         });
-
         connect(customBtn->getSettingButton(), &QToolButton::clicked, [this, command]() {
             setCommand(command);
         });
-
-        customBtn->getTextButton()->setAutoDefault(false);
-
-        customBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
         battleLayout->addWidget(customBtn, row, col);
 
@@ -401,36 +487,19 @@ void MainWindow::selectCommand() {
         }
     }
 
-    auto *dailyGroupBox = new QGroupBox("日常任务", &selectDialog);
-
-    dailyGroupBox->setStyleSheet(style);
-
-    auto *dailyLayout = new QGridLayout(dailyGroupBox);
-    dailyLayout->setSpacing(5);
-
-    for (int i = 0; i < 3; ++i) {
-        dailyLayout->setColumnMinimumWidth(i, 100);
-        dailyLayout->setColumnStretch(i, 1);
-    }
-
-    row = 0;
-    col = 0;
-
+    row = col = 0;
     for (const auto &command: commandDaily) {
         auto *customBtn = new ButtonWithSetting(command, state.config.contains(command));
+        customBtn->getTextButton()->setAutoDefault(false);
+        customBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
         connect(customBtn->getTextButton(), &QPushButton::clicked, [this, command, &selectDialog]() {
             selectDialog.accept();
             runCommand(command);
         });
-
         connect(customBtn->getSettingButton(), &QToolButton::clicked, [this, command]() {
             setCommand(command);
         });
-
-        customBtn->getTextButton()->setAutoDefault(false);
-
-        customBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
         dailyLayout->addWidget(customBtn, row, col);
 
@@ -441,12 +510,36 @@ void MainWindow::selectCommand() {
         }
     }
 
+    row = col = 0;
+    for (int i = 1; i <= 3; ++i) {
+        auto command = "预设" + QString::number(i);
+        auto *customBtn = new ButtonWithSetting(command, state.config.contains(command));
+        customBtn->getTextButton()->setAutoDefault(false);
+        customBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+        connect(customBtn->getTextButton(), &QToolButton::clicked, [this, command, &selectDialog]() {
+            selectDialog.accept();
+            batchRunCommand(command);
+        });
+
+        connect(customBtn->getSettingButton(), &QToolButton::clicked, [this, command]() {
+            setCommand(command);
+        });
+
+        autoRunLayout->addWidget(customBtn, row, col);
+
+        col += 1;
+        if (col >= 3) {
+            col = 0;
+            row++;
+        }
+    }
+
     layout->addWidget(battleGroupBox);
     layout->addWidget(dailyGroupBox);
+    layout->addWidget(autoRunBox);
 
-    if (selectDialog.exec() == QDialog::Accepted) {
-        //        onLogText("开始运行", "red");
-    }
+    selectDialog.exec();
 }
 
 void MainWindow::setCommand(const QString &command) {
@@ -604,33 +697,30 @@ void MainWindow::setCommand(const QString &command) {
 
                 QJsonArray newCheckboxArray;
                 for (const auto &item: checkboxItems) {
-                    QJsonObject obj = {
+                    newCheckboxArray.append(QJsonObject{
                             {"order", std::get<0>(item)},
                             {"text",  std::get<1>(item)},
                             {"value", std::get<2>(item)}
-                    };
-                    newCheckboxArray.append(obj);
+                    });
                 }
 
                 QJsonArray newInputArray;
                 for (const auto &item: inputItems) {
-                    QJsonObject obj = {
+                    newInputArray.append(QJsonObject{
                             {"order", std::get<0>(item)},
                             {"text",  std::get<1>(item)},
                             {"value", std::get<2>(item)}
-                    };
-                    newInputArray.append(obj);
+                    });
                 }
 
                 QJsonArray newSelectArray;
                 for (const auto &item: selectItems) {
-                    QJsonObject obj = {
+                    newSelectArray.append(QJsonObject{
                             {"order",   std::get<0>(item)},
                             {"text",    std::get<1>(item)},
                             {"value",   std::get<2>(item)},
                             {"options", std::get<3>(item)}
-                    };
-                    newSelectArray.append(obj);
+                    });
                 }
 
                 QJsonObject newCommandConfig;
@@ -690,7 +780,6 @@ LRESULT CALLBACK MainWindow::MouseHookProc(int nCode, WPARAM wParam, LPARAM lPar
     }
     return CallNextHookEx(nullptr, nCode, wParam, lParam);
 }
-
 
 int main(int argc, char *argv[]) {
     state.scale = getScale();

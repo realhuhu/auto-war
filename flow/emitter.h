@@ -14,7 +14,7 @@ public:
 
 signals:
 
-    void log(const QString &message, const QString &color = "black");
+    void log(const QString &message, const QString &color = "black", bool force = false);
 };
 
 #endif //QT_EMITTER_H

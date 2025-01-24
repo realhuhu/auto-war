@@ -228,7 +228,8 @@ void exterminateEnemy() {
 
         clearUntil(startUntil, clickUntil, runUntil);
         runUntil.emplace_back(std::make_unique<UntilImage>("/剿灭将领/战斗进行中.png", Previous::NONE, true));
-        runUntil.emplace_back(std::make_unique<UntilImage>("/剿灭将领/进攻.png", Previous::DOWN_CENTER));
+        runUntil.emplace_back(
+                std::make_unique<UntilImage>("/剿灭将领/进攻.png", Previous::DOWN_CENTER, false, Mode::GRAY, 1));
         clicker = clicker->locate(startUntil, runUntil);
 
         clearUntil(startUntil, clickUntil, runUntil);
@@ -242,11 +243,8 @@ void exterminateEnemy() {
 
             clearUntil(startUntil, clickUntil, runUntil);
             runUntil.emplace_back(std::make_unique<UntilImage>("/剿灭将领/关闭窗口.png", Previous::INNER, true));
-            clicker = clicker->click(startUntil, clickUntil, runUntil, positionSelector("yCenter", "max"));
-
-            clearUntil(startUntil, clickUntil, runUntil);
             runUntil.emplace_back(std::make_unique<UntilImage>("/剿灭将领/关闭窗口.png"));
-            clicker = clicker->click(startUntil, clickUntil, runUntil);
+            clicker = clicker->click(startUntil, clickUntil, runUntil, positionSelector("yCenter", "max"));
 
             clearUntil(startUntil, clickUntil, runUntil);
             runUntil.emplace_back(std::make_unique<UntilImage>("/剿灭将领/关闭窗口.png", Previous::INNER, true));
@@ -422,6 +420,11 @@ void countryWar() {
 
         if (!clicker->founded()) {
             emit Emitter::instance()->log("请先移动到与摩多城相邻的城", "red");
+            clicker = std::make_unique<ImageClicker>("/国家战争/返回基地.png");
+
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/国家.png"));
+            clicker->click(startUntil, clickUntil, runUntil);
             break;
         }
         auto city = std::filesystem::path(clicker->templatePath).stem().string();

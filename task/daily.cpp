@@ -237,10 +237,6 @@ void warCenter() {
             clicker = clicker->click(startUntil, clickUntil, runUntil);
 
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/占领演习场.png"));
-            clicker = clicker->click(startUntil, clickUntil, runUntil);
-
-            clearUntil(startUntil, clickUntil, runUntil);
             runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/演习中.png"));
             clicker->click(startUntil, clickUntil, runUntil);
         }
@@ -452,7 +448,8 @@ void guild() {
 
             if (clicker->founded()) {
                 clearUntil(startUntil, clickUntil, runUntil);
-                clickUntil.emplace_back(std::make_unique<UntilImage>("/公会领奖/确定未到领取时间.png", Previous::INNER, true));
+                clickUntil.emplace_back(
+                        std::make_unique<UntilImage>("/公会领奖/确定未到领取时间.png", Previous::INNER, true));
                 clicker->click(startUntil, clickUntil, runUntil);
             }
         }
@@ -581,12 +578,14 @@ void adviser() {
 
         clearUntil(startUntil, clickUntil, runUntil);
         runUntil.emplace_back(std::make_unique<UntilImage>("/参谋抽奖/参谋列表.png"));
-        runUntil.emplace_back(std::make_unique<UntilIfImage>("/参谋抽奖/免费收集.png", Previous::NONE, false, Mode::RGB));
+        runUntil.emplace_back(
+                std::make_unique<UntilIfImage>("/参谋抽奖/免费收集.png", Previous::NONE, false, Mode::RGB));
         clicker = clicker->click(startUntil, clickUntil, runUntil);
 
         if (clicker->founded()) {
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/参谋抽奖/免费收集.png", Previous::NONE, true, Mode::RGB));
+            runUntil.emplace_back(
+                    std::make_unique<UntilImage>("/参谋抽奖/免费收集.png", Previous::NONE, true, Mode::RGB));
             clicker->click(startUntil, clickUntil, runUntil);
         }
     }
@@ -953,13 +952,17 @@ void monthlyCard() {
     runUntil.emplace_back(std::make_unique<UntilImage>("/月卡领取/一键领取.png"));
     clicker = clicker->click(startUntil, clickUntil, runUntil);
 
-    clearUntil(startUntil, clickUntil, runUntil);
-    runUntil.emplace_back(std::make_unique<UntilImage>("/月卡领取/关闭窗口.png"));
-    clicker = clicker->click(startUntil, clickUntil, runUntil);
+    clicker->click();
 
-    clearUntil(startUntil, clickUntil, runUntil);
-    runUntil.emplace_back(std::make_unique<UntilImage>("/月卡领取/关闭窗口.png", Previous::INNER, true));
-    clicker->click(startUntil, clickUntil, runUntil);
+    while (!state.stopFlag.load()) {
+        clicker = std::make_unique<ImageClicker>("/月卡领取/关闭窗口.png");
+
+        if (!clicker->founded()) break;
+
+        clearUntil(startUntil, clickUntil, runUntil);
+        runUntil.emplace_back(std::make_unique<UntilImage>("/月卡领取/关闭窗口.png", Previous::INNER, true));
+        clicker->click(startUntil, clickUntil, runUntil, positionSelector("xCenter", "min"));
+    }
 }
 
 void guildBuilding() {
