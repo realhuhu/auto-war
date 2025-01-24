@@ -79,7 +79,8 @@ void heroCenter() {
 }
 
 void warCenter() {
-    auto config = parseBoolConfig("战争学院", "checkbox", state.config);
+    auto boolConfig = parseBoolConfig("战争学院", "checkbox", state.config);
+    auto stringConfig = parseStringConfig("战争学院", "select", state.config);
 
     std::unique_ptr<ImageClicker> clicker;
 
@@ -93,7 +94,7 @@ void warCenter() {
     runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/战争学院标题.png"));
     clicker->clickIfFound(startUntil, clickUntil, runUntil);
 
-    if (config["技能训练"]) {
+    if (boolConfig["技能训练"]) {
         clicker = std::make_unique<ImageClicker>("/战争学院/训练.png");
 
         clearUntil(startUntil, clickUntil, runUntil);
@@ -109,7 +110,120 @@ void warCenter() {
         clicker->click(startUntil, clickUntil, runUntil);
     }
 
-    if (config["军事演习"]) {
+    clicker = std::make_unique<ImageClicker>("/战争学院/坦克研究.png");
+
+    clearUntil(startUntil, clickUntil, runUntil);
+    runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/改装说明.png"));
+    clicker->click(startUntil, clickUntil, runUntil);
+
+    if (boolConfig["坦克改装"]) {
+        auto refitTank = stringConfig["改造"];
+        auto refitType = stringConfig["改造项目"];
+
+        if (refitTank != "天启") {
+            clicker = std::make_unique<ImageClicker>("/战争学院/" + refitTank + ".png");
+
+            clearUntil(startUntil, clickUntil, runUntil);
+            clicker->click();
+        }
+
+        clicker = std::make_unique<ImageClicker>("/战争学院/改装" + refitType + "图片.png");
+
+        clearUntil(startUntil, clickUntil, runUntil);
+        runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/" + refitType + "提示.png"));
+        clicker->click(startUntil, clickUntil, runUntil);
+
+        clicker = std::make_unique<ImageClicker>("/战争学院/确定研究完成.png");
+
+        if (clicker->founded()) {
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/确定研究完成.png", "inner", true));
+            clicker->click(startUntil, clickUntil, runUntil);
+        }
+
+        clicker = std::make_unique<ImageClicker>("/战争学院/改装.png");
+
+        if (clicker->founded()) {
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+                    "/战争学院/材料不足.png", "/战争学院/正在工作.png", "/战争学院/加速.png"
+            }));
+            clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+            if (clicker->templatePath == "/战争学院/材料不足.png") {
+                clearUntil(startUntil, clickUntil, runUntil);
+                runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/关闭窗口.png"));
+                clicker = clicker->locate(startUntil, runUntil, positionSelector("xCenter", "min"));
+
+                clearUntil(startUntil, clickUntil, runUntil);
+                runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/关闭窗口.png", "inner", true));
+                clicker->click(startUntil, clickUntil, runUntil);
+            } else if (clicker->templatePath == "/战争学院/正在工作.png") {
+                clearUntil(startUntil, clickUntil, runUntil);
+                runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/正在工作.png", "inner", true));
+                clicker->click(startUntil, clickUntil, runUntil);
+            }
+        }
+    }
+
+    if (boolConfig["坦克干扰"]) {
+        auto jamTank = stringConfig["干扰"];
+        auto jamType = stringConfig["干扰项目"];
+
+        clicker = std::make_unique<ImageClicker>("/战争学院/坦克干扰.png");
+        clearUntil(startUntil, clickUntil, runUntil);
+        runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/干扰说明.png"));
+        clicker->click(startUntil, clickUntil, runUntil);
+
+
+
+        if (jamTank != "天启") {
+            clicker = std::make_unique<ImageClicker>("/战争学院/" + jamTank + ".png");
+
+            clearUntil(startUntil, clickUntil, runUntil);
+            clicker->click();
+        }
+
+        clicker = std::make_unique<ImageClicker>("/战争学院/干扰" + jamType + "图片.png");
+
+        clearUntil(startUntil, clickUntil, runUntil);
+        runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/" + jamType + "提示.png"));
+        clicker->click(startUntil, clickUntil, runUntil);
+
+        clicker = std::make_unique<ImageClicker>("/战争学院/确定研究完成.png");
+
+        if (clicker->founded()) {
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/确定研究完成.png", "inner", true));
+            clicker->click(startUntil, clickUntil, runUntil);
+        }
+
+        clicker = std::make_unique<ImageClicker>("/战争学院/干扰.png");
+
+        if (clicker->founded()) {
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+                    "/战争学院/材料不足.png", "/战争学院/正在工作.png", "/战争学院/加速.png"
+            }));
+            clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+            if (clicker->templatePath == "/战争学院/材料不足.png") {
+                clearUntil(startUntil, clickUntil, runUntil);
+                runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/关闭窗口.png"));
+                clicker = clicker->locate(startUntil, runUntil, positionSelector("xCenter", "min"));
+
+                clearUntil(startUntil, clickUntil, runUntil);
+                runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/关闭窗口.png", "inner", true));
+                clicker->click(startUntil, clickUntil, runUntil);
+            } else if (clicker->templatePath == "/战争学院/正在工作.png") {
+                clearUntil(startUntil, clickUntil, runUntil);
+                runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/正在工作.png", "inner", true));
+                clicker->click(startUntil, clickUntil, runUntil);
+            }
+        }
+    }
+
+    if (boolConfig["军事演习"]) {
         clicker = std::make_unique<ImageClicker>("/战争学院/军事演习.png");
 
         clearUntil(startUntil, clickUntil, runUntil);
@@ -269,7 +383,7 @@ void guild() {
         clicker = std::make_unique<ImageClicker>("/公会领奖/捐献.png");
 
         clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilImage>("/公会领奖/活跃任务.png","right"));
+        runUntil.emplace_back(std::make_unique<UntilImage>("/公会领奖/活跃任务.png", "right"));
         clicker = clicker->locate(startUntil, runUntil);
 
         clearUntil(startUntil, clickUntil, runUntil);
