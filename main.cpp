@@ -168,11 +168,12 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     tasks["周任务"] = weeklyTask;
     tasks["今日签到"] = signIn;
     tasks["矿区争夺"] = oreField;
+    tasks["月卡领取"] = monthlyCard;
     tasks["公会建筑"] = guildBuilding;
     commandDaily = QStringList({
                                        "英雄中心", "战争学院", "国家宝箱", "公会领奖", "将领抽奖", "参谋抽奖",
                                        "火炮抽奖", "配件抽奖", "军备抽奖", "每日任务", "周任务", "今日签到",
-                                       "矿区争夺", "公会建筑"
+                                       "矿区争夺", "月卡领取", "公会建筑"
                                });
 
     hook = nullptr;
@@ -213,8 +214,10 @@ void MainWindow::onLogText(const QString &text, const QString &color) const {
     outputText->append(QString("<div style=\"color:%1;\">%2</div>").arg(color, text));
 }
 
-void MainWindow::onLogMessage(const QString &text, const QString &color) const {
+void MainWindow::onLogMessage(const QString &text, const QString &color) {
     if (state.stopFlag.load()) return;
+
+    if (previousLog == text)return;
 
     QDateTime currentDateTime = QDateTime::currentDateTime();
     QTime currentTime = currentDateTime.time();
@@ -229,6 +232,8 @@ void MainWindow::onLogMessage(const QString &text, const QString &color) const {
                 </div>
                 )"
     ).arg(timeString, color, text));
+
+    previousLog = text;
 }
 
 void MainWindow::startCapture() {

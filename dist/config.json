@@ -1,217 +1,217 @@
 {
-  "世界争霸": {
-    "checkbox": [
-    ],
-    "input": [
-      {
-        "order": 0,
-        "text": "打前",
-        "value": 10
-      }
-    ],
-    "tips": "例如'打前5'就是在前五个里随机挑一个打"
-  },
-  "国家战争": {
-    "checkbox": [
-      {
-        "order": 0,
-        "text": "8点时自动领体力",
-        "value": true
-      }
-    ],
-    "tips": "如果在晚上8-9点运行，自动领取签到与vip福利体力"
-  },
-  "公会领奖": {
-    "checkbox": [
-      {
-        "order": 0,
-        "text": "领取公会战奖励",
-        "value": true
-      },
-      {
-        "order": 1,
-        "text": "领取活跃度奖励",
-        "value": true
-      },
-      {
-        "order": 2,
-        "text": "领取夺城战奖励",
-        "value": true
-      },
-      {
-        "order": 3,
-        "text": "领取公会战役宝箱",
-        "value": true
-      }
-    ],
-    "input": [
-    ],
-    "tips": ""
-  },
-  "军备合成": {
-    "checkbox": [
-    ],
-    "input": [
-    ],
-    "tips": "默认在碎甲弹、高爆弹、电磁炮、破甲弹、陶瓷复合装甲中随机选择一个，若要获取其它军备，请先打开该军备的的[合成材料]面板"
-  },
-  "剿灭将领": {
-    "checkbox": [
-      {
-        "order": 0,
-        "text": "紫色元",
-        "value": true
-      },
-      {
-        "order": 1,
-        "text": "紫色帜",
-        "value": true
-      },
-      {
-        "order": 2,
-        "text": "紫色番",
-        "value": true
-      },
-      {
-        "order": 3,
-        "text": "蓝色元",
-        "value": false
-      },
-      {
-        "order": 4,
-        "text": "蓝色帜",
-        "value": false
-      },
-      {
-        "order": 5,
-        "text": "蓝色番",
-        "value": false
-      },
-      {
-        "order": 6,
-        "text": "绿色元",
-        "value": false
-      },
-      {
-        "order": 7,
-        "text": "绿色帜",
-        "value": false
-      },
-      {
-        "order": 8,
-        "text": "绿色番",
-        "value": false
-      }
-    ],
-    "input": [
-    ],
-    "tips": "没有对应敌人会使用刷新令，请提前准备刷新令\n会一直攻击到次数为0，打多轮请提前购买次数"
-  },
-  "参谋抽奖": {
-    "checkbox": [
-      {
-        "order": 0,
-        "text": "免费抽奖",
-        "value": true
-      },
-      {
-        "order": 1,
-        "text": "免费技能书",
-        "value": true
-      }
-    ],
-    "input": [
-    ],
-    "tips": ""
-  },
-  "国家争霸": {
-    "checkbox": [
-    ],
-    "input": [
-      {
-        "order": 0,
-        "text": "打前",
-        "value": 10
-      }
-    ],
-    "tips": "例如'打前5'就是在前五个里随机挑一个打"
-  },
-  "国家宝箱": {
-    "checkbox": [
-      {
-        "order": 0,
-        "text": "领取排名奖励",
-        "value": true
-      },
-      {
-        "order": 1,
-        "text": "领取战功奖励",
-        "value": true
-      },
-      {
-        "order": 2,
-        "text": "领取月卡宝箱",
-        "value": true
-      },
-      {
-        "order": 3,
-        "text": "开一个战功宝箱",
-        "value": true
-      }
-    ],
-    "input": [
-    ],
-    "tips": ""
-  },
-  "将领抽奖": {
-    "checkbox": [
-      {
-        "order": 0,
-        "text": "免费抽奖",
-        "value": true
-      },
-      {
-        "order": 1,
-        "text": "免费学习书",
-        "value": true
-      }
-    ],
-    "input": [
-    ],
-    "tips": ""
-  },
-  "战争学院": {
-    "checkbox": [
-      {
-        "order": 0,
-        "text": "技能训练",
-        "value": true
-      },
-      {
-        "order": 1,
-        "text": "军事演习",
-        "value": true
-      }
-    ],
-    "input": [
-    ],
-    "tips": "技能训练随机选择技能升级"
-  },
-  "英雄中心": {
-    "checkbox": [
-      {
-        "order": 0,
-        "text": "免费抽奖",
-        "value": true
-      },
-      {
-        "order": 1,
-        "text": "英雄训练",
-        "value": true
-      }
-    ],
-    "input": [
-    ],
-    "tips": ""
-  }
+    "世界争霸": {
+        "checkbox": [
+        ],
+        "input": [
+            {
+                "order": 0,
+                "text": "打前",
+                "value": 10
+            }
+        ],
+        "tips": "例如'打前5'就是在前五个里随机挑一个打"
+    },
+    "公会领奖": {
+        "checkbox": [
+            {
+                "order": 0,
+                "text": "领取公会战奖励",
+                "value": true
+            },
+            {
+                "order": 1,
+                "text": "领取活跃度奖励",
+                "value": true
+            },
+            {
+                "order": 2,
+                "text": "领取夺城战奖励",
+                "value": true
+            },
+            {
+                "order": 3,
+                "text": "领取公会战役宝箱",
+                "value": true
+            }
+        ],
+        "input": [
+        ],
+        "tips": ""
+    },
+    "军备合成": {
+        "checkbox": [
+        ],
+        "input": [
+        ],
+        "tips": "默认在碎甲弹、高爆弹、电磁炮、破甲弹、陶瓷复合装甲中随机选择一个，若要获取其它军备，请先打开该军备的的[合成材料]面板"
+    },
+    "剿灭将领": {
+        "checkbox": [
+            {
+                "order": 0,
+                "text": "紫色元",
+                "value": true
+            },
+            {
+                "order": 1,
+                "text": "紫色帜",
+                "value": true
+            },
+            {
+                "order": 2,
+                "text": "紫色番",
+                "value": true
+            },
+            {
+                "order": 3,
+                "text": "蓝色元",
+                "value": false
+            },
+            {
+                "order": 4,
+                "text": "蓝色帜",
+                "value": false
+            },
+            {
+                "order": 5,
+                "text": "蓝色番",
+                "value": false
+            },
+            {
+                "order": 6,
+                "text": "绿色元",
+                "value": false
+            },
+            {
+                "order": 7,
+                "text": "绿色帜",
+                "value": false
+            },
+            {
+                "order": 8,
+                "text": "绿色番",
+                "value": false
+            }
+        ],
+        "input": [
+        ],
+        "tips": "没有对应敌人会使用刷新令，请提前准备刷新令\n会一直攻击到次数为0，打多轮请提前购买次数"
+    },
+    "参谋抽奖": {
+        "checkbox": [
+            {
+                "order": 0,
+                "text": "免费抽奖",
+                "value": true
+            },
+            {
+                "order": 1,
+                "text": "免费技能书",
+                "value": true
+            }
+        ],
+        "input": [
+        ],
+        "tips": ""
+    },
+    "国家争霸": {
+        "checkbox": [
+        ],
+        "input": [
+            {
+                "order": 0,
+                "text": "打前",
+                "value": 10
+            }
+        ],
+        "tips": "例如'打前5'就是在前五个里随机挑一个打"
+    },
+    "国家宝箱": {
+        "checkbox": [
+            {
+                "order": 0,
+                "text": "领取排名奖励",
+                "value": true
+            },
+            {
+                "order": 1,
+                "text": "领取战功奖励",
+                "value": true
+            },
+            {
+                "order": 2,
+                "text": "领取月卡宝箱",
+                "value": true
+            },
+            {
+                "order": 3,
+                "text": "开一个战功宝箱",
+                "value": true
+            }
+        ],
+        "input": [
+        ],
+        "tips": ""
+    },
+    "国家战争": {
+        "checkbox": [
+            {
+                "order": 0,
+                "text": "8点时自动领体力",
+                "value": true
+            }
+        ],
+        "tips": "如果在晚上8-9点运行，自动领取签到与vip福利体力"
+    },
+    "将领抽奖": {
+        "checkbox": [
+            {
+                "order": 0,
+                "text": "免费抽奖",
+                "value": true
+            },
+            {
+                "order": 1,
+                "text": "免费学习书",
+                "value": true
+            }
+        ],
+        "input": [
+        ],
+        "tips": ""
+    },
+    "战争学院": {
+        "checkbox": [
+            {
+                "order": 0,
+                "text": "技能训练",
+                "value": true
+            },
+            {
+                "order": 1,
+                "text": "军事演习",
+                "value": true
+            }
+        ],
+        "input": [
+        ],
+        "tips": "技能训练随机选择技能升级"
+    },
+    "英雄中心": {
+        "checkbox": [
+            {
+                "order": 0,
+                "text": "免费抽奖",
+                "value": true
+            },
+            {
+                "order": 1,
+                "text": "英雄训练",
+                "value": true
+            }
+        ],
+        "input": [
+        ],
+        "tips": ""
+    }
 }

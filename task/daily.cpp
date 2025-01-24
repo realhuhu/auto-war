@@ -223,20 +223,26 @@ void guild() {
 
         if (clicker->founded()) {
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/公会领奖/领取奖励.png"));
-            clicker = clicker->click(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/公会领奖/公会战争标题.png"));
+            clicker->click(startUntil, clickUntil, runUntil);
 
-            clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/公会领奖/领取奖励.png", "right"));
-            clicker = clicker->click(startUntil, clickUntil, runUntil);
+            clicker = std::make_unique<ImageClicker>("/公会领奖/报名公会战.png");
 
-            clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/公会领奖/确定领取公会战奖励.png"));
-            clicker = clicker->click(startUntil, clickUntil, runUntil);
+            if (!clicker->founded()) {
+                clicker = std::make_unique<ImageClicker>("/公会领奖/领取奖励.png");
 
-            clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/公会领奖/报名公会战.png"));
-            clicker = clicker->click(startUntil, clickUntil, runUntil);
+                clearUntil(startUntil, clickUntil, runUntil);
+                runUntil.emplace_back(std::make_unique<UntilImage>("/公会领奖/领取奖励.png", "right"));
+                clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+                clearUntil(startUntil, clickUntil, runUntil);
+                runUntil.emplace_back(std::make_unique<UntilImage>("/公会领奖/确定领取公会战奖励.png"));
+                clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+                clearUntil(startUntil, clickUntil, runUntil);
+                runUntil.emplace_back(std::make_unique<UntilImage>("/公会领奖/报名公会战.png"));
+                clicker = clicker->click(startUntil, clickUntil, runUntil);
+            }
 
             clearUntil(startUntil, clickUntil, runUntil);
             runUntil.emplace_back(std::make_unique<UntilImage>("/公会领奖/确定报名.png"));
@@ -256,11 +262,15 @@ void guild() {
     clicker = std::make_unique<ImageClicker>("/公会领奖/公会.png");
 
     clearUntil(startUntil, clickUntil, runUntil);
-    runUntil.emplace_back(std::make_unique<UntilImage>("/公会领奖/公会福利.png"));
+    clickUntil.emplace_back(std::make_unique<UntilImage>("/公会领奖/公会福利.png"));
     clicker->click(startUntil, clickUntil, runUntil);
 
     if (config["领取活跃度奖励"]) {
-        clicker = std::make_unique<ImageClicker>("/公会领奖/活跃任务.png");
+        clicker = std::make_unique<ImageClicker>("/公会领奖/捐献.png");
+
+        clearUntil(startUntil, clickUntil, runUntil);
+        runUntil.emplace_back(std::make_unique<UntilImage>("/公会领奖/活跃任务.png","right"));
+        clicker = clicker->locate(startUntil, runUntil);
 
         clearUntil(startUntil, clickUntil, runUntil);
         clickUntil.emplace_back(std::make_unique<UntilImage>("/公会领奖/活跃任务按钮.png"));
@@ -323,8 +333,15 @@ void guild() {
 
         if (clicker->founded()) {
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/公会领奖/领取公会战役奖励.png", "inner", true));
-            clicker->click(startUntil, clickUntil, runUntil);
+            clicker->click(startUntil, clickUntil, runUntil, similaritySelector, 0, 0.5);
+
+            clicker = std::make_unique<ImageClicker>("/公会领奖/确定未到领取时间.png");
+
+            if (clicker->founded()) {
+                clearUntil(startUntil, clickUntil, runUntil);
+                clickUntil.emplace_back(std::make_unique<UntilImage>("/公会领奖/确定未到领取时间.png", "inner", true));
+                clicker->click(startUntil, clickUntil, runUntil);
+            }
         }
     }
 
@@ -808,6 +825,28 @@ void oreField() {
             }
         }
     }
+}
+
+void monthlyCard() {
+    std::unique_ptr<ImageClicker> clicker;
+
+    std::vector<std::unique_ptr<Until>> startUntil;
+    std::vector<std::unique_ptr<Until>> clickUntil;
+    std::vector<std::unique_ptr<Until>> runUntil;
+
+    clicker = std::make_unique<ImageClicker>("/月卡领取/畅玩月卡.png");
+
+    clearUntil(startUntil, clickUntil, runUntil);
+    runUntil.emplace_back(std::make_unique<UntilImage>("/月卡领取/一键领取.png"));
+    clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+    clearUntil(startUntil, clickUntil, runUntil);
+    runUntil.emplace_back(std::make_unique<UntilImage>("/月卡领取/关闭窗口.png"));
+    clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+    clearUntil(startUntil, clickUntil, runUntil);
+    runUntil.emplace_back(std::make_unique<UntilImage>("/月卡领取/关闭窗口.png", "inner", true));
+    clicker->click(startUntil, clickUntil, runUntil);
 }
 
 void guildBuilding() {

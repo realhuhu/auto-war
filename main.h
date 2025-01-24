@@ -38,7 +38,7 @@ private slots:
 
     void onLogText(const QString &text, const QString &color = "red") const;
 
-    void onLogMessage(const QString &text, const QString &color = "black") const;
+    void onLogMessage(const QString &text, const QString &color = "black");
 
     void startCapture();
 
@@ -63,6 +63,7 @@ private:
     bool isWaiting;
     HHOOK hook;
     QTextEdit *outputText;
+    QString previousLog;
 };
 
 #endif // MAINWINDOW_H

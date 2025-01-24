@@ -27,6 +27,8 @@ void signIn();
 
 void oreField();
 
+void monthlyCard();
+
 void guildBuilding();
 
 #endif //QT_DAILY_H
