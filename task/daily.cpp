@@ -176,7 +176,6 @@ void warCenter() {
         clicker->click(startUntil, clickUntil, runUntil);
 
 
-
         if (jamTank != "天启") {
             clicker = std::make_unique<ImageClicker>("/战争学院/" + jamTank + ".png");
 
@@ -493,7 +492,7 @@ void admiral() {
 
             clearUntil(startUntil, clickUntil, runUntil);
             runUntil.emplace_back(std::make_unique<UntilImage>("/将领抽奖/确定.png"));
-            clicker = clicker->click(startUntil, clickUntil, runUntil, similaritySelector, 0, 1);
+            clicker = clicker->click(startUntil, clickUntil, runUntil, similaritySelector, 0, 2);
 
             clearUntil(startUntil, clickUntil, runUntil);
             runUntil.emplace_back(std::make_unique<UntilImage>("/将领抽奖/确定.png", "inner", true));
