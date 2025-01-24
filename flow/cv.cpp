@@ -8,7 +8,7 @@
 #include "../state.h"
 #include "segment.h"
 
-cv::Mat CV::getScreen(const std::string &mode) {
+cv::Mat CV::getScreen(Mode mode) {
     SetProcessDPIAware();
 
     RECT rect;
@@ -35,7 +35,8 @@ cv::Mat CV::getScreen(const std::string &mode) {
     DeleteDC(memDC);
     ReleaseDC(state.hwnd, hwndDC);
 
-    if (mode == "rgb") {
+
+    if (mode == Mode::RGB) {
         return screenshot;
     } else {
         cv::Mat gray;
@@ -48,7 +49,7 @@ std::vector<Segment> CV::findPositions(
         const cv::Mat &rawImg,
         const std::string &templatePath,
         double threshold,
-        const std::string &mode
+        Mode mode
 ) {
     cv::Mat templateImg;
     auto absolutePath = QCoreApplication::applicationDirPath() + "/res" + QString::fromStdString(templatePath);
@@ -60,7 +61,7 @@ std::vector<Segment> CV::findPositions(
     QByteArray byteArray = file.readAll();
     std::vector<char> data(byteArray.data(), byteArray.data() + byteArray.size());
 
-    if (mode == "rgb") {
+    if (mode == Mode::RGB) {
         templateImg = cv::imdecode(cv::Mat(data), cv::IMREAD_COLOR);
         file.close();
         std::vector<cv::Mat> templateChannels, rawChannels;

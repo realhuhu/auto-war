@@ -11,28 +11,29 @@
 
 #include <QCoreApplication>
 
+#include "enum.h"
 #include "segment.h"
 
 class Until {
 public:
     std::string imgPath;
     double threshold;
-    std::string onPrevious;
+    Previous onPrevious;
     double interval;
     double timeout;
     double finishWait;
     bool reverse;
-    std::string mode;
+    Mode mode;
     std::vector<Segment> targetSegmentList;
 
     explicit Until(
             double threshold = 0.9,
-            std::string onPrevious = "none",
+            Previous onPrevious = Previous::NONE,
             double interval = 0.1,
             double finishWait = 0,
             double timeout = -1,
             bool reverse = false,
-            std::string mode = "gray"
+            Mode mode = Mode::GRAY
     );
 
     virtual void loop(std::unique_ptr<Segment> &previous, int globalTimeout);
@@ -55,9 +56,9 @@ class UntilImage : public Until {
 public:
     explicit UntilImage(
             const std::string &imgPath,
-            const std::string &onPrevious = "none",
+            Previous onPrevious = Previous::NONE,
             bool reverse = false,
-            std::string mode = "gray",
+            Mode mode = Mode::GRAY,
             double finishWait = 0,
             double threshold = 0.9,
             double interval = 0.1,
@@ -75,9 +76,9 @@ public:
 
     UntilAnyImage(
             const std::initializer_list<const std::string> &imgList,
-            const std::string &onPrevious = "none",
+            Previous onPrevious = Previous::NONE,
             bool reverse = false,
-            std::string mode = "gray",
+            Mode mode = Mode::GRAY,
             double finishWait = 0,
             double threshold = 0.9,
             double interval = 0.1,
@@ -85,10 +86,10 @@ public:
     );
 
     explicit UntilAnyImage(
-            const std::vector<std::string>& imgList,
-            const std::string &onPrevious = "none",
+            const std::vector<std::string> &imgList,
+            Previous onPrevious = Previous::NONE,
             bool reverse = false,
-            std::string mode = "gray",
+            Mode mode = Mode::GRAY,
             double finishWait = 0,
             double threshold = 0.9,
             double interval = 0.1,
@@ -106,9 +107,9 @@ public:
 
     explicit UntilImageStable(
             std::string imgPath,
-            const std::string &onPrevious = "none",
+            Previous onPrevious = Previous::NONE,
             bool reverse = false,
-            std::string mode = "gray",
+            Mode mode = Mode::GRAY,
             double finishWait = 0,
             double threshold = 0.9,
             double interval = 0.2,
@@ -126,9 +127,9 @@ class UntilIfImage : public UntilImage {
 public:
     explicit UntilIfImage(
             const std::string &imgPath,
-            const std::string &onPrevious = "none",
+            Previous onPrevious = Previous::NONE,
             bool reverse = false,
-            std::string mode = "gray",
+            Mode mode = Mode::GRAY,
             double finishWait = 0,
             double threshold = 0.9,
             double interval = 0.1,
@@ -144,9 +145,9 @@ class UntilIfAnyImage : public UntilAnyImage {
 public:
     UntilIfAnyImage(
             const std::initializer_list<const std::string> &imgList,
-            const std::string &onPrevious = "none",
+            Previous onPrevious = Previous::NONE,
             bool reverse = false,
-            std::string mode = "gray",
+            Mode mode = Mode::GRAY,
             double finishWait = 0,
             double threshold = 0.9,
             double interval = 0.1,
@@ -154,10 +155,10 @@ public:
     );
 
     explicit UntilIfAnyImage(
-            const std::vector<std::string>& imgList,
-            const std::string &onPrevious = "none",
+            const std::vector<std::string> &imgList,
+            Previous onPrevious = Previous::NONE,
             bool reverse = false,
-            std::string mode = "gray",
+            Mode mode = Mode::GRAY,
             double finishWait = 0,
             double threshold = 0.9,
             double interval = 0.1,

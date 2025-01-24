@@ -15,7 +15,7 @@ ImageClicker::ImageClicker(
         int wait,
         float threshold,
         int timeout,
-        const std::string &mode
+        Mode mode
 ) : templatePath(imgPath),
     globalThreshold(threshold),
     globalTimeout(timeout) {
@@ -30,7 +30,7 @@ ImageClicker::ImageClicker(
         const std::vector<std::string> &imgPathList,
         float threshold,
         int timeout,
-        const std::string &mode
+        Mode mode
 ) : globalThreshold(threshold),
     globalTimeout(timeout) {
     for (const auto &imgPath: imgPathList) {
@@ -104,7 +104,7 @@ void ImageClicker::_click(
         const std::vector<std::unique_ptr<Until>> &clickUntilList,
         int offsetX,
         int offsetY,
-        const std::string &position
+        Click position
 ) {
     auto start = std::chrono::high_resolution_clock::now();
     while (!state.stopFlag.load()) {
@@ -183,7 +183,7 @@ std::unique_ptr<ImageClicker> ImageClicker::click(
         float finishWait,
         int offsetX,
         int offsetY,
-        const std::string &position
+        Click position
 ) {
     auto executor = [this, &selector, &clickUntilList, &offsetX, &offsetY, &position]() -> bool {
         if (targetSegmentList.empty()) throw std::runtime_error("未匹配到图像: " + this->templatePath);
@@ -223,7 +223,7 @@ std::unique_ptr<ImageClicker> ImageClicker::clickIfFound(
         float finishWait,
         int offsetX,
         int offsetY,
-        const std::string &position
+        Click position
 ) {
     auto executor = [this, &selector, &clickUntilList, &offsetX, &offsetY, &position]() -> bool {
         if (targetSegmentList.empty()) {

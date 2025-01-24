@@ -38,6 +38,8 @@ add_executable(qt
         task/common.h
         task/common.cpp
         ${qrc_FILES}
+        flow/enum.h
+        flow/enum.cpp
 )
 
 target_link_libraries(qt ${OpenCV_LIBS})

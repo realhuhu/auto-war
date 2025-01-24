@@ -27,16 +27,16 @@ void countryArena() {
         clicker = clicker->click(startUntil, clickUntil, runUntil);
 
         clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilImage>("/国家争霸/关闭窗口.png", "inner", true));
+        runUntil.emplace_back(std::make_unique<UntilImage>("/国家争霸/关闭窗口.png", Previous::INNER, true));
         clicker->click(startUntil, clickUntil, runUntil);
 
         return;
     }
 
-    clicker = std::make_unique<ImageClicker>("/国家争霸/领取积分.png", 0, 0.9, 60, "rgb");
+    clicker = std::make_unique<ImageClicker>("/国家争霸/领取积分.png", 0, 0.9, 60, Mode::RGB);
 
     clearUntil(startUntil, clickUntil, runUntil);
-    runUntil.emplace_back(std::make_unique<UntilImage>("/国家争霸/领取积分.png", "inner", true, "rgb"));
+    runUntil.emplace_back(std::make_unique<UntilImage>("/国家争霸/领取积分.png", Previous::INNER, true, Mode::RGB));
     clicker->clickIfFound(startUntil, clickUntil, runUntil);
 
     while (!state.stopFlag.load()) {
@@ -52,11 +52,11 @@ void countryArena() {
 
         if (clicker->templatePath == "/国家争霸/购买次数.png") {
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/国家争霸/关闭窗口.png", "top"));
+            runUntil.emplace_back(std::make_unique<UntilImage>("/国家争霸/关闭窗口.png", Previous::TOP));
             clicker = clicker->locate(startUntil, runUntil);
 
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/国家争霸/购买次数.png", "none", true));
+            runUntil.emplace_back(std::make_unique<UntilImage>("/国家争霸/购买次数.png", Previous::NONE, true));
             runUntil.emplace_back(std::make_unique<UntilImage>("/国家争霸/关闭窗口.png"));
             clicker = clicker->click(startUntil, clickUntil, runUntil, positionSelector("xCenter", "min"));
 
@@ -75,7 +75,7 @@ void countryArena() {
         clicker = std::make_unique<ImageClicker>("/国家争霸/确认失败.png", 1);
 
         clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilImage>("/国家争霸/确认失败.png", "none", true));
+        runUntil.emplace_back(std::make_unique<UntilImage>("/国家争霸/确认失败.png", Previous::NONE, true));
         clicker->clickIfFound(startUntil, clickUntil, runUntil, similaritySelector);
     }
 }
@@ -103,7 +103,7 @@ void worldArena() {
         clicker = clicker->click(startUntil, clickUntil, runUntil);
 
         clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilImage>("/世界争霸/关闭窗口.png", "inner", true));
+        runUntil.emplace_back(std::make_unique<UntilImage>("/世界争霸/关闭窗口.png", Previous::INNER, true));
         clicker->click(startUntil, clickUntil, runUntil);
 
         return;
@@ -122,11 +122,11 @@ void worldArena() {
 
         if (clicker->templatePath == "/世界争霸/购买次数.png") {
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/世界争霸/关闭窗口.png", "top"));
+            runUntil.emplace_back(std::make_unique<UntilImage>("/世界争霸/关闭窗口.png", Previous::TOP));
             clicker = clicker->locate(startUntil, runUntil);
 
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/世界争霸/购买次数.png", "none", true));
+            runUntil.emplace_back(std::make_unique<UntilImage>("/世界争霸/购买次数.png", Previous::NONE, true));
             runUntil.emplace_back(std::make_unique<UntilImage>("/世界争霸/关闭窗口.png"));
             clicker = clicker->click(startUntil, clickUntil, runUntil, positionSelector("xCenter", "min"));
 
@@ -145,7 +145,7 @@ void worldArena() {
         clicker = std::make_unique<ImageClicker>("/世界争霸/确认失败.png", 1);
 
         clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilImage>("/世界争霸/确认失败.png", "none", true));
+        runUntil.emplace_back(std::make_unique<UntilImage>("/世界争霸/确认失败.png", Previous::NONE, true));
         clicker->clickIfFound(startUntil, clickUntil, runUntil, similaritySelector);
     }
 }
@@ -172,11 +172,11 @@ void exterminateEnemy() {
 
         if (clicker->templatePath == "/剿灭将领/等级不足.png") {
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/剿灭将领/确定关闭.png", "down"));
+            runUntil.emplace_back(std::make_unique<UntilImage>("/剿灭将领/确定关闭.png", Previous::DOWN));
             clicker = clicker->locate(startUntil, runUntil);
 
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/剿灭将领/确定关闭.png", "inner", true));
+            runUntil.emplace_back(std::make_unique<UntilImage>("/剿灭将领/确定关闭.png", Previous::INNER, true));
             clicker->click(startUntil, clickUntil, runUntil);
             return;
         }
@@ -191,7 +191,7 @@ void exterminateEnemy() {
     }
 
     while (!state.stopFlag.load()) {
-        clicker = std::make_unique<ImageClicker>("/剿灭将领/合成.png", 0, 0.95, 60, "rgb");
+        clicker = std::make_unique<ImageClicker>("/剿灭将领/合成.png", 0, 0.95, 60, Mode::RGB);
 
         if (clicker->founded()) {
             clearUntil(startUntil, clickUntil, runUntil);
@@ -199,14 +199,15 @@ void exterminateEnemy() {
             clicker = clicker->click(startUntil, clickUntil, runUntil);
 
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/剿灭将领/确定奖励.png", "inner", true, "gray", 1));
+            runUntil.emplace_back(
+                    std::make_unique<UntilImage>("/剿灭将领/确定奖励.png", Previous::INNER, true, Mode::GRAY, 1));
             clicker->click(startUntil, clickUntil, runUntil);
         }
 
         clicker = std::make_unique<ImageClicker>("/剿灭将领/信物商店.png");
 
         clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilIfAnyImage>(chosen, "right", false, "rgb", 0, 0.95));
+        runUntil.emplace_back(std::make_unique<UntilIfAnyImage>(chosen, Previous::RIGHT, false, Mode::RGB, 0, 0.95));
         clicker = clicker->locate(startUntil, runUntil);
 
         if (!clicker->founded()) {
@@ -219,15 +220,15 @@ void exterminateEnemy() {
 
             if (clicker->founded()) {
                 clearUntil(startUntil, clickUntil, runUntil);
-                runUntil.emplace_back(std::make_unique<UntilImage>("/剿灭将领/确定刷新.png", "inner", true));
+                runUntil.emplace_back(std::make_unique<UntilImage>("/剿灭将领/确定刷新.png", Previous::INNER, true));
                 clicker->click(startUntil, clickUntil, runUntil);
             }
             continue;
         }
 
         clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilImage>("/剿灭将领/战斗进行中.png", "none", true));
-        runUntil.emplace_back(std::make_unique<UntilImage>("/剿灭将领/进攻.png", "down_center"));
+        runUntil.emplace_back(std::make_unique<UntilImage>("/剿灭将领/战斗进行中.png", Previous::NONE, true));
+        runUntil.emplace_back(std::make_unique<UntilImage>("/剿灭将领/进攻.png", Previous::DOWN_CENTER));
         clicker = clicker->locate(startUntil, runUntil);
 
         clearUntil(startUntil, clickUntil, runUntil);
@@ -240,7 +241,7 @@ void exterminateEnemy() {
             clicker = std::make_unique<ImageClicker>("/军备合成/关闭窗口.png");
 
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/剿灭将领/关闭窗口.png", "inner", true));
+            runUntil.emplace_back(std::make_unique<UntilImage>("/剿灭将领/关闭窗口.png", Previous::INNER, true));
             clicker = clicker->click(startUntil, clickUntil, runUntil, positionSelector("yCenter", "max"));
 
             clearUntil(startUntil, clickUntil, runUntil);
@@ -248,7 +249,7 @@ void exterminateEnemy() {
             clicker = clicker->click(startUntil, clickUntil, runUntil);
 
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/剿灭将领/关闭窗口.png", "inner", true));
+            runUntil.emplace_back(std::make_unique<UntilImage>("/剿灭将领/关闭窗口.png", Previous::INNER, true));
             clicker->click(startUntil, clickUntil, runUntil);
             break;
         }
@@ -322,17 +323,17 @@ void armsCompound() {
 
         if (clicker->templatePath == "/军备合成/次数不足.png") {
             clearUntil(startUntil, clickUntil, runUntil);
-            clickUntil.emplace_back(std::make_unique<UntilImage>("/军备合成/次数不足.png", "inner", true));
+            clickUntil.emplace_back(std::make_unique<UntilImage>("/军备合成/次数不足.png", Previous::INNER, true));
             clickUntil.emplace_back(std::make_unique<UntilImage>("/军备合成/关闭窗口.png"));
             clicker = clicker->click(startUntil, clickUntil, runUntil);
 
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/军备合成/关闭窗口.png", "inner", true));
+            runUntil.emplace_back(std::make_unique<UntilImage>("/军备合成/关闭窗口.png", Previous::INNER, true));
             runUntil.emplace_back(std::make_unique<UntilImage>("/军备合成/关闭窗口.png"));
             clicker = clicker->click(startUntil, clickUntil, runUntil);
 
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/军备合成/关闭窗口.png", "inner", true));
+            runUntil.emplace_back(std::make_unique<UntilImage>("/军备合成/关闭窗口.png", Previous::INNER, true));
             clicker->click(startUntil, clickUntil, runUntil);
 
             break;
@@ -379,19 +380,20 @@ void countryWar() {
             clickUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/连续登录.png"));
             clicker->click(startUntil, clickUntil, runUntil);
 
-            clicker = std::make_unique<ImageClicker>("/国家战争/领取连续登录奖励.png", 0, 0.9, 60, "rgb");
+            clicker = std::make_unique<ImageClicker>("/国家战争/领取连续登录奖励.png", 0, 0.9, 60, Mode::RGB);
 
             if (clicker->founded()) {
                 clearUntil(startUntil, clickUntil, runUntil);
                 runUntil.emplace_back(
-                        std::make_unique<UntilImage>("/国家战争/领取连续登录奖励.png", "inner", true, "rgb"));
+                        std::make_unique<UntilImage>("/国家战争/领取连续登录奖励.png", Previous::INNER, true,
+                                                     Mode::RGB));
                 clicker->click(startUntil, clickUntil, runUntil);
             }
 
             clicker = std::make_unique<ImageClicker>("/国家战争/关闭窗口.png");
 
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/关闭窗口.png", "inner", true));
+            runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/关闭窗口.png", Previous::INNER, true));
             clicker->click(startUntil, clickUntil, runUntil);
         }
     }
@@ -415,7 +417,7 @@ void countryWar() {
                 "/国家战争/马赛.png", "/国家战争/慕尼黑.png", "/国家战争/法兰克福.png",
                 "/国家战争/列宁格勒.png", "/国家战争/叶卡捷琳堡.png", "/国家战争/都灵.png",
                 "/国家战争/米兰.png", "/国家战争/伯明翰.png", "/国家战争/曼彻斯特.png"
-        }, "right"));
+        }, Previous::RIGHT));
         clicker = clicker->locate(startUntil, runUntil);
 
         if (!clicker->founded()) {
@@ -496,7 +498,7 @@ void countryWar() {
                 clicker = clicker->click(startUntil, clickUntil, runUntil);
 
                 clearUntil(startUntil, clickUntil, runUntil);
-                runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/确定兑换.png", "inner", true));
+                runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/确定兑换.png", Previous::INNER, true));
                 runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/召唤支援兵.png"));
                 clicker = clicker->click(startUntil, clickUntil, runUntil);
 
@@ -511,7 +513,8 @@ void countryWar() {
         }
 
         clearUntil(startUntil, clickUntil, runUntil);
-        startUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/可战斗.png", "none", false, "rgb", 0.6));
+        startUntil.emplace_back(
+                std::make_unique<UntilImage>("/国家战争/可战斗.png", Previous::NONE, false, Mode::RGB, 0.6));
         runUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
                 "/国家战争/恢复行动力.png", "/国家战争/跳过战斗.png", "/国家战争/请稍后.png"
         }));
@@ -519,11 +522,11 @@ void countryWar() {
 
         if (clicker->templatePath == "/国家战争/恢复行动力.png") {
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/关闭窗口.png", "right"));
+            runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/关闭窗口.png", Previous::RIGHT));
             clicker = clicker->locate(startUntil, runUntil);
 
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/关闭窗口.png", "inner", true));
+            runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/关闭窗口.png", Previous::INNER, true));
             runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/领取图纸.png"));
             clicker = clicker->clickIfFound(startUntil, clickUntil, runUntil);
 
@@ -539,7 +542,7 @@ void countryWar() {
 
         if (clicker->templatePath == "/国家战争/请稍后.png") {
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/确定稍后.png", "down"));
+            runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/确定稍后.png", Previous::DOWN));
             clicker = clicker->locate(startUntil, runUntil);
 
             clearUntil(startUntil, clickUntil, runUntil);
@@ -556,7 +559,7 @@ void countryWar() {
         clicker = clicker->click(startUntil, clickUntil, runUntil);
 
         clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/结束战斗.png", "inner", true));
+        runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/结束战斗.png", Previous::INNER, true));
         runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/前往.png"));
         clicker->click(startUntil, clickUntil, runUntil);
     }

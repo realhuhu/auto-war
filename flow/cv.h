@@ -10,18 +10,19 @@
 #include <QString>
 #include <QCoreApplication>
 
+#include "enum.h"
 #include "until.h"
 #include "segment.h"
 
 class CV {
 public:
-    static cv::Mat getScreen(const std::string &mode = "gray");
+    static cv::Mat getScreen(Mode mode = Mode::GRAY);
 
     static std::vector<Segment> findPositions(
             const cv::Mat &rawImg,
             const std::string &templatePath,
             double threshold = 0.9,
-            const std::string &mode = "gray"
+            Mode mode = Mode::GRAY
     );
 };
 

@@ -11,6 +11,7 @@
 
 #include <QString>
 
+#include "enum.h"
 #include "until.h"
 #include "segment.h"
 
@@ -27,14 +28,14 @@ public:
             int wait = 0,
             float threshold = 0.9,
             int timeout = 60,
-            const std::string &mode = "gray"
+            Mode mode = Mode::GRAY
     );
 
     explicit ImageClicker(
             const std::vector<std::string> &imgPathList,
             float threshold = 0.9,
             int timeout = 60,
-            const std::string &mode = "gray"
+            Mode mode = Mode::GRAY
     );
 
     explicit ImageClicker(
@@ -65,7 +66,7 @@ public:
             const std::vector<std::unique_ptr<Until>> &clickUntilList,
             int offsetX = 0,
             int offsetY = 0,
-            const std::string& position="center"
+            Click position = Click::CENTER
     );
 
     void _finish(float finishWait, const std::vector<std::unique_ptr<Until>> &runUntilList);
@@ -89,7 +90,7 @@ public:
             float finishWait = 0,
             int offsetX = 0,
             int offsetY = 0,
-            const std::string& position="center"
+            Click position = Click::CENTER
     );
 
     std::unique_ptr<ImageClicker> clickIfFound(
@@ -101,7 +102,7 @@ public:
             float finishWait = 0,
             int offsetX = 0,
             int offsetY = 0,
-            const std::string& position="center"
+            Click position = Click::CENTER
     );
 
     std::unique_ptr<ImageClicker> locate(

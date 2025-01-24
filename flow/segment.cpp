@@ -20,23 +20,30 @@ Segment::Segment(
     yCenter = y1 + h / 2;
 }
 
-void Segment::click(double wait, int offsetX, int offsetY, const std::string &position) const {
+void Segment::click(double wait, int offsetX, int offsetY, Click position) const {
     int x, y;
-    if (position == "left") {
-        x = x1;
-        y = yCenter;
-    } else if (position == "top") {
-        x = xCenter;
-        y = y1;
-    } else if (position == "down") {
-        x = xCenter;
-        y = y2;
-    } else if (position == "right") {
-        x = x2;
-        y = yCenter;
-    } else {
-        x = xCenter;
-        y = yCenter;
+
+    switch (position) {
+        case Click::CENTER:
+            x = xCenter;
+            y = yCenter;
+            break;
+        case Click::LEFT:
+            x = x1;
+            y = yCenter;
+            break;
+        case Click::TOP:
+            x = xCenter;
+            y = y1;
+            break;
+        case Click::RIGHT:
+            x = x2;
+            y = yCenter;
+            break;
+        case Click::DOWN:
+            x = xCenter;
+            y = y2;
+            break;
     }
 
     x += offsetX * state.scale;

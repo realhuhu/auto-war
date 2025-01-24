@@ -13,6 +13,8 @@
 
 #include <QCoreApplication>
 
+#include "enum.h"
+
 struct Segment {
     std::string path;
     double similarity;
@@ -33,7 +35,7 @@ struct Segment {
             int x, int y
     );
 
-    void click(double wait = 0.1, int offsetX = 0, int offsetY = 0, const std::string &position = "center") const;
+    void click(double wait = 0.1, int offsetX = 0, int offsetY = 0, Click position = Click::CENTER) const;
 
     [[nodiscard]] std::string on(const Segment &segment, const std::string &basis) const;
 

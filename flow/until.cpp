@@ -9,24 +9,25 @@
 
 #include "../state.h"
 #include "cv.h"
+#include "enum.h"
 #include "segment.h"
 #include "emitter.h"
 
 Until::Until(
         double threshold,
-        std::string onPrevious,
+        Previous onPrevious,
         double interval,
         double finishWait,
         double timeout,
         bool reverse,
-        std::string mode
+        Mode mode
 ) : threshold(threshold),
-    onPrevious(std::move(onPrevious)),
+    onPrevious(onPrevious),
     interval(interval),
     timeout(timeout),
     finishWait(finishWait),
     reverse(reverse),
-    mode(std::move(mode)) {}
+    mode(mode) {}
 
 void Until::loop(std::unique_ptr<Segment> &previous, int globalTimeout) {
     auto start = std::chrono::high_resolution_clock::now();
@@ -57,57 +58,64 @@ bool Until::fulfilled(std::unique_ptr<Segment> &previous) {
 }
 
 std::vector<Segment> Until::filter(const std::vector<Segment> &positions, std::unique_ptr<Segment> &previous) const {
-    if (onPrevious == "none") return positions;
+    if (onPrevious == Previous::NONE) return positions;
 
     if (!previous) throw std::runtime_error("Previous segment为空" + this->toString());
 
     std::vector<Segment> result;
 
-    emit Emitter::instance()->log(QString::fromStdString("筛选: 在 " + previous->toString() + " " + onPrevious));
+    emit Emitter::instance()->log(
+            QString::fromStdString("筛选: 在" + previous->toString() + "" + PreviousToString(onPrevious))
+    );
 
-    if (onPrevious == "left") {
-        for (const auto &position: positions) {
-            if (!(position.on(*previous, "vertical") == "left")) continue;
-            result.push_back(position);
-        }
-    } else if (onPrevious == "right") {
-        for (const auto &position: positions) {
-            if (!(position.on(*previous, "vertical") == "right")) continue;
-            result.push_back(position);
-        }
-    }
-    if (onPrevious == "top") {
-        for (const auto &position: positions) {
-            if (!(position.on(*previous, "horizontal") == "top")) continue;
-            result.push_back(position);
-        }
-    }
-    if (onPrevious == "down") {
-        for (const auto &position: positions) {
-            if (!(position.on(*previous, "horizontal") == "down")) continue;
-            result.push_back(position);
-        }
-    }
-    if (onPrevious == "top_center") {
-        for (const auto &position: positions) {
-            if (!(position.on(*previous, "horizontal") == "top")) continue;
-            if (!(position.on(*previous, "vertical") == "center")) continue;
-            result.push_back(position);
-        }
-    }
-    if (onPrevious == "down_center") {
-        for (const auto &position: positions) {
-            if (!(position.on(*previous, "horizontal") == "down")) continue;
-            if (!(position.on(*previous, "vertical") == "center")) continue;
-            result.push_back(position);
-        }
-    }
-    if (onPrevious == "inner") {
-        for (const auto &position: positions) {
-            if (!(position.on(*previous, "horizontal") == "center")) continue;
-            if (!(position.on(*previous, "vertical") == "center")) continue;
-            result.push_back(position);
-        }
+    switch (onPrevious) {
+        case Previous::LEFT:
+            for (const auto &position: positions) {
+                if (!(position.on(*previous, "vertical") == "left")) continue;
+                result.push_back(position);
+            }
+            break;
+        case Previous::RIGHT:
+            for (const auto &position: positions) {
+                if (!(position.on(*previous, "vertical") == "right")) continue;
+                result.push_back(position);
+            }
+            break;
+        case Previous::TOP:
+            for (const auto &position: positions) {
+                if (!(position.on(*previous, "horizontal") == "top")) continue;
+                result.push_back(position);
+            }
+            break;
+        case Previous::DOWN:
+            for (const auto &position: positions) {
+                if (!(position.on(*previous, "horizontal") == "down")) continue;
+                result.push_back(position);
+            }
+            break;
+        case Previous::TOP_CENTER:
+            for (const auto &position: positions) {
+                if (!(position.on(*previous, "horizontal") == "top")) continue;
+                if (!(position.on(*previous, "vertical") == "center")) continue;
+                result.push_back(position);
+            }
+            break;
+        case Previous::DOWN_CENTER:
+            for (const auto &position: positions) {
+                if (!(position.on(*previous, "horizontal") == "down")) continue;
+                if (!(position.on(*previous, "vertical") == "center")) continue;
+                result.push_back(position);
+            }
+            break;
+        case Previous::INNER:
+            for (const auto &position: positions) {
+                if (!(position.on(*previous, "horizontal") == "center")) continue;
+                if (!(position.on(*previous, "vertical") == "center")) continue;
+                result.push_back(position);
+            }
+            break;
+        case Previous::NONE:
+            return positions;
     }
 
     emit Emitter::instance()->log(
@@ -135,14 +143,14 @@ std::string Until::toString() const {
 
 UntilImage::UntilImage(
         const std::string &imgPath,
-        const std::string &onPrevious,
+        Previous onPrevious,
         bool reverse,
-        std::string mode,
+        Mode mode,
         double finishWait,
         double threshold,
         double interval,
         double timeout
-) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, std::move(mode)) {
+) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, mode) {
     this->imgPath = imgPath;
 }
 
@@ -178,14 +186,14 @@ std::string UntilImage::toString() const {
 
 UntilAnyImage::UntilAnyImage(
         const std::initializer_list<const std::string> &imgList,
-        const std::string &onPrevious,
+        Previous onPrevious,
         bool reverse,
-        std::string mode,
+        Mode mode,
         double finishWait,
         double threshold,
         double interval,
         double timeout
-) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, std::move(mode)) {
+) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, mode) {
     for (const auto &i: imgList) {
         imgPathList.push_back(i);
     }
@@ -193,14 +201,14 @@ UntilAnyImage::UntilAnyImage(
 
 UntilAnyImage::UntilAnyImage(
         const std::vector<std::string> &imgList,
-        const std::string &onPrevious,
+        Previous onPrevious,
         bool reverse,
-        std::string mode,
+        Mode mode,
         double finishWait,
         double threshold,
         double interval,
         double timeout
-) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, std::move(mode)) {
+) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, mode) {
     for (const auto &i: imgList) {
         imgPathList.push_back(i);
     }
@@ -239,14 +247,14 @@ std::string UntilAnyImage::toString() const {
 
 UntilImageStable::UntilImageStable(
         std::string imgPath,
-        const std::string &onPrevious,
+        Previous onPrevious,
         bool reverse,
-        std::string mode,
+        Mode mode,
         double finishWait,
         double threshold,
         double interval,
         double timeout
-) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, std::move(mode)) {
+) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, mode) {
     this->imgPath = std::move(imgPath);
 }
 
@@ -298,13 +306,14 @@ std::string UntilImageStable::toString() const {
 
 UntilIfImage::UntilIfImage(
         const std::string &imgPath,
-        const std::string &onPrevious,
-        bool reverse, std::string mode,
+        Previous onPrevious,
+        bool reverse,
+        Mode mode,
         double finishWait,
         double threshold,
         double interval,
         double timeout
-) : UntilImage(imgPath, onPrevious, reverse, std::move(mode), finishWait, threshold, interval, timeout) {}
+) : UntilImage(imgPath, onPrevious, reverse, mode, finishWait, threshold, interval, timeout) {}
 
 void UntilIfImage::loop(std::unique_ptr<Segment> &previous, int globalTimeout) {
     this->fulfilled(previous);
@@ -322,25 +331,25 @@ std::string UntilIfImage::toString() const {
 
 UntilIfAnyImage::UntilIfAnyImage(
         const std::initializer_list<const std::string> &imgList,
-        const std::string &onPrevious,
+        Previous onPrevious,
         bool reverse,
-        std::string mode,
+        Mode mode,
         double finishWait,
         double threshold,
         double interval,
         double timeout
-) : UntilAnyImage(imgList, onPrevious, reverse, std::move(mode), finishWait, threshold, interval, timeout) {}
+) : UntilAnyImage(imgList, onPrevious, reverse, mode, finishWait, threshold, interval, timeout) {}
 
 UntilIfAnyImage::UntilIfAnyImage(
         const std::vector<std::string> &imgList,
-        const std::string &onPrevious,
+        Previous onPrevious,
         bool reverse,
-        std::string mode,
+        Mode mode,
         double finishWait,
         double threshold,
         double interval, double
         timeout
-) : UntilAnyImage(imgList, onPrevious, reverse, std::move(mode), finishWait, threshold, interval, timeout) {}
+) : UntilAnyImage(imgList, onPrevious, reverse, mode, finishWait, threshold, interval, timeout) {}
 
 void UntilIfAnyImage::loop(std::unique_ptr<Segment> &previous, int globalTimeout) {
     this->fulfilled(previous);
