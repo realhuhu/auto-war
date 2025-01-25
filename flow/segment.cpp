@@ -21,6 +21,8 @@ Segment::Segment(
 }
 
 void Segment::click(double wait, int offsetX, int offsetY, Click position) const {
+    if (state.stopFlag.load()) return;
+
     int x, y;
 
     switch (position) {

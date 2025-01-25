@@ -139,7 +139,11 @@ void ImageClicker::_click(
 
         emit Emitter::instance()->log("CLICK不满足，继续循环点击");
 
-        std::this_thread::sleep_for(std::chrono::duration<float>(1));
+        int i = 10;
+        while (!state.stopFlag.load() && i > 0) {
+            std::this_thread::sleep_for(std::chrono::duration<float>(0.1));
+            i--;
+        }
     }
 }
 
@@ -166,13 +170,15 @@ std::unique_ptr<ImageClicker> ImageClicker::_execute(
 ) {
     emit Emitter::instance()->log(QString::fromStdString(this->toString() + "开始" + name + "流程"), "green");
 
+    if (state.stopFlag.load()) throw std::runtime_error("stop");
     _start(startWait, startUntilList);
-
+    if (state.stopFlag.load()) throw std::runtime_error("stop");
     bool skipFinish = executor();
-
+    if (state.stopFlag.load()) throw std::runtime_error("stop");
     if (!skipFinish) _finish(finishWait, runUntilList);
-
+    if (state.stopFlag.load()) throw std::runtime_error("stop");
     auto clicker = _createChain(clickUntilList, runUntilList);
+    if (state.stopFlag.load()) throw std::runtime_error("stop");
 
     emit Emitter::instance()->log(QString::fromStdString(this->toString() + "结束" + name + "流程"), "green");
     return clicker;

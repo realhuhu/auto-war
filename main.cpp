@@ -252,7 +252,7 @@ void MainWindow::onLogText(const QString &text, const QString &color) const {
 void MainWindow::onLogMessage(const QString &text, const QString &color, bool force) {
     if (state.stopFlag.load() && !force) return;
 
-    if (previousLog == text)return;
+    if (previousLog == text) return;
 
     QDateTime currentDateTime = QDateTime::currentDateTime();
     QTime currentTime = currentDateTime.time();
