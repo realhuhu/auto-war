@@ -311,8 +311,6 @@ void MainWindow::runCommand(const QString &command) {
             if (!state.stopFlag.load()) {
                 emit logMessage("出错了: " + QString(e.what()), "red", true);
                 emit logMessage(command + "运行错误", "red", true);
-            } else {
-                emit logMessage(command + "运行完成", "red", true);
             }
 
             if (state.currentThread) {
@@ -372,8 +370,6 @@ void MainWindow::batchRunCommand(const QString &command) {
                         if (!state.stopFlag.load()) {
                             emit logMessage("出错了: " + QString::fromStdString(e.what()), "red");
                             emit logMessage(subCommand + "运行错误", "red", true);
-                        } else {
-                            emit logMessage(subCommand + "运行结束", "red", true);
                         }
                     }
                 }
@@ -389,8 +385,6 @@ void MainWindow::batchRunCommand(const QString &command) {
             if (!state.stopFlag.load()) {
                 emit logMessage("出错了: " + QString(e.what()), "red");
                 emit logMessage("一键执行错误", "red", true);
-            } else {
-                emit logMessage("一键执行结束", "red", true);
             }
 
             if (state.currentThread) {
@@ -474,9 +468,11 @@ void MainWindow::selectCommand() {
             selectDialog.accept();
             runCommand(command);
         });
-        connect(customBtn->getSettingButton(), &QToolButton::clicked, [this, command]() {
-            setCommand(command);
-        });
+        if (customBtn->getSettingButton()) {
+            connect(customBtn->getSettingButton(), &QToolButton::clicked, [this, command]() {
+                setCommand(command);
+            });
+        }
 
         battleLayout->addWidget(customBtn, row, col);
 
@@ -497,9 +493,12 @@ void MainWindow::selectCommand() {
             selectDialog.accept();
             runCommand(command);
         });
-        connect(customBtn->getSettingButton(), &QToolButton::clicked, [this, command]() {
-            setCommand(command);
-        });
+
+        if (customBtn->getSettingButton()) {
+            connect(customBtn->getSettingButton(), &QToolButton::clicked, [this, command]() {
+                setCommand(command);
+            });
+        }
 
         dailyLayout->addWidget(customBtn, row, col);
 
@@ -522,9 +521,11 @@ void MainWindow::selectCommand() {
             batchRunCommand(command);
         });
 
-        connect(customBtn->getSettingButton(), &QToolButton::clicked, [this, command]() {
-            setCommand(command);
-        });
+        if (customBtn->getSettingButton()) {
+            connect(customBtn->getSettingButton(), &QToolButton::clicked, [this, command]() {
+                setCommand(command);
+            });
+        }
 
         autoRunLayout->addWidget(customBtn, row, col);
 
