@@ -432,49 +432,62 @@ void countryWar() {
 
         clicker = std::make_unique<ImageClicker>("/国家战争/前往.png");
 
-        clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilImageStable>("/国家战争/" + city + "城.png"));
-        clicker = clicker->click(startUntil, clickUntil, runUntil);
-
         int offsetX = 0;
         int offsetY = 0;
+        std::string anchor;
         if (city == "芝加哥") {
-            offsetX = 87;
-            offsetY = -154;
+            offsetX = 341;
+            offsetY = -119;
+            anchor = "旧金山城";
         } else if (city == "纽约") {
-            offsetX = -136;
-            offsetY = -120;
+            offsetX = -171;
+            offsetY = -285;
+            anchor = "旧金山城";
         } else if (city == "米兰") {
-            offsetX = 100;
-            offsetY = -133;
+            offsetX = 267;
+            offsetY = -207;
+            anchor = "那不勒斯城";
         } else if (city == "都灵") {
-            offsetX = -167;
-            offsetY = -81;
+            offsetX = -310;
+            offsetY = 75;
+            anchor = "那不勒斯城";
         } else if (city == "波尔多") {
-            offsetX = -211;
-            offsetY = -89;
+            offsetX = -10;
+            offsetY = -281;
+            anchor = "巴黎城";
         } else if (city == "马赛") {
-            offsetX = -29;
-            offsetY = 46;
+            offsetX = 114;
+            offsetY = 267;
+            anchor = "巴黎城";
         } else if (city == "列宁格勒") {
-            offsetX = -126;
-            offsetY = -37;
+            offsetX = -332;
+            offsetY = -90;
+            anchor = "斯大林格勒城";
         } else if (city == "叶卡捷琳堡") {
-            offsetX = 280;
-            offsetY = -47;
+            offsetX = 358;
+            offsetY = 89;
+            anchor = "斯大林格勒城";
         } else if (city == "法兰克福") {
             offsetX = 163;
             offsetY = 61;
+            anchor = "法兰克福城";
         } else if (city == "慕尼黑") {
             offsetX = 159;
             offsetY = 20;
+            anchor = "慕尼黑城";
         } else if (city == "伯明翰") {
             offsetX = 159;
             offsetY = 54;
+            anchor = "伯明翰城";
         } else if (city == "曼彻斯特") {
             offsetX = 89;
             offsetY = -206;
+            anchor = "曼彻斯特城";
         }
+
+        clearUntil(startUntil, clickUntil, runUntil);
+        runUntil.emplace_back(std::make_unique<UntilImageStable>("/国家战争/" + anchor + ".png"));
+        clicker = clicker->click(startUntil, clickUntil, runUntil);
 
         clearUntil(startUntil, clickUntil, runUntil);
         clickUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/城市信息.png"));
