@@ -468,13 +468,13 @@ void countryWar() {
             offsetY = 89;
             anchor = "斯大林格勒城";
         } else if (city == "法兰克福") {
-            offsetX = 163;
-            offsetY = 61;
-            anchor = "法兰克福城";
+            offsetX = 112;
+            offsetY = 249;
+            anchor = "汉堡城";
         } else if (city == "慕尼黑") {
-            offsetX = 159;
-            offsetY = 20;
-            anchor = "慕尼黑城";
+            offsetX = 385;
+            offsetY = -47;
+            anchor = "汉堡城";
         } else if (city == "伯明翰") {
             offsetX = 159;
             offsetY = 54;
