@@ -841,7 +841,7 @@ void signIn() {
     clicker = std::make_unique<ImageClicker>("/每日签到/关闭窗口.png");
 
     clearUntil(startUntil, clickUntil, runUntil);
-    runUntil.emplace_back(std::make_unique<UntilImage>("/每日签到/关闭窗口.png", Previous::INNER, true));
+    clickUntil.emplace_back(std::make_unique<UntilImage>("/每日签到/关闭窗口.png", Previous::INNER, true));
     clicker->click(startUntil, clickUntil, runUntil);
 }
 
