@@ -45,25 +45,19 @@ cv::Mat CV::getScreen(Mode mode) {
     }
 }
 
-std::vector<Segment> CV::findPositions(
+std::vector<Segment> singleFindPositions(
         const cv::Mat &rawImg,
-        const std::string &templatePath,
+        QFile *imgFile,
         double threshold,
         Mode mode
 ) {
     cv::Mat templateImg;
-    auto absolutePath = QCoreApplication::applicationDirPath() + "/res" + QString::fromStdString(templatePath);
-    QFile file(absolutePath);
-
-
-    if (!file.open(QIODevice::ReadOnly)) throw std::runtime_error("文件不存在: " + absolutePath.toStdString());
-
-    QByteArray byteArray = file.readAll();
+    QByteArray byteArray = imgFile->readAll();
     std::vector<char> data(byteArray.data(), byteArray.data() + byteArray.size());
 
     if (mode == Mode::RGB) {
         templateImg = cv::imdecode(cv::Mat(data), cv::IMREAD_COLOR);
-        file.close();
+        imgFile->close();
         std::vector<cv::Mat> templateChannels, rawChannels;
         cv::split(templateImg, templateChannels);
         cv::split(rawImg, rawChannels);
@@ -82,7 +76,7 @@ std::vector<Segment> CV::findPositions(
         int h = templateImg.rows;
         for (const auto &loc: locations) {
             segments.emplace_back(
-                    templatePath,
+                    imgFile->fileName().toStdString(),
                     result.at<double>(loc.y, loc.x),
                     w * state.scale,
                     h * state.scale,
@@ -93,7 +87,7 @@ std::vector<Segment> CV::findPositions(
         return segments;
     } else {
         templateImg = cv::imdecode(cv::Mat(data), cv::IMREAD_GRAYSCALE);
-        file.close();
+        imgFile->close();
         cv::Mat result;
         cv::matchTemplate(rawImg, templateImg, result, cv::TM_CCOEFF_NORMED);
         std::vector<cv::Point> locations;
@@ -104,7 +98,7 @@ std::vector<Segment> CV::findPositions(
         int h = templateImg.rows;
         for (const auto &loc: locations) {
             segments.emplace_back(
-                    templatePath,
+                    imgFile->fileName().toStdString(),
                     result.at<double>(loc.y, loc.x),
                     w * state.scale,
                     h * state.scale,
@@ -114,4 +108,27 @@ std::vector<Segment> CV::findPositions(
         }
         return segments;
     }
+}
+
+std::vector<Segment> CV::findPositions(
+        const cv::Mat &rawImg,
+        const std::string &templatePath,
+        double threshold,
+        Mode mode
+) {
+    auto absolutePath = QCoreApplication::applicationDirPath() + "/res" + QString::fromStdString(templatePath);
+
+    QFile imgFile(absolutePath);
+
+    if (!imgFile.open(QIODevice::ReadOnly)) throw std::runtime_error("文件不存在: " + absolutePath.toStdString());
+
+    auto ps = singleFindPositions(rawImg, &imgFile, threshold, mode);
+
+    if (!ps.empty()) return ps;
+
+    QFile tryImgFile(absolutePath.replace(".png", "1.png"));
+
+    if (!tryImgFile.open(QIODevice::ReadOnly)) return ps;
+
+    return singleFindPositions(rawImg, &tryImgFile, threshold, mode);
 }

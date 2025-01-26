@@ -112,7 +112,7 @@ void ImageClicker::_click(
     emit Emitter::instance()->log(QString::fromStdString("开始循环点击: " + segment.toString()));
 
     segment.click(0, offsetX, offsetY, position);
-    std::this_thread::sleep_for(std::chrono::duration<float>(0.2));
+    std::this_thread::sleep_for(std::chrono::duration<float>(0.5));
 
     while (!state.stopFlag.load()) {
         auto now = std::chrono::high_resolution_clock::now();

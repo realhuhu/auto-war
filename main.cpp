@@ -201,13 +201,13 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     tasks["军备抽奖"] = arms;
     tasks["每日任务"] = dailyTask;
     tasks["周任务"] = weeklyTask;
-    tasks["今日签到"] = signIn;
+    tasks["每日签到"] = signIn;
     tasks["矿区争夺"] = oreField;
     tasks["月卡领取"] = monthlyCard;
     tasks["公会建筑"] = guildBuilding;
     commandDaily = QStringList({
                                        "英雄中心", "战争学院", "国家宝箱", "公会领奖", "将领抽奖", "参谋抽奖",
-                                       "火炮抽奖", "配件抽奖", "军备抽奖", "每日任务", "周任务", "今日签到",
+                                       "火炮抽奖", "配件抽奖", "军备抽奖", "每日任务", "周任务", "每日签到",
                                        "矿区争夺", "月卡领取", "公会建筑"
                                });
 
@@ -249,8 +249,8 @@ void MainWindow::onLogText(const QString &text, const QString &color) const {
     outputText->append(QString("<div style=\"color:%1;\">%2</div>").arg(color, text));
 }
 
-void MainWindow::onLogMessage(const QString &text, const QString &color, bool force) {
-    if (state.stopFlag.load() && !force) return;
+void MainWindow::onLogMessage(const QString &text, const QString &color) {
+    if (state.stopFlag.load()) return;
 
     if (previousLog == text) return;
 
@@ -298,19 +298,20 @@ void MainWindow::runCommand(const QString &command) {
     state.currentThread = new QThread(this);
 
     auto func = tasks[command];
-    QObject::connect(state.currentThread, &QThread::started, [this, func, &command]() {
+    QObject::connect(state.currentThread, &QThread::started, [func, this]() {
         try {
-            emit logMessage("开始运行: " + command, "blue", true);
             func();
-            emit logMessage("运行完成: " + command, "blue", true);
+            emit logMessage("运行完成", "red");
             if (state.currentThread) {
                 state.currentThread->quit();
                 state.currentThread = nullptr;
             }
         } catch (const std::exception &e) {
             if (!state.stopFlag.load()) {
-                emit logMessage("出错了: " + QString(e.what()), "red", true);
-                emit logMessage(command + "运行错误", "red", true);
+                emit logMessage("出错了: " + QString(e.what()), "red");
+                emit logMessage("运行结束", "red");
+            } else {
+                emit logMessage("运行完成", "red");
             }
 
             if (state.currentThread) {
@@ -322,6 +323,8 @@ void MainWindow::runCommand(const QString &command) {
 
     QObject::connect(state.currentThread, &QThread::finished, state.currentThread, &QThread::deleteLater);
     state.currentThread->start();
+
+    onLogText("开始执行命令: " + command, "blue");
 }
 
 void MainWindow::batchRunCommand(const QString &command) {
@@ -343,7 +346,7 @@ void MainWindow::batchRunCommand(const QString &command) {
 
     QObject::connect(state.currentThread, &QThread::started, [this, &command]() {
         try {
-            emit logMessage("开始一键执行", "red", true);
+            emit logMessage("开始一键执行", "red");
 
             auto checkboxArray = state.config[command].toObject()["checkbox"].toArray();
 
@@ -363,28 +366,32 @@ void MainWindow::batchRunCommand(const QString &command) {
                     auto subCommand = checkbox["text"].toString();
 
                     try {
-                        emit logMessage("开始运行: " + subCommand, "blue", true);
+                        emit logMessage("开始运行: " + subCommand, "blue");
                         tasks[subCommand]();
-                        emit logMessage("运行完成: " + subCommand, "blue", true);
+                        emit logMessage("运行完成: " + subCommand, "blue");
                     } catch (const std::exception &e) {
                         if (!state.stopFlag.load()) {
                             emit logMessage("出错了: " + QString::fromStdString(e.what()), "red");
-                            emit logMessage(subCommand + "运行错误", "red", true);
+                            emit logMessage(subCommand + "运行错误", "red");
+                        } else {
+                            emit logMessage("运行完成: " + subCommand, "red");
+                        }
+
+                        if (state.currentThread) {
+                            state.currentThread->quit();
+                            state.currentThread = nullptr;
                         }
                     }
                 }
             }
 
-            emit logMessage("一键执行完成", "red", true);
-
-            if (state.currentThread) {
-                state.currentThread->quit();
-                state.currentThread = nullptr;
-            }
+            emit logMessage("一键执行完成", "red");
         } catch (const std::exception &e) {
             if (!state.stopFlag.load()) {
                 emit logMessage("出错了: " + QString(e.what()), "red");
-                emit logMessage("一键执行错误", "red", true);
+                emit logMessage("一键执行错误", "red");
+            } else {
+                emit logMessage("一键执行完成", "red");
             }
 
             if (state.currentThread) {

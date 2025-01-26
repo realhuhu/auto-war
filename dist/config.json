@@ -315,7 +315,7 @@
             {
                 "order": 4,
                 "text": "国家战争",
-                "value": true
+                "value": false
             },
             {
                 "order": 6,
@@ -359,7 +359,7 @@
             },
             {
                 "order": 14,
-                "text": "今日签到",
+                "text": "每日签到",
                 "value": true
             },
             {
@@ -468,7 +468,7 @@
             },
             {
                 "order": 14,
-                "text": "今日签到",
+                "text": "每日签到",
                 "value": false
             },
             {
@@ -577,7 +577,7 @@
             },
             {
                 "order": 14,
-                "text": "今日签到",
+                "text": "每日签到",
                 "value": true
             },
             {
