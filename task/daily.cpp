@@ -419,13 +419,9 @@ void guild() {
     clicker->click(startUntil, clickUntil, runUntil);
 
     if (config["领取夺城战奖励"]) {
-        clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
-                "/公会领奖/夺城战已领取.png", "/公会领奖/领取夺城战奖励.png"
-        }));
-        clicker = clicker->click(startUntil, clickUntil, runUntil);
+        clicker = std::make_unique<ImageClicker>("/公会领奖/领取夺城战奖励.png");
 
-        if (clicker->templatePath == "/公会领奖/领取夺城战奖励.png") {
+        if (clicker->founded()) {
             clearUntil(startUntil, clickUntil, runUntil);
             runUntil.emplace_back(std::make_unique<UntilImage>("/公会领奖/领取夺城战奖励.png", Previous::INNER, true));
             clicker->click(startUntil, clickUntil, runUntil);
