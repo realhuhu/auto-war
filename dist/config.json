@@ -71,32 +71,32 @@
             {
                 "order": 3,
                 "text": "蓝色元",
-                "value": false
+                "value": true
             },
             {
                 "order": 4,
                 "text": "蓝色帜",
-                "value": false
+                "value": true
             },
             {
                 "order": 5,
                 "text": "蓝色番",
-                "value": false
+                "value": true
             },
             {
                 "order": 6,
                 "text": "绿色元",
-                "value": false
+                "value": true
             },
             {
                 "order": 7,
                 "text": "绿色帜",
-                "value": false
+                "value": true
             },
             {
                 "order": 8,
                 "text": "绿色番",
-                "value": false
+                "value": true
             }
         ],
         "input": [
@@ -315,7 +315,7 @@
             {
                 "order": 4,
                 "text": "国家战争",
-                "value": false
+                "value": true
             },
             {
                 "order": 6,
@@ -424,7 +424,7 @@
             {
                 "order": 4,
                 "text": "国家战争",
-                "value": false
+                "value": true
             },
             {
                 "order": 6,

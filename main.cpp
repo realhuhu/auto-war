@@ -280,143 +280,6 @@ void MainWindow::startCapture() {
     if (hook == nullptr) onLogText("Failed to set hook");
 }
 
-void MainWindow::runCommand(const QString &command) {
-    if (!state.hwnd) {
-        onLogText("请先获取游戏窗口!");
-        return;
-    }
-
-    if (state.currentThread) {
-        state.stopFlag.store(true);
-        state.currentThread->quit();
-        state.currentThread->wait();
-        state.currentThread = nullptr;
-        return;
-    }
-
-    state.stopFlag.store(false);
-    state.currentThread = new QThread(this);
-
-    auto func = tasks[command];
-    QObject::connect(state.currentThread, &QThread::started, [func, this]() {
-        try {
-            func();
-            emit logMessage("运行完成", "red");
-            if (state.currentThread) {
-                state.currentThread->quit();
-                state.currentThread = nullptr;
-            }
-        } catch (const std::exception &e) {
-            if (!state.stopFlag.load()) {
-                emit logMessage("出错了: " + QString(e.what()), "red");
-                emit logMessage("运行结束", "red");
-            } else {
-                emit logMessage("运行完成", "red");
-            }
-
-            if (state.currentThread) {
-                state.currentThread->quit();
-                state.currentThread = nullptr;
-            }
-        }
-    });
-
-    QObject::connect(state.currentThread, &QThread::finished, state.currentThread, &QThread::deleteLater);
-    state.currentThread->start();
-
-    onLogText("开始执行命令: " + command, "blue");
-}
-
-void MainWindow::batchRunCommand(const QString &command) {
-    if (!state.hwnd) {
-        onLogText("请先获取游戏窗口!");
-        return;
-    }
-
-    if (state.currentThread) {
-        state.stopFlag.store(true);
-        state.currentThread->quit();
-        state.currentThread->wait();
-        state.currentThread = nullptr;
-        return;
-    }
-
-    state.stopFlag.store(false);
-    state.currentThread = new QThread(this);
-
-    QObject::connect(state.currentThread, &QThread::started, [this, &command]() {
-        try {
-            emit logMessage("开始一键执行", "red");
-
-            auto checkboxArray = state.config[command].toObject()["checkbox"].toArray();
-
-            std::vector<QJsonObject> checkboxes;
-            for (const auto &item: checkboxArray) {
-                checkboxes.push_back(item.toObject());
-            }
-
-            std::sort(checkboxes.begin(), checkboxes.end(), [](const QJsonObject &a, const QJsonObject &b) {
-                return a["order"].toInt() < b["order"].toInt();
-            });
-
-            for (const auto &checkbox: checkboxes) {
-                if (state.stopFlag.load()) break;
-
-                if (checkbox["value"].toBool()) {
-                    auto subCommand = checkbox["text"].toString();
-
-                    try {
-                        emit logMessage("开始运行: " + subCommand, "blue");
-                        tasks[subCommand]();
-                        emit logMessage("运行完成: " + subCommand, "blue");
-                    } catch (const std::exception &e) {
-                        if (!state.stopFlag.load()) {
-                            emit logMessage("出错了: " + QString::fromStdString(e.what()), "red");
-                            emit logMessage(subCommand + "运行错误", "red");
-                        } else {
-                            emit logMessage("运行完成: " + subCommand, "red");
-                        }
-
-                        if (state.currentThread) {
-                            state.currentThread->quit();
-                            state.currentThread = nullptr;
-                        }
-                    }
-                }
-            }
-
-            emit logMessage("一键执行完成", "red");
-        } catch (const std::exception &e) {
-            if (!state.stopFlag.load()) {
-                emit logMessage("出错了: " + QString(e.what()), "red");
-                emit logMessage("一键执行错误", "red");
-            } else {
-                emit logMessage("一键执行完成", "red");
-            }
-
-            if (state.currentThread) {
-                state.currentThread->quit();
-                state.currentThread = nullptr;
-            }
-        }
-    });
-
-    QObject::connect(state.currentThread, &QThread::finished, state.currentThread, &QThread::deleteLater);
-    state.currentThread->start();
-}
-
-void MainWindow::stopCommand() {
-    if (!state.currentThread || !state.currentThread->isRunning()) {
-        onLogText("当前无命令正在执行");
-        return;
-    }
-
-    state.stopFlag.store(true);
-    state.currentThread->quit();
-    state.currentThread->wait();
-    onLogText("命令已停止执行");
-}
-
 void MainWindow::selectCommand() {
     QDialog selectDialog(this);
     selectDialog.setWindowTitle("选择命令");
@@ -548,6 +411,147 @@ void MainWindow::selectCommand() {
     layout->addWidget(autoRunBox);
 
     selectDialog.exec();
+}
+
+void MainWindow::stopCommand() {
+    if (!state.currentThread || !state.currentThread->isRunning()) {
+        onLogText("当前无命令正在执行");
+        return;
+    }
+
+    state.stopFlag.store(true);
+    state.currentThread->quit();
+    state.currentThread->wait();
+    onLogText("命令已停止执行");
+}
+
+void MainWindow::clearText() {
+    outputText->clear();
+}
+
+void MainWindow::runCommand(const QString &command) {
+    if (!state.hwnd) {
+        onLogText("请先获取游戏窗口!");
+        return;
+    }
+
+    if (state.currentThread) {
+        state.stopFlag.store(true);
+        state.currentThread->quit();
+        state.currentThread->wait();
+        state.currentThread = nullptr;
+        return;
+    }
+
+    state.stopFlag.store(false);
+    state.currentThread = new QThread(this);
+
+    auto func = tasks[command];
+    QObject::connect(state.currentThread, &QThread::started, [func, this]() {
+        try {
+            func();
+            emit logMessage("运行完成", "red");
+            if (state.currentThread) {
+                state.currentThread->quit();
+                state.currentThread = nullptr;
+            }
+        } catch (const std::exception &e) {
+            if (!state.stopFlag.load()) {
+                emit logMessage("出错了: " + QString(e.what()), "red");
+                emit logMessage("运行结束", "red");
+            } else {
+                emit logMessage("运行完成", "red");
+            }
+
+            if (state.currentThread) {
+                state.currentThread->quit();
+                state.currentThread = nullptr;
+            }
+        }
+    });
+
+    QObject::connect(state.currentThread, &QThread::finished, state.currentThread, &QThread::deleteLater);
+    state.currentThread->start();
+
+    onLogText("开始执行命令: " + command, "blue");
+}
+
+void MainWindow::batchRunCommand(const QString &command) {
+    if (!state.hwnd) {
+        onLogText("请先获取游戏窗口!");
+        return;
+    }
+
+    if (state.currentThread) {
+        state.stopFlag.store(true);
+        state.currentThread->quit();
+        state.currentThread->wait();
+        state.currentThread = nullptr;
+        return;
+    }
+
+    state.stopFlag.store(false);
+    state.currentThread = new QThread(this);
+
+    QObject::connect(state.currentThread, &QThread::started, [this, &command]() {
+        try {
+            emit logMessage("开始一键执行", "red");
+
+            auto checkboxArray = state.config[command].toObject()["checkbox"].toArray();
+
+            std::vector<QJsonObject> checkboxes;
+            for (const auto &item: checkboxArray) {
+                checkboxes.push_back(item.toObject());
+            }
+
+            std::sort(checkboxes.begin(), checkboxes.end(), [](const QJsonObject &a, const QJsonObject &b) {
+                return a["order"].toInt() < b["order"].toInt();
+            });
+
+            for (const auto &checkbox: checkboxes) {
+                if (state.stopFlag.load()) break;
+
+                if (checkbox["value"].toBool()) {
+                    auto subCommand = checkbox["text"].toString();
+
+                    try {
+                        emit logMessage("开始运行: " + subCommand, "blue");
+                        tasks[subCommand]();
+                        emit logMessage("运行完成: " + subCommand, "blue");
+                    } catch (const std::exception &e) {
+                        if (!state.stopFlag.load()) {
+                            emit logMessage("出错了: " + QString::fromStdString(e.what()), "red");
+                            emit logMessage(subCommand + "运行错误", "red");
+                        } else {
+                            emit logMessage("运行完成: " + subCommand, "red");
+                        }
+
+                        if (state.currentThread) {
+                            state.currentThread->quit();
+                            state.currentThread = nullptr;
+                        }
+                    }
+                }
+            }
+
+            emit logMessage("一键执行完成", "red");
+        } catch (const std::exception &e) {
+            if (!state.stopFlag.load()) {
+                emit logMessage("出错了: " + QString(e.what()), "red");
+                emit logMessage("一键执行错误", "red");
+            } else {
+                emit logMessage("一键执行完成", "red");
+            }
+
+            if (state.currentThread) {
+                state.currentThread->quit();
+                state.currentThread = nullptr;
+            }
+        }
+    });
+
+    QObject::connect(state.currentThread, &QThread::finished, state.currentThread, &QThread::deleteLater);
+    state.currentThread->start();
 }
 
 void MainWindow::setCommand(const QString &command) {
@@ -756,9 +760,6 @@ void MainWindow::setCommand(const QString &command) {
     settingDialog.exec();
 }
 
-void MainWindow::clearText() {
-    outputText->clear();
-}
 
 LRESULT CALLBACK MainWindow::MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
     if (nCode >= 0) {
