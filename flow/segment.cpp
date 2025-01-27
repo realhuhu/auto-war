@@ -162,9 +162,7 @@ Selector orderedRandomSelector(
 
         std::sort(sortedSegments.begin(), sortedSegments.end(), compare);
 
-        if (option == "max") {
-            std::reverse(sortedSegments.begin(), sortedSegments.end());
-        }
+        if (option == "max") std::reverse(sortedSegments.begin(), sortedSegments.end());
 
         std::vector<Segment> new_vector(
                 sortedSegments.begin(),

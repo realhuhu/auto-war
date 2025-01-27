@@ -300,12 +300,13 @@ std::unique_ptr<ImageClicker> ImageClicker::locate(
     );
 }
 
+bool ImageClicker::founded() const {
+    return !targetSegmentList.empty();
+}
+
 std::string ImageClicker::toString() const {
     if (templatePath.empty()) return "无";
 
     return "[" + QFileInfo(QString::fromStdString(templatePath)).baseName().toStdString() + "]";
 }
 
-bool ImageClicker::founded() const {
-    return !targetSegmentList.empty();
-}

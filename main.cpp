@@ -25,9 +25,10 @@
 
 
 #include "state.h"
+#include "flow/cv.h"
+#include "flow/emitter.h"
 #include "task/daily.h"
 #include "task/battle.h"
-#include "flow/emitter.h"
 
 auto configFile = "config.json";
 
@@ -145,6 +146,42 @@ private:
     QLabel *label;
     QComboBox *comboBox;
 };
+
+class ImageDialog : public QDialog {
+Q_OBJECT
+
+public:
+    explicit ImageDialog(
+            const QImage &image,
+            QWidget *parent
+    ) : QDialog(parent) {
+        this->setWindowTitle("查看截屏");
+        this->setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint);
+
+        int maxWidth = 400;
+        int maxHeight = 400;
+
+        auto *layout = new QVBoxLayout(this);
+        auto imageLabel = new QLabel(this);
+        imageLabel->setMaximumSize(maxWidth, maxHeight);
+
+        layout->addWidget(imageLabel);
+
+        int originalWidth = image.width();
+        int originalHeight = image.height();
+
+        float scaleWidth = static_cast<float>(maxWidth) / originalWidth;
+        float scaleHeight = static_cast<float>(maxHeight) / originalHeight;
+        float scale = qMin(scaleWidth, scaleHeight); // 取较小的缩放比例，保证图像不会被拉伸超出边界
+        int scaledWidth = static_cast<int>(originalWidth * scale);
+        int scaledHeight = static_cast<int>(originalHeight * scale);
+
+        auto scaledImage = image.scaled(scaledWidth, scaledHeight, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+        imageLabel->setPixmap(QPixmap::fromImage(scaledImage));
+    };
+};
+
 
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     setWindowTitle("红警自动");
@@ -303,18 +340,22 @@ void MainWindow::selectCommand() {
     auto *battleGroupBox = new QGroupBox("自动战斗", &selectDialog);
     auto *dailyGroupBox = new QGroupBox("日常任务", &selectDialog);
     auto *autoRunBox = new QGroupBox("一键执行", &selectDialog);
+    auto *otherFunctionBox = new QGroupBox("其它功能", &selectDialog);
 
     battleGroupBox->setStyleSheet(style);
     dailyGroupBox->setStyleSheet(style);
     autoRunBox->setStyleSheet(style);
+    otherFunctionBox->setStyleSheet(style);
 
     auto *battleLayout = new QGridLayout(battleGroupBox);
     auto *dailyLayout = new QGridLayout(dailyGroupBox);
     auto *autoRunLayout = new QGridLayout(autoRunBox);
+    auto *otherFunctionLayout = new QGridLayout(otherFunctionBox);
 
     battleLayout->setSpacing(5);
     dailyLayout->setSpacing(5);
     autoRunLayout->setSpacing(5);
+    otherFunctionLayout->setSpacing(5);
 
     for (int i = 0; i < 3; ++i) {
         battleLayout->setColumnMinimumWidth(i, 100);
@@ -406,9 +447,36 @@ void MainWindow::selectCommand() {
         }
     }
 
+    auto *viewBtn = new ButtonWithSetting("查看截屏", false);
+    viewBtn->getTextButton()->setAutoDefault(false);
+    viewBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+    connect(viewBtn->getTextButton(), &QToolButton::clicked, [this, &selectDialog]() {
+        if (!state.hwnd) {
+            onLogText("请先获取游戏窗口!");
+            selectDialog.accept();
+            return;
+        }
+
+        auto screenshot = CV::getScreen(Mode::RGB);
+        cv::cvtColor(screenshot, screenshot, cv::COLOR_BGR2RGB);
+
+        auto *dialog = new ImageDialog(QImage(
+                screenshot.data,
+                screenshot.cols,
+                screenshot.rows,
+                static_cast<int>(screenshot.step),
+                QImage::Format_RGB888
+        ), this);
+        dialog->exec();
+    });
+
+    otherFunctionLayout->addWidget(viewBtn, 0, 0);
+
     layout->addWidget(battleGroupBox);
     layout->addWidget(dailyGroupBox);
     layout->addWidget(autoRunBox);
+    layout->addWidget(otherFunctionBox);
 
     selectDialog.exec();
 }
@@ -759,7 +827,6 @@ void MainWindow::setCommand(const QString &command) {
 
     settingDialog.exec();
 }
-
 
 LRESULT CALLBACK MainWindow::MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
     if (nCode >= 0) {

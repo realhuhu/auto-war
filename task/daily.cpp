@@ -103,11 +103,11 @@ void warCenter() {
 
         clearUntil(startUntil, clickUntil, runUntil);
         runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/关闭窗口.png"));
-        clicker = clicker->locate(startUntil, runUntil, positionSelector("xCenter", "min"));
+        clicker = clicker->locate(startUntil, runUntil);
 
         clearUntil(startUntil, clickUntil, runUntil);
         runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/关闭窗口.png", Previous::INNER, true));
-        clicker->click(startUntil, clickUntil, runUntil);
+        clicker->click(startUntil, clickUntil, runUntil, positionSelector("xCenter", "min"));
     }
 
     clicker = std::make_unique<ImageClicker>("/战争学院/坦克研究.png");
