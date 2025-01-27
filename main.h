@@ -56,9 +56,9 @@ private slots:
 
     void closeEvent(QCloseEvent *event) override;
 
+private:
     static LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam);
 
-private:
     HHOOK hook;
     bool isWaiting;
 

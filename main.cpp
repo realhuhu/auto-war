@@ -29,6 +29,7 @@
 #include "flow/emitter.h"
 #include "task/daily.h"
 #include "task/battle.h"
+#include "function/clicker.h"
 
 auto configFile = "config.json";
 
@@ -151,10 +152,7 @@ class ImageDialog : public QDialog {
 Q_OBJECT
 
 public:
-    explicit ImageDialog(
-            const QImage &image,
-            QWidget *parent
-    ) : QDialog(parent) {
+    explicit ImageDialog(const QImage &image, QWidget *parent) : QDialog(parent) {
         this->setWindowTitle("查看截屏");
         this->setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
@@ -361,10 +359,12 @@ void MainWindow::selectCommand() {
         battleLayout->setColumnMinimumWidth(i, 100);
         dailyLayout->setColumnMinimumWidth(i, 100);
         autoRunLayout->setColumnMinimumWidth(i, 100);
+        otherFunctionLayout->setColumnMinimumWidth(i, 100);
 
         battleLayout->setColumnStretch(i, 1);
         dailyLayout->setColumnStretch(i, 1);
         autoRunLayout->setColumnStretch(i, 1);
+        otherFunctionLayout->setColumnStretch(i, 1);
     }
 
     int row, col;
@@ -448,8 +448,13 @@ void MainWindow::selectCommand() {
     }
 
     auto *viewBtn = new ButtonWithSetting("查看截屏", false);
+    auto *clickerBtn = new ButtonWithSetting("连点器", false);
+
     viewBtn->getTextButton()->setAutoDefault(false);
+    clickerBtn->getTextButton()->setAutoDefault(false);
+
     viewBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    clickerBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
     connect(viewBtn->getTextButton(), &QToolButton::clicked, [this, &selectDialog]() {
         if (!state.hwnd) {
@@ -471,7 +476,21 @@ void MainWindow::selectCommand() {
         dialog->exec();
     });
 
+    connect(clickerBtn->getTextButton(), &QToolButton::clicked, [this, &selectDialog]() {
+        if (!state.hwnd) {
+            onLogText("请先获取游戏窗口!");
+            selectDialog.accept();
+            return;
+        }
+
+        auto *dialog = new ClickerDialog(this);
+        selectDialog.accept();
+        dialog->exec();
+    });
+
+
     otherFunctionLayout->addWidget(viewBtn, 0, 0);
+    otherFunctionLayout->addWidget(clickerBtn, 0, 1);
 
     layout->addWidget(battleGroupBox);
     layout->addWidget(dailyGroupBox);

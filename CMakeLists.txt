@@ -40,6 +40,8 @@ add_executable(qt
         ${qrc_FILES}
         flow/enum.h
         flow/enum.cpp
+        function/clicker.h
+        function/clicker.cpp
 )
 
 target_link_libraries(qt ${OpenCV_LIBS})
