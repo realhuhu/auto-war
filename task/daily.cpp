@@ -797,7 +797,7 @@ void weeklyTask() {
     clicker = std::make_unique<ImageClicker>("/周任务/周任务.png");
 
     clearUntil(startUntil, clickUntil, runUntil);
-    runUntil.emplace_back(std::make_unique<UntilImage>("/周任务/任务进度.png"));
+    runUntil.emplace_back(std::make_unique<UntilImage>("/周任务/周目标标题.png"));
     clicker->click(startUntil, clickUntil, runUntil);
 
     while (!state.stopFlag.load()) {

@@ -7,7 +7,6 @@
 #include <memory>
 #include <thread>
 #include <iostream>
-#include <filesystem>
 
 #include <QCoreApplication>
 

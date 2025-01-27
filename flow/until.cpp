@@ -138,7 +138,7 @@ bool Until::flag(std::unique_ptr<Segment> &previous) {
 }
 
 std::string Until::toString() const {
-    return "[Until" + std::filesystem::path(imgPath).stem().string() + "]";
+    return "[Until" + imgPath + "]";
 }
 
 UntilImage::UntilImage(
@@ -175,11 +175,10 @@ bool UntilImage::flag(std::unique_ptr<Segment> &previous) {
 
 std::string UntilImage::toString() const {
     return QString(
-            "等待%1<img src='%2' alt='%3' height='14'>"
+            "等待%1<img src='%2' height='14'>"
     ).arg(
             QString(reverse ? "消失" : ""),
-            QCoreApplication::applicationDirPath() + QString::fromStdString("/res" + imgPath),
-            QString::fromStdString(std::filesystem::path(imgPath).stem().string())
+            QCoreApplication::applicationDirPath() + QString::fromStdString("/res" + imgPath)
     ).toStdString();
 }
 
@@ -235,9 +234,8 @@ std::string UntilAnyImage::toString() const {
     auto start = QString("等待|");
 
     for (const auto &currentImgPath: imgPathList) {
-        start += QString("<img src='%1' alt='%2' height='14'>|").arg(
-                QCoreApplication::applicationDirPath() + QString::fromStdString("/res" + currentImgPath),
-                QString::fromStdString(std::filesystem::path(currentImgPath).stem().string())
+        start += QString("<img src='%1' height='14'>|").arg(
+                QCoreApplication::applicationDirPath() + QString::fromStdString("/res" + currentImgPath)
         );
     }
 
@@ -296,10 +294,9 @@ bool UntilImageStable::flag(std::unique_ptr<Segment> &previous) {
 
 std::string UntilImageStable::toString() const {
     return QString(
-            "等待稳定<img src='%1' alt='%2' height='14'>"
+            "等待稳定<img src='%1' height='14'>"
     ).arg(
-            QCoreApplication::applicationDirPath() + QString::fromStdString("/res" + imgPath),
-            QString::fromStdString(std::filesystem::path(imgPath).stem().string())
+            QCoreApplication::applicationDirPath() + QString::fromStdString("/res" + imgPath)
     ).toStdString();
 }
 
@@ -321,10 +318,9 @@ void UntilIfImage::loop(std::unique_ptr<Segment> &previous, int globalTimeout) {
 
 std::string UntilIfImage::toString() const {
     return QString(
-            "尝试等待<img src='%1' alt='%2' height='14'>"
+            "尝试等待<img src='%1' height='14'>"
     ).arg(
-            QCoreApplication::applicationDirPath() + QString::fromStdString("/res" + imgPath),
-            QString::fromStdString(std::filesystem::path(imgPath).stem().string())
+            QCoreApplication::applicationDirPath() + QString::fromStdString("/res" + imgPath)
     ).toStdString();
 }
 
@@ -359,9 +355,8 @@ std::string UntilIfAnyImage::toString() const {
     auto start = QString("尝试等待|");
 
     for (const auto &currentImgPath: imgPathList) {
-        start += QString("<img src='%1' alt='%2' height='14'>|").arg(
-                QCoreApplication::applicationDirPath() + QString::fromStdString("/res" + currentImgPath),
-                QString::fromStdString(std::filesystem::path(currentImgPath).stem().string())
+        start += QString("<img src='%1' height='14'>|").arg(
+                QCoreApplication::applicationDirPath() + QString::fromStdString("/res" + currentImgPath)
         );
     }
 

@@ -9,8 +9,6 @@
 #include "segment.h"
 
 cv::Mat CV::getScreen(Mode mode) {
-    SetProcessDPIAware();
-
     RECT rect;
     GetWindowRect(state.hwnd, &rect);
     int width = rect.right - rect.left;

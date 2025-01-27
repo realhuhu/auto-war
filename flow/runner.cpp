@@ -4,6 +4,8 @@
 #include <utility>
 #include <stdexcept>
 
+#include <QFileInfo>
+
 #include "../state.h"
 #include "cv.h"
 #include "until.h"
@@ -301,7 +303,7 @@ std::unique_ptr<ImageClicker> ImageClicker::locate(
 std::string ImageClicker::toString() const {
     if (templatePath.empty()) return "无";
 
-    return "[" + std::filesystem::path(templatePath).stem().string() + "]";
+    return "[" + QFileInfo(QString::fromStdString(templatePath)).baseName().toStdString() + "]";
 }
 
 bool ImageClicker::founded() const {

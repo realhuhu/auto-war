@@ -89,12 +89,10 @@ Segment Segment::copy() const {
 }
 
 std::string Segment::toString() const {
-    std::filesystem::path p(this->path);
     return QString(
-            "(%3, %4)<img src='%1' alt='%2' height='14'>"
+            "(%3, %4)<img src='%1' height='14'>"
     ).arg(
             QString::fromStdString(this->path),
-            QString::fromStdString(p.stem().string()),
             QString::number(this->xCenter),
             QString::number(this->yCenter)
     ).toStdString();

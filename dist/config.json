@@ -424,7 +424,7 @@
             {
                 "order": 4,
                 "text": "国家战争",
-                "value": true
+                "value": false
             },
             {
                 "order": 6,

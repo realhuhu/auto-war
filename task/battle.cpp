@@ -1,5 +1,7 @@
 #include "battle.h"
 
+#include <QFileInfo>
+
 #include "common.h"
 #include "../state.h"
 #include "../flow/runner.h"
@@ -314,7 +316,7 @@ void armsCompound() {
         clicker = std::make_unique<ImageClicker>("/军备合成/开始战斗.png");
 
         clearUntil(startUntil, clickUntil, runUntil);
-        clickUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+        runUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
                 "/军备合成/跳过战斗.png", "/军备合成/次数不足.png"
         }));
         clicker = clicker->click(startUntil, clickUntil, runUntil);
@@ -427,8 +429,8 @@ void countryWar() {
             clicker->click(startUntil, clickUntil, runUntil);
             break;
         }
-        auto city = std::filesystem::path(clicker->templatePath).stem().string();
-        emit Emitter::instance()->log(QString::fromStdString("当前所在: " + city), "blue");
+        auto city = QFileInfo(QString::fromStdString(clicker->templatePath)).baseName();
+        emit Emitter::instance()->log(QString::fromStdString("当前所在: " + city.toStdString()), "blue");
 
         clicker = std::make_unique<ImageClicker>("/国家战争/前往.png");
 
