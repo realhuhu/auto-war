@@ -26,8 +26,6 @@ Q_OBJECT
 public:
     explicit MainWindow(QWidget *parent = nullptr);
 
-    ~MainWindow() override = default;
-
 signals:
 
     void logMessage(const QString &message, const QString &color = "black");

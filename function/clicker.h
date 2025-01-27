@@ -39,8 +39,6 @@ Q_OBJECT
 public:
     explicit ClickerDialog(QWidget *parent = nullptr);
 
-    ~ClickerDialog() override;
-
 private slots:
 
     void appendCoordinate(int x, int y);

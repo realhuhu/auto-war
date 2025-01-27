@@ -180,7 +180,6 @@ public:
     };
 };
 
-
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     setWindowTitle("红警自动");
     resize(480, 320);
