@@ -485,6 +485,7 @@ void MainWindow::selectCommand() {
 
         auto *dialog = new ClickerDialog(this);
         selectDialog.accept();
+        this->showMinimized();
         dialog->exec();
     });
 

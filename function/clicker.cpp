@@ -87,8 +87,15 @@ ClickerDialog::ClickerDialog(QWidget *parent) : QDialog(parent) {
 
 ClickerDialog::~ClickerDialog() {
     if (hook) UnhookWindowsHookEx(hook);
-    instance = nullptr; // 防止悬空指针
+    instance = nullptr;
 }
+
+void ClickerDialog::closeEvent(QCloseEvent *) {
+    if (hook) UnhookWindowsHookEx(hook);
+    instance = nullptr;
+    parentWidget()->showNormal();
+}
+
 
 void ClickerDialog::appendCoordinate(int x, int y) {
     RECT clientRect = {0};
@@ -122,6 +129,11 @@ void ClickerDialog::startRecord() {
 
     textEdit->append("请按顺序点击");
     isWaiting = true;
+
+    if (hook) {
+        UnhookWindowsHookEx(hook);
+        hook = nullptr;
+    }
     hook = SetWindowsHookEx(WH_MOUSE_LL, MouseHookProc, nullptr, 0);
     if (!hook) textEdit->append("钩子安装失败");
 }

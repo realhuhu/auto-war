@@ -63,6 +63,8 @@ private:
     QSpinBox *intervalSpinBox;
     std::vector<POINT> pointList;
     ClickThread *clickThread = nullptr;
+
+    void closeEvent(QCloseEvent *) override;
 };
 
 #endif //QT_CLICKER_H

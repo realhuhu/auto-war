@@ -315,7 +315,7 @@
             {
                 "order": 4,
                 "text": "国家战争",
-                "value": false
+                "value": true
             },
             {
                 "order": 6,
