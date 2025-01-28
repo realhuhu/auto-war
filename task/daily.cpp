@@ -153,11 +153,11 @@ void warCenter() {
             if (clicker->templatePath == "/战争学院/材料不足.png") {
                 clearUntil(startUntil, clickUntil, runUntil);
                 runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/关闭窗口.png"));
-                clicker = clicker->locate(startUntil, runUntil, positionSelector("xCenter", "min"));
+                clicker = clicker->locate(startUntil, runUntil);
 
                 clearUntil(startUntil, clickUntil, runUntil);
                 runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/关闭窗口.png", Previous::INNER, true));
-                clicker->click(startUntil, clickUntil, runUntil);
+                clicker->click(startUntil, clickUntil, runUntil, positionSelector("xCenter", "min"));
             } else if (clicker->templatePath == "/战争学院/正在工作.png") {
                 clearUntil(startUntil, clickUntil, runUntil);
                 runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/正在工作.png", Previous::INNER, true));
@@ -1006,7 +1006,7 @@ void guildBuilding() {
     clicker = clicker->click(startUntil, clickUntil, runUntil);
 
     clearUntil(startUntil, clickUntil, runUntil);
-    runUntil.emplace_back(std::make_unique<UntilImage>("/公会建筑/勋章刷新.png", Previous::NONE, true));
+    clickUntil.emplace_back(std::make_unique<UntilImage>("/公会建筑/勋章刷新.png", Previous::NONE, true));
     clicker->click(startUntil, clickUntil, runUntil);
 
     auto iterator = CV::findPositions(CV::getScreen(), "/公会建筑/需要人数.png");
