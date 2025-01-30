@@ -1,12 +1,4 @@
 #include "cv.h"
-#include <opencv2/imgproc.hpp>
-#include <opencv2/imgcodecs.hpp>
-
-#include <QFile>
-#include <QCoreApplication>
-
-#include "../state.h"
-#include "segment.h"
 
 cv::Mat CV::getScreen(Mode mode) {
     RECT rect;
@@ -33,14 +25,11 @@ cv::Mat CV::getScreen(Mode mode) {
     DeleteDC(memDC);
     ReleaseDC(state.hwnd, hwndDC);
 
+    if (mode == Mode::RGB) return screenshot;
 
-    if (mode == Mode::RGB) {
-        return screenshot;
-    } else {
-        cv::Mat gray;
-        cv::cvtColor(screenshot, gray, cv::COLOR_BGR2GRAY);
-        return gray;
-    }
+    cv::Mat gray;
+    cv::cvtColor(screenshot, gray, cv::COLOR_BGR2GRAY);
+    return gray;
 }
 
 std::vector<Segment> singleFindPositions(

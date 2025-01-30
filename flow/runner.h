@@ -4,14 +4,13 @@
 #include <vector>
 #include <chrono>
 #include <thread>
-#include <memory>
-#include <iostream>
-#include <functional>
 
 #include <QString>
+#include <QFileInfo>
 
 #include "enum.h"
 #include "until.h"
+#include "emitter.h"
 #include "segment.h"
 
 class ImageClicker {

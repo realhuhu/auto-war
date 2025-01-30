@@ -3,14 +3,15 @@
 
 #include <vector>
 #include <chrono>
-#include <string>
-#include <memory>
 #include <thread>
 #include <iostream>
 
 #include <QCoreApplication>
 
+#include "../state.h"
+#include "cv.h"
 #include "enum.h"
+#include "emitter.h"
 #include "segment.h"
 
 class Until {

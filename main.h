@@ -1,14 +1,15 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <Windows.h>
-#include <functional>
+#include <windows.h>
 
 #include <QMap>
 #include <QWidget>
 #include <QDialog>
 #include <QThread>
 #include <QScreen>
+#include <QGroupBox>
+#include <QCheckBox>
 #include <QDateTime>
 #include <QTextEdit>
 #include <QHBoxLayout>
@@ -17,9 +18,18 @@
 #include <QPushButton>
 #include <QJsonObject>
 #include <QApplication>
+#include <QJsonDocument>
 
 #include "state.h"
+#include "flow/cv.h"
+#include "flow/emitter.h"
+#include "task/daily.h"
 #include "task/battle.h"
+#include "widget/imageDialog.h"
+#include "widget/labeledSpinBox.h"
+#include "widget/labeledComboBox.h"
+#include "widget/buttonWithSetting.h"
+#include "function/clicker.h"
 
 class MainWindow : public QWidget {
 Q_OBJECT

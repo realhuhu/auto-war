@@ -1,11 +1,5 @@
 #include "daily.h"
 
-#include "common.h"
-#include "../state.h"
-#include "../flow/cv.h"
-#include "../flow/runner.h"
-#include "../flow/emitter.h"
-
 void heroCenter() {
     auto config = parseBoolConfig("英雄中心", "checkbox", state.config);
 

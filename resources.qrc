@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file>resources/ui/setting.png</file>
-        <file>resources/ui/transparent.png</file>
+        <file>resource/ui/setting.png</file>
+        <file>resource/ui/transparent.png</file>
     </qresource>
 </RCC>

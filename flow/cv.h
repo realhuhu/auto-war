@@ -3,15 +3,15 @@
 
 #include <windows.h>
 
-#include <opencv2/opencv.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
 
-#include <QDir>
 #include <QFile>
 #include <QString>
 #include <QCoreApplication>
 
+#include "../state.h"
 #include "enum.h"
-#include "until.h"
 #include "segment.h"
 
 class CV {

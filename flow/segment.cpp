@@ -1,11 +1,4 @@
 #include "segment.h"
-#include <random>
-#include <algorithm>
-#include <stdexcept>
-#include <windows.h>
-
-#include "../state.h"
-#include "emitter.h"
 
 Segment::Segment(
         std::string p,

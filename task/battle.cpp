@@ -1,11 +1,5 @@
 #include "battle.h"
 
-#include <QFileInfo>
-
-#include "common.h"
-#include "../state.h"
-#include "../flow/runner.h"
-
 void countryArena() {
     auto config = parseIntConfig("国家争霸", "input", state.config);
 

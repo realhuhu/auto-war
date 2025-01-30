@@ -1,12 +1,4 @@
 #include "clicker.h"
-#include <thread>
-#include <chrono>
-
-#include <QLabel>
-#include <QMessageBox>
-#include <QApplication>
-
-# include "../state.h"
 
 ClickThread::ClickThread(
         const std::vector<POINT> &points,
@@ -27,10 +19,8 @@ void ClickThread::run() {
             auto sleepDuration = std::chrono::milliseconds(interval);
             auto startTime = std::chrono::steady_clock::now();
             while (std::chrono::steady_clock::now() - startTime < sleepDuration) {
-                if (stopFlag.load()) {
-                    return; // 如果 stopFlag 为 true，立即退出
-                }
-                std::this_thread::sleep_for(std::chrono::milliseconds(10)); // 小周期睡眠
+                if (stopFlag.load()) return;
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
         }
     }

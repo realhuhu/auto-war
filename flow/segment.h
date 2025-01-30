@@ -5,14 +5,10 @@
 #include <vector>
 #include <thread>
 #include <chrono>
-#include <string>
-#include <iostream>
-#include <functional>
-#include <opencv2/opencv.hpp>
 
-#include <QCoreApplication>
-
+#include "../state.h"
 #include "enum.h"
+#include "emitter.h"
 
 struct Segment {
     std::string path;

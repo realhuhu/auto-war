@@ -1,35 +1,4 @@
 #include "main.h"
-#include <Windows.h>
-#include <functional>
-
-#include <QIcon>
-#include <QFile>
-#include <QLabel>
-#include <QDialog>
-#include <QThread>
-#include <QWidget>
-#include <QScreen>
-#include <QSpinBox>
-#include <QComboBox>
-#include <QGroupBox>
-#include <QCheckBox>
-#include <QDateTime>
-#include <QTextEdit>
-#include <QJsonArray>
-#include <QPushButton>
-#include <QHBoxLayout>
-#include <QToolButton>
-#include <QJsonObject>
-#include <QApplication>
-#include <QJsonDocument>
-
-
-#include "state.h"
-#include "flow/cv.h"
-#include "flow/emitter.h"
-#include "task/daily.h"
-#include "task/battle.h"
-#include "function/clicker.h"
 
 auto configFile = "config.json";
 
@@ -43,142 +12,6 @@ float getScale() {
     EnumDisplaySettings(info.szDevice, ENUM_CURRENT_SETTINGS, &devMode);
     return static_cast<float>(devMode.dmPelsWidth) / (info.rcMonitor.right - info.rcMonitor.left);
 }
-
-class ButtonWithSetting : public QWidget {
-Q_OBJECT
-public:
-    explicit ButtonWithSetting(
-            const QString &text,
-            bool showSettingButton = true,
-            QWidget *parent = nullptr
-    ) : QWidget(parent) {
-        auto *layout = new QHBoxLayout(this);
-        layout->setSpacing(0);
-        layout->setContentsMargins(0, 0, 0, 0);
-
-        textButton = new QPushButton(text);
-        textButton->setFixedHeight(25);
-        textButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-
-        layout->addWidget(textButton);
-
-        if (showSettingButton) {
-            settingButton = new QToolButton();
-            settingButton->setIcon(QIcon(":/resources/ui/setting.png"));
-            settingButton->setIconSize(QSize(16, 16));
-            settingButton->setFixedHeight(25);
-            settingButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-            layout->addWidget(settingButton);
-        } else {
-            settingButton = nullptr;
-        }
-
-        setLayout(layout);
-    }
-
-    [[nodiscard]] QPushButton *getTextButton() const { return textButton; }
-
-    [[nodiscard]] QToolButton *getSettingButton() const { return settingButton; }
-
-private:
-    QPushButton *textButton;
-    QToolButton *settingButton;
-};
-
-class LabeledSpinBox : public QWidget {
-public:
-    LabeledSpinBox(const QString &text, int value, QWidget *parent = nullptr)
-            : QWidget(parent) {
-        auto *layout = new QHBoxLayout(this);
-        layout->setContentsMargins(0, 0, 0, 0);
-
-        label = new QLabel(text + ":");
-        spinBox = new QSpinBox();
-        spinBox->setValue(value);
-        spinBox->setMinimum(1);
-        spinBox->setFixedWidth(100);
-
-        label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        spinBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
-        layout->addWidget(label);
-        layout->addWidget(spinBox);
-        layout->addStretch(1);
-    }
-
-    [[nodiscard]] QSpinBox *getSpinBox() const { return spinBox; }
-
-private:
-    QLabel *label;
-    QSpinBox *spinBox;
-};
-
-class LabeledComboBox : public QWidget {
-public:
-    LabeledComboBox(const QString &text, const QJsonArray &options, const QString &initialValue = "") {
-        auto *layout = new QHBoxLayout(this);
-        layout->setContentsMargins(0, 0, 0, 0);
-
-        label = new QLabel(text + ":");
-        comboBox = new QComboBox();
-        comboBox->setFixedWidth(100);
-
-        label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        comboBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
-        for (const auto &option: options) {
-            comboBox->addItem(option.toString());
-        }
-
-        if (!initialValue.isEmpty()) {
-            comboBox->setCurrentText(initialValue);
-        }
-
-        layout->addWidget(label);
-        layout->addWidget(comboBox);
-        layout->addStretch(1);
-    }
-
-    QComboBox *getComboBox() {
-        return comboBox;
-    }
-
-private:
-    QLabel *label;
-    QComboBox *comboBox;
-};
-
-class ImageDialog : public QDialog {
-Q_OBJECT
-
-public:
-    explicit ImageDialog(const QImage &image, QWidget *parent) : QDialog(parent) {
-        this->setWindowTitle("查看截屏");
-        this->setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint);
-
-        int maxWidth = 400;
-        int maxHeight = 400;
-
-        auto *layout = new QVBoxLayout(this);
-        auto imageLabel = new QLabel(this);
-        imageLabel->setMaximumSize(maxWidth, maxHeight);
-
-        layout->addWidget(imageLabel);
-
-        int originalWidth = image.width();
-        int originalHeight = image.height();
-
-        float scaleWidth = static_cast<float>(maxWidth) / originalWidth;
-        float scaleHeight = static_cast<float>(maxHeight) / originalHeight;
-        float scale = qMin(scaleWidth, scaleHeight); // 取较小的缩放比例，保证图像不会被拉伸超出边界
-        int scaledWidth = static_cast<int>(originalWidth * scale);
-        int scaledHeight = static_cast<int>(originalHeight * scale);
-
-        auto scaledImage = image.scaled(scaledWidth, scaledHeight, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-
-        imageLabel->setPixmap(QPixmap::fromImage(scaledImage));
-    };
-};
 
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     setWindowTitle("红警自动");
@@ -297,7 +130,7 @@ void MainWindow::onLogMessage(const QString &text, const QString &color) {
                 <div>
                 <span style="color:white;background-color:green;">&nbsp;%1&nbsp;</span>
                 <span style="color:%2;">%3</span>
-                <img src=":/resources/ui/transparent.png" height='14' width='1'>
+                <img src=":/resource/ui/transparent.png" height='14' width='1'>
                 </div>
                 )"
     ).arg(timeString, color, text));
@@ -887,5 +720,3 @@ int main(int argc, char *argv[]) {
     window.show();
     return QApplication::exec();
 }
-
-#include "main.moc"

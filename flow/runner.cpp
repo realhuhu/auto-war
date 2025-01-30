@@ -1,16 +1,4 @@
 #include "runner.h"
-#include <chrono>
-#include <thread>
-#include <utility>
-#include <stdexcept>
-
-#include <QFileInfo>
-
-#include "../state.h"
-#include "cv.h"
-#include "until.h"
-#include "emitter.h"
-#include "segment.h"
 
 ImageClicker::ImageClicker(
         const std::string &imgPath,

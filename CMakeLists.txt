@@ -42,6 +42,14 @@ add_executable(qt
         flow/enum.cpp
         function/clicker.h
         function/clicker.cpp
+        widget/buttonWithSetting.h
+        widget/buttonWithSetting.cpp
+        widget/labeledSpinBox.cpp
+        widget/labeledSpinBox.h
+        widget/labeledComboBox.h
+        widget/labeledComboBox.cpp
+        widget/imageDialog.cpp
+        widget/imageDialog.h
 )
 
 target_link_libraries(qt ${OpenCV_LIBS})

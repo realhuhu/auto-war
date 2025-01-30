@@ -1,18 +1,5 @@
 #include "until.h"
 
-#include <chrono>
-#include <thread>
-#include <utility>
-#include <stdexcept>
-#include <algorithm>
-
-
-#include "../state.h"
-#include "cv.h"
-#include "enum.h"
-#include "segment.h"
-#include "emitter.h"
-
 Until::Until(
         double threshold,
         Previous onPrevious,

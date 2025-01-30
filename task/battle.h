@@ -5,13 +5,18 @@
 #include <memory>
 #include <chrono>
 #include <thread>
-#include <functional>
 
 #include <QString>
+#include <QFileInfo>
 
+#include "common.h"
+#include "../state.h"
+#include "../flow/cv.h"
+#include "../flow/enum.h"
 #include "../flow/until.h"
-#include "../flow/segment.h"
+#include "../flow/runner.h"
 #include "../flow/emitter.h"
+
 
 void countryWar();
 
