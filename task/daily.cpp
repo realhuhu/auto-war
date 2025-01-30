@@ -18,7 +18,7 @@ void heroCenter() {
     clicker = std::make_unique<ImageClicker>("/英雄中心/英雄.png");
 
     clearUntil(startUntil, clickUntil, runUntil);
-    runUntil.emplace_back(std::make_unique<UntilImage>("/英雄中心/英雄中心.png"));
+    clickUntil.emplace_back(std::make_unique<UntilImage>("/英雄中心/英雄中心.png"));
     clicker->clickIfFound(startUntil, clickUntil, runUntil);
 
     if (config["免费抽奖"]) {
@@ -91,7 +91,7 @@ void warCenter() {
     clicker = std::make_unique<ImageClicker>("/战争学院/战争学院.png");
 
     clearUntil(startUntil, clickUntil, runUntil);
-    runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/战争学院标题.png"));
+    clickUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/战争学院标题.png"));
     clicker->clickIfFound(startUntil, clickUntil, runUntil);
 
     if (boolConfig["技能训练"]) {
@@ -471,7 +471,7 @@ void admiral() {
     clicker = std::make_unique<ImageClicker>("/将领抽奖/将领.png");
 
     clearUntil(startUntil, clickUntil, runUntil);
-    runUntil.emplace_back(std::make_unique<UntilImage>("/将领抽奖/将领面板.png"));
+    clickUntil.emplace_back(std::make_unique<UntilImage>("/将领抽奖/将领面板.png"));
     clicker->clickIfFound(startUntil, clickUntil, runUntil);
 
     if (config["免费抽奖"]) {
@@ -654,7 +654,7 @@ void equipment() {
     clicker = std::make_unique<ImageClicker>("/配件抽奖/配件中心.png");
 
     clearUntil(startUntil, clickUntil, runUntil);
-    runUntil.emplace_back(std::make_unique<UntilImage>("/配件抽奖/配件中心标题.png"));
+    clickUntil.emplace_back(std::make_unique<UntilImage>("/配件抽奖/配件中心标题.png"));
     clicker->click(startUntil, clickUntil, runUntil, similaritySelector);
 
     clicker = std::make_unique<ImageClicker>("/配件抽奖/野外.png");
@@ -708,7 +708,7 @@ void arms() {
     clicker = std::make_unique<ImageClicker>("/军备抽奖/军备研究.png");
 
     clearUntil(startUntil, clickUntil, runUntil);
-    runUntil.emplace_back(std::make_unique<UntilImage>("/军备抽奖/军备研究提示.png"));
+    clickUntil.emplace_back(std::make_unique<UntilImage>("/军备抽奖/军备研究提示.png"));
     clicker->click(startUntil, clickUntil, runUntil);
 
     for (const auto &i: std::vector<std::string>{"机械", "自动化"}) {
@@ -749,7 +749,7 @@ void dailyTask() {
     clicker = std::make_unique<ImageClicker>("/每日任务/每日任务.png");
 
     clearUntil(startUntil, clickUntil, runUntil);
-    runUntil.emplace_back(std::make_unique<UntilImage>("/每日任务/奖励.png"));
+    clickUntil.emplace_back(std::make_unique<UntilImage>("/每日任务/奖励.png"));
     clicker->click(startUntil, clickUntil, runUntil);
 
     for (const auto &i: std::vector<std::string>{"1", "3", "5", "8", "10"}) {
@@ -797,7 +797,7 @@ void weeklyTask() {
     clicker = std::make_unique<ImageClicker>("/周任务/周任务.png");
 
     clearUntil(startUntil, clickUntil, runUntil);
-    runUntil.emplace_back(std::make_unique<UntilImage>("/周任务/周目标标题.png"));
+    clickUntil.emplace_back(std::make_unique<UntilImage>("/周任务/周目标标题.png"));
     clicker->click(startUntil, clickUntil, runUntil);
 
     while (!state.stopFlag.load()) {
@@ -855,7 +855,7 @@ void oreField() {
     clicker = std::make_unique<ImageClicker>("/矿区争夺/矿区争夺战.png");
 
     clearUntil(startUntil, clickUntil, runUntil);
-    runUntil.emplace_back(std::make_unique<UntilImage>("/矿区争夺/矿区争夺.png"));
+    clickUntil.emplace_back(std::make_unique<UntilImage>("/矿区争夺/矿区争夺.png"));
     clicker->click(startUntil, clickUntil, runUntil);
 
     clicker = std::make_unique<ImageClicker>("/矿区争夺/撤军.png");
@@ -946,7 +946,7 @@ void monthlyCard() {
     clicker = std::make_unique<ImageClicker>("/月卡领取/畅玩月卡.png");
 
     clearUntil(startUntil, clickUntil, runUntil);
-    runUntil.emplace_back(std::make_unique<UntilImage>("/月卡领取/一键领取.png"));
+    clickUntil.emplace_back(std::make_unique<UntilImage>("/月卡领取/一键领取.png"));
     clicker = clicker->click(startUntil, clickUntil, runUntil);
 
     clicker->click();

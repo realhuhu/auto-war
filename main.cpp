@@ -613,15 +613,17 @@ void MainWindow::batchRunCommand(const QString &command) {
                             emit logMessage("运行完成: " + subCommand, "red");
                         }
 
-                        if (state.currentThread) {
-                            state.currentThread->quit();
-                            state.currentThread = nullptr;
-                        }
+                        throw e;
                     }
                 }
             }
 
             emit logMessage("一键执行完成", "red");
+
+            if (state.currentThread) {
+                state.currentThread->quit();
+                state.currentThread = nullptr;
+            }
         } catch (const std::exception &e) {
             if (!state.stopFlag.load()) {
                 emit logMessage("出错了: " + QString(e.what()), "red");

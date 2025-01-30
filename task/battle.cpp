@@ -488,12 +488,20 @@ void countryWar() {
         }
 
         clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilImageStable>("/国家战争/" + anchor + ".png"));
+        runUntil.emplace_back(
+                std::make_unique<UntilImageStable>("/国家战争/" + anchor + ".png",
+                                                   Previous::NONE,
+                                                   false,
+                                                   Mode::GRAY,
+                                                   0,
+                                                   0.9,
+                                                   0.5)
+        );
         clicker = clicker->click(startUntil, clickUntil, runUntil);
 
         clearUntil(startUntil, clickUntil, runUntil);
         clickUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/城市信息.png"));
-        clicker->click(startUntil, clickUntil, runUntil, similaritySelector, 0, 1, offsetX, offsetY);
+        clicker->click(startUntil, clickUntil, runUntil, similaritySelector, 0, 1.5, offsetX, offsetY);
 
         clicker = std::make_unique<ImageClicker>("/国家战争/扫荡.png");
 
