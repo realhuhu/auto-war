@@ -1,11 +1,11 @@
 #include "until.h"
 
 Until::Until(
-        double threshold,
+        float threshold,
         Previous onPrevious,
-        double interval,
-        double finishWait,
-        double timeout,
+        float interval,
+        float finishWait,
+        float timeout,
         bool reverse,
         Mode mode
 ) : threshold(threshold),
@@ -16,23 +16,23 @@ Until::Until(
     reverse(reverse),
     mode(mode) {}
 
-void Until::loop(std::unique_ptr<Segment> &previous, int globalTimeout) {
+void Until::loop(std::unique_ptr<Segment> &previous, float globalTimeout) {
     auto start = std::chrono::high_resolution_clock::now();
     auto maxTime = (timeout == -1) ? globalTimeout : timeout;
 
     while (!state.stopFlag.load()) {
         auto now = std::chrono::high_resolution_clock::now();
-        auto elapsed = std::chrono::duration<double>(now - start).count();
+        auto elapsed = std::chrono::duration<float>(now - start).count();
 
         if (elapsed > maxTime) throw std::runtime_error("超时，结束运行: " + this->toString());
 
         bool fulfilled = this->fulfilled(previous);
         if (fulfilled) {
-            if (finishWait > 0) std::this_thread::sleep_for(std::chrono::duration<float>(finishWait));
+            sleep(finishWait);
             break;
         }
 
-        std::this_thread::sleep_for(std::chrono::duration<float>(interval));
+        sleep(interval);
     }
 }
 
@@ -133,10 +133,10 @@ UntilImage::UntilImage(
         Previous onPrevious,
         bool reverse,
         Mode mode,
-        double finishWait,
-        double threshold,
-        double interval,
-        double timeout
+        float finishWait,
+        float threshold,
+        float interval,
+        float timeout
 ) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, mode) {
     this->imgPath = imgPath;
 }
@@ -175,10 +175,10 @@ UntilAnyImage::UntilAnyImage(
         Previous onPrevious,
         bool reverse,
         Mode mode,
-        double finishWait,
-        double threshold,
-        double interval,
-        double timeout
+        float finishWait,
+        float threshold,
+        float interval,
+        float timeout
 ) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, mode) {
     for (const auto &i: imgList) {
         imgPathList.push_back(i);
@@ -190,10 +190,10 @@ UntilAnyImage::UntilAnyImage(
         Previous onPrevious,
         bool reverse,
         Mode mode,
-        double finishWait,
-        double threshold,
-        double interval,
-        double timeout
+        float finishWait,
+        float threshold,
+        float interval,
+        float timeout
 ) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, mode) {
     for (const auto &i: imgList) {
         imgPathList.push_back(i);
@@ -235,10 +235,10 @@ UntilImageStable::UntilImageStable(
         Previous onPrevious,
         bool reverse,
         Mode mode,
-        double finishWait,
-        double threshold,
-        double interval,
-        double timeout
+        float finishWait,
+        float threshold,
+        float interval,
+        float timeout
 ) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, mode) {
     this->imgPath = std::move(imgPath);
 }
@@ -293,13 +293,13 @@ UntilIfImage::UntilIfImage(
         Previous onPrevious,
         bool reverse,
         Mode mode,
-        double finishWait,
-        double threshold,
-        double interval,
-        double timeout
+        float finishWait,
+        float threshold,
+        float interval,
+        float timeout
 ) : UntilImage(imgPath, onPrevious, reverse, mode, finishWait, threshold, interval, timeout) {}
 
-void UntilIfImage::loop(std::unique_ptr<Segment> &previous, int globalTimeout) {
+void UntilIfImage::loop(std::unique_ptr<Segment> &previous, float globalTimeout) {
     this->fulfilled(previous);
 }
 
@@ -317,10 +317,10 @@ UntilIfAnyImage::UntilIfAnyImage(
         Previous onPrevious,
         bool reverse,
         Mode mode,
-        double finishWait,
-        double threshold,
-        double interval,
-        double timeout
+        float finishWait,
+        float threshold,
+        float interval,
+        float timeout
 ) : UntilAnyImage(imgList, onPrevious, reverse, mode, finishWait, threshold, interval, timeout) {}
 
 UntilIfAnyImage::UntilIfAnyImage(
@@ -328,13 +328,13 @@ UntilIfAnyImage::UntilIfAnyImage(
         Previous onPrevious,
         bool reverse,
         Mode mode,
-        double finishWait,
-        double threshold,
-        double interval, double
-        timeout
+        float finishWait,
+        float threshold,
+        float interval,
+        float timeout
 ) : UntilAnyImage(imgList, onPrevious, reverse, mode, finishWait, threshold, interval, timeout) {}
 
-void UntilIfAnyImage::loop(std::unique_ptr<Segment> &previous, int globalTimeout) {
+void UntilIfAnyImage::loop(std::unique_ptr<Segment> &previous, float globalTimeout) {
     this->fulfilled(previous);
 }
 
@@ -348,15 +348,4 @@ std::string UntilIfAnyImage::toString() const {
     }
 
     return start.toStdString();
-}
-
-
-void clearUntil(
-        std::vector<std::unique_ptr<Until>> &startUntil,
-        std::vector<std::unique_ptr<Until>> &clickUntil,
-        std::vector<std::unique_ptr<Until>> &runUntil
-) {
-    startUntil.clear();
-    clickUntil.clear();
-    runUntil.clear();
 }

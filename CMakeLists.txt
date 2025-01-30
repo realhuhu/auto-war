@@ -27,19 +27,19 @@ add_executable(qt
         flow/segment.cpp
         task/battle.h
         task/battle.cpp
-        state.h
-        state.cpp
+        util/state.h
+        util/state.cpp
         main.h
         main.cpp
-        flow/emitter.h
+        util/emitter.h
         ico.o
         task/daily.h
         task/daily.cpp
         task/common.h
         task/common.cpp
         ${qrc_FILES}
-        flow/enum.h
-        flow/enum.cpp
+        util/enum.h
+        util/enum.cpp
         function/clicker.h
         function/clicker.cpp
         widget/buttonWithSetting.h
@@ -50,6 +50,8 @@ add_executable(qt
         widget/labeledComboBox.cpp
         widget/imageDialog.cpp
         widget/imageDialog.h
+        util/sleep.cpp
+        util/sleep.h
 )
 
 target_link_libraries(qt ${OpenCV_LIBS})

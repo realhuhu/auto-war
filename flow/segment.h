@@ -3,12 +3,11 @@
 
 #include <random>
 #include <vector>
-#include <thread>
-#include <chrono>
 
-#include "../state.h"
-#include "enum.h"
-#include "emitter.h"
+#include "../util/enum.h"
+#include "../util/sleep.h"
+#include "../util/state.h"
+#include "../util/emitter.h"
 
 struct Segment {
     std::string path;
@@ -30,7 +29,7 @@ struct Segment {
             int x, int y
     );
 
-    void click(double wait = 0.1, int offsetX = 0, int offsetY = 0, Click position = Click::CENTER) const;
+    void click(float wait = 0.1, int offsetX = 0, int offsetY = 0, Click position = Click::CENTER) const;
 
     [[nodiscard]] std::string on(const Segment &segment, const std::string &basis) const;
 

@@ -1,38 +1,37 @@
 #ifndef QT_RUNNER_H
 #define QT_RUNNER_H
 
-#include <vector>
-#include <chrono>
-#include <thread>
-
 #include <QString>
 #include <QFileInfo>
 
-#include "enum.h"
+#include "../util/state.h"
+#include "../util/enum.h"
+#include "../util/sleep.h"
+#include "../util/emitter.h"
+#include "cv.h"
 #include "until.h"
-#include "emitter.h"
 #include "segment.h"
 
 class ImageClicker {
 public:
     std::string templatePath;
     float globalThreshold;
-    int globalTimeout;
+    float globalTimeout;
     std::vector<Segment> targetSegmentList;
     std::unique_ptr<Segment> previousSegment;
 
     explicit ImageClicker(
             const std::string &imgPath,
-            int wait = 0,
+            float wait = 0,
             float threshold = 0.9,
-            int timeout = 60,
+            float timeout = 60,
             Mode mode = Mode::GRAY
     );
 
     explicit ImageClicker(
             const std::vector<std::string> &imgPathList,
             float threshold = 0.9,
-            int timeout = 60,
+            float timeout = 60,
             Mode mode = Mode::GRAY
     );
 
@@ -40,14 +39,14 @@ public:
             std::string imgPath,
             const Segment &segment,
             float threshold = 0.9,
-            int timeout = 60
+            float timeout = 60
     );
 
     explicit ImageClicker(
             std::string imgPath,
             const std::vector<Segment> &targetSegmentList,
             float threshold = 0.9,
-            int timeout = 60
+            float timeout = 60
     );
 
     [[nodiscard]] bool founded() const;

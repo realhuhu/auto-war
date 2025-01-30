@@ -20,9 +20,9 @@
 #include <QApplication>
 #include <QJsonDocument>
 
-#include "state.h"
+#include "util/state.h"
+#include "util/emitter.h"
 #include "flow/cv.h"
-#include "flow/emitter.h"
 #include "task/daily.h"
 #include "task/battle.h"
 #include "widget/imageDialog.h"

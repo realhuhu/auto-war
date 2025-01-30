@@ -1,10 +1,10 @@
 #ifndef QT_CLICKER_H
 #define QT_CLICKER_H
 
-#include <thread>
-#include <chrono>
 #include <vector>
 #include <atomic>
+#include <chrono>
+#include <thread>
 #include <windows.h>
 
 #include <QLabel>
@@ -17,7 +17,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
-# include "../state.h"
+# include "../util/state.h"
 
 class ClickThread : public QThread {
 Q_OBJECT

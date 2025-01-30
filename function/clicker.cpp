@@ -15,7 +15,7 @@ void ClickThread::run() {
             LPARAM lparam = (point.y << 16) | point.x;
             PostMessageW(hwnd, WM_LBUTTONDOWN, 0, lparam);
             PostMessageW(hwnd, WM_LBUTTONUP, 0, lparam);
-            // 将 sleep_for 拆分为多个小周期
+
             auto sleepDuration = std::chrono::milliseconds(interval);
             auto startTime = std::chrono::steady_clock::now();
             while (std::chrono::steady_clock::now() - startTime < sleepDuration) {

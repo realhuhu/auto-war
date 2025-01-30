@@ -563,7 +563,7 @@ void countryWar() {
         if (clicker->templatePath == "/国家战争/确定.png") {
             clearUntil(startUntil, clickUntil, runUntil);
             runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/确定.png", Previous::INNER, true));
-            clicker = clicker->click(startUntil, clickUntil, runUntil);
+            clicker->click(startUntil, clickUntil, runUntil);
             continue;
         }
 

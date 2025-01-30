@@ -13,7 +13,7 @@ Segment::Segment(
     yCenter = y1 + h / 2;
 }
 
-void Segment::click(double wait, int offsetX, int offsetY, Click position) const {
+void Segment::click(float wait, int offsetX, int offsetY, Click position) const {
     if (state.stopFlag.load()) return;
 
     int x, y;
@@ -49,7 +49,7 @@ void Segment::click(double wait, int offsetX, int offsetY, Click position) const
 
     emit Emitter::instance()->log(QString::fromStdString("点击: (%1,%2)").arg(QString::number(x), QString::number(y)));
 
-    if (wait > 0) std::this_thread::sleep_for(std::chrono::duration<float>(wait));
+    sleep(wait);
 }
 
 std::string Segment::on(const Segment &segment, const std::string &basis) const {

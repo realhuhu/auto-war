@@ -880,9 +880,11 @@ void oreField() {
             return;
         }
 
+        clicker = std::make_unique<ImageClicker>("/矿区争夺/刷新次数.png");
+
         clearUntil(startUntil, clickUntil, runUntil);
         runUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
-                "/矿区争夺/确定.png", "/矿区争夺/抢占.png"
+                "/矿区争夺/确定.png", "/矿区争夺/占领.png", "/矿区争夺/抢占.png"
         }));
         clicker = clicker->click(startUntil, clickUntil, runUntil, positionSelector("xCenter", "max"), 0, 1, 0, -26);
 
@@ -891,6 +893,22 @@ void oreField() {
             runUntil.emplace_back(std::make_unique<UntilImage>("/矿区争夺/确定.png", Previous::INNER, true));
             runUntil.emplace_back(std::make_unique<UntilImage>("/矿区争夺/关闭窗口.png"));
             clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/矿区争夺/关闭窗口.png", Previous::INNER, true));
+            clicker->click(startUntil, clickUntil, runUntil);
+
+            return;
+        }
+
+        if (clicker->templatePath == "/矿区争夺/占领.png") {
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/矿区争夺/撤军.png"));
+            clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/矿区争夺/关闭窗口.png", Previous::TOP));
+            clicker = clicker->locate(startUntil, runUntil);
 
             clearUntil(startUntil, clickUntil, runUntil);
             runUntil.emplace_back(std::make_unique<UntilImage>("/矿区争夺/关闭窗口.png", Previous::INNER, true));
@@ -976,7 +994,7 @@ void guildBuilding() {
 
         clicker = std::make_unique<ImageClicker>("/公会建筑/公会建筑小.png");
 
-        if (clicker->targetSegmentList.empty()) {
+        if (clicker->founded()) {
             emit Emitter::instance()->log("无法找到公会建筑!", "red");
             return;
         }

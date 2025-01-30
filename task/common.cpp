@@ -53,3 +53,13 @@ std::map<std::string, std::string> parseStringConfig(
 
     return resultMap;
 }
+
+void clearUntil(
+        std::vector<std::unique_ptr<Until>> &startUntil,
+        std::vector<std::unique_ptr<Until>> &clickUntil,
+        std::vector<std::unique_ptr<Until>> &runUntil
+) {
+    startUntil.clear();
+    clickUntil.clear();
+    runUntil.clear();
+}

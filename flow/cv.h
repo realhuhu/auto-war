@@ -10,8 +10,8 @@
 #include <QString>
 #include <QCoreApplication>
 
-#include "../state.h"
-#include "enum.h"
+#include "../util/state.h"
+#include "../util/enum.h"
 #include "segment.h"
 
 class CV {

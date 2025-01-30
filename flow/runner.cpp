@@ -2,15 +2,15 @@
 
 ImageClicker::ImageClicker(
         const std::string &imgPath,
-        int wait,
+        float wait,
         float threshold,
-        int timeout,
+        float timeout,
         Mode mode
 ) : templatePath(imgPath),
     globalThreshold(threshold),
     globalTimeout(timeout) {
 
-    if (wait) std::this_thread::sleep_for(std::chrono::duration<float>(wait));
+    sleep(wait);
 
     targetSegmentList = CV::findPositions(CV::getScreen(mode), imgPath, globalThreshold, mode);
 }
@@ -19,7 +19,7 @@ ImageClicker::ImageClicker(
 ImageClicker::ImageClicker(
         const std::vector<std::string> &imgPathList,
         float threshold,
-        int timeout,
+        float timeout,
         Mode mode
 ) : globalThreshold(threshold),
     globalTimeout(timeout) {
@@ -37,7 +37,7 @@ ImageClicker::ImageClicker(
         std::string imgPath,
         const Segment &segment,
         float threshold,
-        int timeout
+        float timeout
 ) : templatePath(std::move(imgPath)),
     globalThreshold(threshold),
     globalTimeout(timeout) {
@@ -48,7 +48,7 @@ ImageClicker::ImageClicker(
         std::string imgPath,
         const std::vector<Segment> &targetSegmentList,
         float threshold,
-        int timeout
+        float timeout
 ) : templatePath(std::move(imgPath)),
     globalThreshold(threshold),
     globalTimeout(timeout),
@@ -80,7 +80,7 @@ void ImageClicker::_start(
         float startWait,
         const std::vector<std::unique_ptr<Until>> &startUntilList
 ) {
-    if (startWait > 0) std::this_thread::sleep_for(std::chrono::duration<float>(startWait));
+    sleep(startWait);
 
     for (const auto &startUntil: startUntilList) {
         emit Emitter::instance()->log(QString::fromStdString("START判断: " + startUntil->toString()));
@@ -102,13 +102,14 @@ void ImageClicker::_click(
     emit Emitter::instance()->log(QString::fromStdString("开始循环点击: " + segment.toString()));
 
     segment.click(0, offsetX, offsetY, position);
-    std::this_thread::sleep_for(std::chrono::duration<float>(0.5));
+
+    sleep(0.5);
 
     while (!state.stopFlag.load()) {
         auto now = std::chrono::high_resolution_clock::now();
-        if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count() > globalTimeout) {
-            throw std::runtime_error("超时，结束运行: " + this->toString());
-        }
+        auto elapsed = std::chrono::duration<float>(now - start).count();
+
+        if (elapsed > globalTimeout) throw std::runtime_error("超时，结束运行: " + this->toString());
 
         if (clickUntilList.empty()) break;
 
@@ -129,14 +130,14 @@ void ImageClicker::_click(
 
         emit Emitter::instance()->log("CLICK不满足，继续循环点击");
 
-        std::this_thread::sleep_for(std::chrono::duration<float>(1));
+        sleep(1);
     }
 }
 
 void ImageClicker::_finish(
         float finishWait, const std::vector<std::unique_ptr<Until>> &runUntilList
 ) {
-    if (finishWait > 0) std::this_thread::sleep_for(std::chrono::duration<float>(finishWait));
+    sleep(finishWait);
 
     for (const auto &runUntil: runUntilList) {
         emit Emitter::instance()->log(QString::fromStdString("RUN判断: " + runUntil->toString()));

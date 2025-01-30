@@ -440,7 +440,7 @@ void MainWindow::batchRunCommand(const QString &command) {
                         emit logMessage("运行完成: " + subCommand, "blue");
                     } catch (const std::exception &e) {
                         if (!state.stopFlag.load()) {
-                            emit logMessage("出错了: " + QString::fromStdString(e.what()), "red");
+                            emit logMessage("出错了: " + QString(e.what()), "red");
                             emit logMessage(subCommand + "运行错误", "red");
                         } else {
                             emit logMessage("运行完成: " + subCommand, "red");
@@ -459,7 +459,6 @@ void MainWindow::batchRunCommand(const QString &command) {
             }
         } catch (const std::exception &e) {
             if (!state.stopFlag.load()) {
-                emit logMessage("出错了: " + QString(e.what()), "red");
                 emit logMessage("一键执行错误", "red");
             } else {
                 emit logMessage("一键执行完成", "red");
