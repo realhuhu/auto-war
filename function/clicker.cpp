@@ -87,8 +87,11 @@ ClickerDialog::ClickerDialog(QWidget *parent) : QDialog(parent) {
 void ClickerDialog::closeEvent(QCloseEvent *) {
     if (hook) UnhookWindowsHookEx(hook);
 
-    clickThread->stop();
-    clickThread = nullptr;
+    if (clickThread) {
+        clickThread->stop();
+        clickThread = nullptr;
+    }
+
     instance = nullptr;
 
     parentWidget()->showNormal();
