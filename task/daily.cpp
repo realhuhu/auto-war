@@ -969,7 +969,7 @@ void monthlyCard() {
         if (!clicker->founded()) break;
 
         clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilImage>("/月卡领取/关闭窗口.png", Previous::INNER, true));
+        clickUntil.emplace_back(std::make_unique<UntilImage>("/月卡领取/关闭窗口.png", Previous::INNER, true));
         clicker->click(startUntil, clickUntil, runUntil, positionSelector("xCenter", "min"));
     }
 }
