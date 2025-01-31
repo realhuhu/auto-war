@@ -91,17 +91,19 @@ void warCenter() {
     if (boolConfig["技能训练"]) {
         clicker = std::make_unique<ImageClicker>("/战争学院/训练.png");
 
-        clearUntil(startUntil, clickUntil, runUntil);
-        clickUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/次数不足.png"));
-        clicker = clicker->click(startUntil, clickUntil, runUntil, randomSelector, 0.5);
+        if (clicker->founded()) {
+            clearUntil(startUntil, clickUntil, runUntil);
+            clickUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/次数不足.png"));
+            clicker = clicker->click(startUntil, clickUntil, runUntil, randomSelector, 0.5);
 
-        clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/关闭窗口.png"));
-        clicker = clicker->locate(startUntil, runUntil);
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/关闭窗口.png"));
+            clicker = clicker->locate(startUntil, runUntil);
 
-        clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/关闭窗口.png", Previous::INNER, true));
-        clicker->click(startUntil, clickUntil, runUntil, positionSelector("xCenter", "min"));
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/关闭窗口.png", Previous::INNER, true));
+            clicker->click(startUntil, clickUntil, runUntil, positionSelector("xCenter", "min"));
+        }
     }
 
     clicker = std::make_unique<ImageClicker>("/战争学院/坦克研究.png");
@@ -227,8 +229,11 @@ void warCenter() {
 
         if (clicker->templatePath == "/战争学院/空演习场.png") {
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/占领演习场.png"));
-            clicker = clicker->click(startUntil, clickUntil, runUntil);
+            clicker->click(startUntil, clickUntil, runUntil, similaritySelector, 0, 0.5);
+
+            clicker = std::make_unique<ImageClicker>("/战争学院/占领演习场.png");
+
+            if (!clicker->founded()) return;
 
             clearUntil(startUntil, clickUntil, runUntil);
             runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/演习中.png"));

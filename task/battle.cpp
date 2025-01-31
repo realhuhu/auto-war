@@ -90,11 +90,11 @@ void worldArena() {
 
     clearUntil(startUntil, clickUntil, runUntil);
     runUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
-            "/世界争霸/争霸战标题.png", "/世界争霸/未开启.png"
+            "/世界争霸/争霸战标题.png", "/世界争霸/未开启.png", "/世界争霸/未参加.png"
     }));
     clicker = clicker->clickIfFound(startUntil, clickUntil, runUntil);
 
-    if (clicker->templatePath == "/世界争霸/未开启.png") {
+    if (clicker->templatePath == "/世界争霸/未开启.png" || clicker->templatePath == "/世界争霸/未参加.png") {
         clearUntil(startUntil, clickUntil, runUntil);
         runUntil.emplace_back(std::make_unique<UntilImage>("/世界争霸/关闭窗口.png"));
         clicker = clicker->click(startUntil, clickUntil, runUntil);
