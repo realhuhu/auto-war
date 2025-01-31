@@ -1,6 +1,7 @@
 #include "main.h"
 
-auto configFile = "config.json";
+
+auto configFile = "/config.json";
 
 float getScale() {
     MONITORINFOEX info = {};
@@ -89,7 +90,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
 
     onLogText(QString::fromStdString("当前缩放率: ") + QString::number(state.scale));
 
-    QFile file(configFile);
+    QFile file(QCoreApplication::applicationDirPath() + configFile);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         onLogText("无法打开配置文件: config.json");
     } else {
@@ -664,7 +665,7 @@ void MainWindow::setCommand(const QString &command) {
 
                 state.config[command] = newCommandConfig;
 
-                QFile file("config.json");
+                QFile file(QCoreApplication::applicationDirPath() + configFile);
                 if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
                     QJsonDocument doc(state.config);
                     file.write(doc.toJson());
