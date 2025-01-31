@@ -21,7 +21,7 @@ public:
     static std::vector<Segment> findPositions(
             const cv::Mat &rawImg,
             const std::string &templatePath,
-            double threshold = 0.9,
+            float threshold = 0.9,
             Mode mode = Mode::GRAY
     );
 };

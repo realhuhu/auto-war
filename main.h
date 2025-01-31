@@ -22,14 +22,13 @@
 
 #include "util/state.h"
 #include "util/emitter.h"
-#include "flow/cv.h"
 #include "task/daily.h"
 #include "task/battle.h"
-#include "widget/imageDialog.h"
 #include "widget/labeledSpinBox.h"
 #include "widget/labeledComboBox.h"
 #include "widget/buttonWithSetting.h"
-#include "function/clicker.h"
+#include "function/imageDialog.h"
+#include "function/clickerDialog.h"
 
 class MainWindow : public QWidget {
 Q_OBJECT

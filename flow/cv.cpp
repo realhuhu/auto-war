@@ -35,7 +35,7 @@ cv::Mat CV::getScreen(Mode mode) {
 std::vector<Segment> singleFindPositions(
         const cv::Mat &rawImg,
         QFile *imgFile,
-        double threshold,
+        float threshold,
         Mode mode
 ) {
     cv::Mat templateImg;
@@ -64,7 +64,7 @@ std::vector<Segment> singleFindPositions(
         for (const auto &loc: locations) {
             segments.emplace_back(
                     imgFile->fileName().toStdString(),
-                    result.at<double>(loc.y, loc.x),
+                    result.at<float>(loc.y, loc.x),
                     w * state.scale,
                     h * state.scale,
                     loc.x * state.scale,
@@ -86,7 +86,7 @@ std::vector<Segment> singleFindPositions(
         for (const auto &loc: locations) {
             segments.emplace_back(
                     imgFile->fileName().toStdString(),
-                    result.at<double>(loc.y, loc.x),
+                    result.at<float>(loc.y, loc.x),
                     w * state.scale,
                     h * state.scale,
                     loc.x * state.scale,
@@ -100,7 +100,7 @@ std::vector<Segment> singleFindPositions(
 std::vector<Segment> CV::findPositions(
         const cv::Mat &rawImg,
         const std::string &templatePath,
-        double threshold,
+        float threshold,
         Mode mode
 ) {
     auto absolutePath = QCoreApplication::applicationDirPath() + "/res" + QString::fromStdString(templatePath);

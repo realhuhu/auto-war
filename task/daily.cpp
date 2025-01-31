@@ -50,7 +50,7 @@ void heroCenter() {
             if (!clicker->founded())break;
 
             clearUntil(startUntil, clickUntil, runUntil);
-            clickUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+            clickUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
                     "/英雄中心/星星亮.png", "/英雄中心/星星暗.png"
             }));
             clicker = clicker->click(startUntil, clickUntil, runUntil, positionSelector("yCenter", "min"));
@@ -139,7 +139,7 @@ void warCenter() {
 
         if (clicker->founded()) {
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+            runUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
                     "/战争学院/材料不足.png", "/战争学院/正在工作.png", "/战争学院/加速.png"
             }));
             clicker = clicker->click(startUntil, clickUntil, runUntil);
@@ -195,7 +195,7 @@ void warCenter() {
 
         if (clicker->founded()) {
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+            runUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
                     "/战争学院/材料不足.png", "/战争学院/正在工作.png", "/战争学院/加速.png"
             }));
             clicker = clicker->click(startUntil, clickUntil, runUntil);
@@ -220,7 +220,7 @@ void warCenter() {
         clicker = std::make_unique<ImageClicker>("/战争学院/军事演习.png");
 
         clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+        runUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
                 "/战争学院/空演习场.png", "/战争学院/演习中.png"
         }));
         clicker = clicker->click(startUntil, clickUntil, runUntil);
@@ -529,7 +529,7 @@ void adviser() {
     clicker = std::make_unique<ImageClicker>("/参谋抽奖/参谋.png");
 
     clearUntil(startUntil, clickUntil, runUntil);
-    clickUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+    clickUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
             "/参谋抽奖/参谋面板.png", "/参谋抽奖/确定未开启.png"
     }));
     clicker = clicker->click(startUntil, clickUntil, runUntil, similaritySelector, 0, 1);
@@ -598,7 +598,7 @@ void mortar() {
     clicker = std::make_unique<ImageClicker>("/火炮抽奖/远程部队.png");
 
     clearUntil(startUntil, clickUntil, runUntil);
-    clickUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+    clickUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
             "/火炮抽奖/远程火炮.png", "/火炮抽奖/确定未开启.png"
     }));
     clicker = clicker->click(startUntil, clickUntil, runUntil, similaritySelector, 0, 1);
@@ -821,7 +821,7 @@ void signIn() {
     clicker = std::make_unique<ImageClicker>("/每日签到/每日签到.png");
 
     clearUntil(startUntil, clickUntil, runUntil);
-    clickUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+    clickUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
             "/每日签到/签到.png", "/每日签到/已签到.png"
     }, Previous::NONE, false, Mode::RGB));
     clicker = clicker->click(startUntil, clickUntil, runUntil);
@@ -883,7 +883,7 @@ void oreField() {
         clicker = std::make_unique<ImageClicker>("/矿区争夺/刷新次数.png");
 
         clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+        runUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
                 "/矿区争夺/确定.png", "/矿区争夺/占领.png", "/矿区争夺/抢占.png"
         }));
         clicker = clicker->click(startUntil, clickUntil, runUntil, positionSelector("xCenter", "max"), 0, 1, 0, -26);

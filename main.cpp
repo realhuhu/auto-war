@@ -188,7 +188,7 @@ void MainWindow::selectCommand() {
     autoRunLayout->setSpacing(5);
     otherFunctionLayout->setSpacing(5);
 
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 4; ++i) {
         battleLayout->setColumnMinimumWidth(i, 100);
         dailyLayout->setColumnMinimumWidth(i, 100);
         autoRunLayout->setColumnMinimumWidth(i, 100);
@@ -221,7 +221,7 @@ void MainWindow::selectCommand() {
         battleLayout->addWidget(customBtn, row, col);
 
         col += 1;
-        if (col >= 3) {
+        if (col >= 4) {
             col = 0;
             row++;
         }
@@ -247,14 +247,14 @@ void MainWindow::selectCommand() {
         dailyLayout->addWidget(customBtn, row, col);
 
         col += 1;
-        if (col >= 3) {
+        if (col >= 4) {
             col = 0;
             row++;
         }
     }
 
     row = col = 0;
-    for (int i = 1; i <= 3; ++i) {
+    for (int i = 1; i <= 4; ++i) {
         auto command = "预设" + QString::number(i);
         auto *customBtn = new ButtonWithSetting(command, state.config.contains(command));
         customBtn->getTextButton()->setAutoDefault(false);
@@ -274,7 +274,7 @@ void MainWindow::selectCommand() {
         autoRunLayout->addWidget(customBtn, row, col);
 
         col += 1;
-        if (col >= 3) {
+        if (col >= 4) {
             col = 0;
             row++;
         }
@@ -295,17 +295,7 @@ void MainWindow::selectCommand() {
             selectDialog.accept();
             return;
         }
-
-        auto screenshot = CV::getScreen(Mode::RGB);
-        cv::cvtColor(screenshot, screenshot, cv::COLOR_BGR2RGB);
-
-        auto *dialog = new ImageDialog(QImage(
-                screenshot.data,
-                screenshot.cols,
-                screenshot.rows,
-                static_cast<int>(screenshot.step),
-                QImage::Format_RGB888
-        ), this);
+        auto *dialog = new ImageDialog(this);
         dialog->exec();
     });
 
@@ -619,10 +609,57 @@ void MainWindow::setCommand(const QString &command) {
 
     auto *buttonLayout = new QHBoxLayout();
     buttonLayout->addStretch();
-    auto *saveButton = new QPushButton("确定");
+    auto *confirmButton = new QPushButton("确定");
+    auto *saveButton = new QPushButton("确定并保存");
+    buttonLayout->addWidget(confirmButton);
     buttonLayout->addWidget(saveButton);
 
     mainLayout->addLayout(buttonLayout);
+
+    connect(
+            confirmButton,
+            &QPushButton::clicked,
+            [this, command, &checkboxItems, &inputItems, &settingDialog, &selectItems, commandConfig]() {
+
+                QJsonArray newCheckboxArray;
+                for (const auto &item : checkboxItems) {
+                    newCheckboxArray.append(QJsonObject{
+                            {"order", std::get<0>(item)},
+                            {"text",  std::get<1>(item)},
+                            {"value", std::get<2>(item)}
+                    });
+                }
+
+                QJsonArray newInputArray;
+                for (const auto &item : inputItems) {
+                    newInputArray.append(QJsonObject{
+                            {"order", std::get<0>(item)},
+                            {"text",  std::get<1>(item)},
+                            {"value", std::get<2>(item)}
+                    });
+                }
+
+                QJsonArray newSelectArray;
+                for (const auto &item : selectItems) {
+                    newSelectArray.append(QJsonObject{
+                            {"order",   std::get<0>(item)},
+                            {"text",    std::get<1>(item)},
+                            {"value",   std::get<2>(item)},
+                            {"options", std::get<3>(item)}
+                    });
+                }
+
+                QJsonObject newCommandConfig;
+                newCommandConfig["checkbox"] = newCheckboxArray;
+                newCommandConfig["input"]    = newInputArray;
+                newCommandConfig["select"]   = newSelectArray;
+                newCommandConfig["tips"]     = commandConfig["tips"].toString();
+
+                state.config[command] = newCommandConfig;
+
+                settingDialog.accept();
+            }
+    );
 
     connect(
             saveButton,

@@ -134,6 +134,7 @@ void ImageClicker::_click(
     }
 }
 
+
 void ImageClicker::_finish(
         float finishWait, const std::vector<std::unique_ptr<Until>> &runUntilList
 ) {
@@ -157,15 +158,13 @@ std::unique_ptr<ImageClicker> ImageClicker::_execute(
 ) {
     emit Emitter::instance()->log(QString::fromStdString(this->toString() + "开始" + name + "流程"), "green");
 
-    if (state.stopFlag.load()) throw std::runtime_error("stop");
     _start(startWait, startUntilList);
-    if (state.stopFlag.load()) throw std::runtime_error("stop");
+
     bool skipFinish = executor();
-    if (state.stopFlag.load()) throw std::runtime_error("stop");
+
     if (!skipFinish) _finish(finishWait, runUntilList);
-    if (state.stopFlag.load()) throw std::runtime_error("stop");
+
     auto clicker = _createChain(clickUntilList, runUntilList);
-    if (state.stopFlag.load()) throw std::runtime_error("stop");
 
     emit Emitter::instance()->log(QString::fromStdString(this->toString() + "结束" + name + "流程"), "green");
     return clicker;
@@ -259,6 +258,66 @@ std::unique_ptr<ImageClicker> ImageClicker::clickIfFound(
     );
 }
 
+
+std::unique_ptr<ImageClicker> ImageClicker::drag(
+        const std::vector<std::unique_ptr<Until>> &startUntilList,
+        const std::vector<std::unique_ptr<Until>> &clickUntilList,
+        const Selector &selector,
+        float startWait,
+        float finishWait
+) {
+    auto executor = [this, &selector, &clickUntilList]() -> bool {
+        if (targetSegmentList.empty()) throw std::runtime_error("未匹配到图像: " + this->templatePath);
+
+        auto beforeSegment = selector(targetSegmentList);
+
+        previousSegment = std::make_unique<Segment>(beforeSegment.copy());
+
+        emit Emitter::instance()->log(QString::fromStdString("开始拖动: " + beforeSegment.toString()));
+
+        while (!state.stopFlag.load()) {
+            if (clickUntilList.empty()) break;
+
+            bool allFulfilled = true;
+            for (const auto &clickUntil: clickUntilList) {
+                if (!clickUntil->fulfilled(previousSegment)) {
+                    allFulfilled = false;
+                    break;
+                }
+            }
+
+            if (allFulfilled) {
+                emit Emitter::instance()->log("所有CLICK满足，结束拖动");
+                break;
+            }
+
+            beforeSegment.drag(0.1, 10);
+            auto afterSegment = selector(CV::findPositions(CV::getScreen(), templatePath));
+
+            if (beforeSegment == afterSegment) {
+                emit Emitter::instance()->log("已拖动到底，结束拖动");
+                break;
+            }
+
+            emit Emitter::instance()->log("CLICK不满足，继续拖动");
+
+            beforeSegment = afterSegment;
+        }
+
+        return false;
+    };
+
+    return _execute(
+            "drag",
+            executor,
+            startWait,
+            finishWait,
+            startUntilList,
+            clickUntilList,
+            {}
+    );
+}
+
 std::unique_ptr<ImageClicker> ImageClicker::locate(
         const std::vector<std::unique_ptr<Until>> &startUntilList,
         const std::vector<std::unique_ptr<Until>> &runUntilList,
@@ -267,7 +326,7 @@ std::unique_ptr<ImageClicker> ImageClicker::locate(
         float finishWait
 ) {
     auto executor = [this, &selector]() -> bool {
-        if (targetSegmentList.empty()) throw std::runtime_error("图片列表为空: " + this->templatePath);
+        if (targetSegmentList.empty()) throw std::runtime_error("未匹配到图像: " + this->templatePath);
 
         auto segment = selector(targetSegmentList);
 

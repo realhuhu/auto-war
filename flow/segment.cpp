@@ -2,11 +2,12 @@
 
 Segment::Segment(
         std::string p,
-        double sim,
+        float sim,
         int width,
         int height,
-        int x, int y
-) : path(std::move(p)), similarity(sim), w(width), h(height), x1(x), y1(y) {
+        int x1,
+        int y1
+) : path(std::move(p)), similarity(sim), w(width), h(height), x1(x1), y1(y1) {
     x2 = x1 + w;
     y2 = y1 + h;
     xCenter = x1 + w / 2;
@@ -52,6 +53,34 @@ void Segment::click(float wait, int offsetX, int offsetY, Click position) const 
     sleep(wait);
 }
 
+void Segment::drag(float wait, int distance) const {
+    if (state.stopFlag.load()) return;
+
+    int xStart = xCenter;
+    int yStart = yCenter;
+
+    int xEnd = xStart; // 垂直方向，x坐标不变
+    int yEnd = yStart + distance * state.scale;
+
+    // 构造LPARAM参数，x在低16位，y在高16位
+    LPARAM from = (yStart << 16) | xStart;
+    LPARAM to = (yEnd << 16) | xEnd;
+
+    PostMessageW(state.hwnd, WM_LBUTTONDOWN, 0, from);
+    sleep(0.1);
+
+    PostMessageW(state.hwnd, WM_MOUSEMOVE, MK_LBUTTON, to);
+    sleep(0.1);
+
+    PostMessageW(state.hwnd, WM_LBUTTONUP, 0, to);
+    sleep(0.1);
+
+    emit Emitter::instance()->log(QString::fromStdString("拖动: 从(%1,%2)到(%3,%4)").arg(
+            QString::number(xStart), QString::number(yStart), QString::number(xEnd), QString::number(yEnd))
+    );
+    sleep(wait);
+}
+
 std::string Segment::on(const Segment &segment, const std::string &basis) const {
     if (basis == "vertical") {
         if (x2 <= segment.x1) {
@@ -79,6 +108,14 @@ std::string Segment::on(const Segment &segment, const std::string &basis) const 
 
 Segment Segment::copy() const {
     return {path, similarity, w, h, x1, y1};
+}
+
+bool operator==(const Segment& a, const Segment& b) {
+    return (a.xCenter == b.xCenter) && (a.yCenter == b.yCenter);
+}
+
+bool operator!=(const Segment& a, const Segment& b) {
+    return !(a == b);
 }
 
 std::string Segment::toString() const {

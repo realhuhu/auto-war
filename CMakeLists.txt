@@ -40,16 +40,16 @@ add_executable(qt
         ${qrc_FILES}
         util/enum.h
         util/enum.cpp
-        function/clicker.h
-        function/clicker.cpp
+        function/clickerDialog.h
+        function/clickerDialog.cpp
         widget/buttonWithSetting.h
         widget/buttonWithSetting.cpp
         widget/labeledSpinBox.cpp
         widget/labeledSpinBox.h
         widget/labeledComboBox.h
         widget/labeledComboBox.cpp
-        widget/imageDialog.cpp
-        widget/imageDialog.h
+        function/imageDialog.cpp
+        function/imageDialog.h
         util/sleep.cpp
         util/sleep.h
 )

@@ -32,4 +32,6 @@ void clearUntil(
         std::vector<std::unique_ptr<Until>> &runUntil
 );
 
+using list = std::initializer_list<const std::string>;
+
 #endif //QT_COMMON_H

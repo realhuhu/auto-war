@@ -11,7 +11,7 @@
 
 struct Segment {
     std::string path;
-    double similarity;
+    float similarity;
     int w;
     int h;
     int x1;
@@ -23,7 +23,7 @@ struct Segment {
 
     Segment(
             std::string p,
-            double sim,
+            float sim,
             int width,
             int height,
             int x, int y
@@ -31,9 +31,13 @@ struct Segment {
 
     void click(float wait = 0.1, int offsetX = 0, int offsetY = 0, Click position = Click::CENTER) const;
 
+    void drag(float wait = 0.1, int distance = 0) const;
+
     [[nodiscard]] std::string on(const Segment &segment, const std::string &basis) const;
 
     [[nodiscard]] Segment copy() const;
+
+    friend bool operator==(const Segment& a, const Segment& b);
 
     [[nodiscard]] virtual std::string toString() const;
 };

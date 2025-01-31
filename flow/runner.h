@@ -66,6 +66,11 @@ public:
             Click position = Click::CENTER
     );
 
+    void _drag(
+            const Selector &selector,
+            const std::vector<std::unique_ptr<Until>> &clickUntilList
+    );
+
     void _finish(float finishWait, const std::vector<std::unique_ptr<Until>> &runUntilList);
 
     std::unique_ptr<ImageClicker> _execute(
@@ -102,6 +107,15 @@ public:
             Click position = Click::CENTER
     );
 
+
+    std::unique_ptr<ImageClicker> drag(
+            const std::vector<std::unique_ptr<Until>> &startUntilList = {},
+            const std::vector<std::unique_ptr<Until>> &clickUntilList = {},
+            const Selector &selector = similaritySelector,
+            float startWait = 0,
+            float finishWait = 0
+    );
+
     std::unique_ptr<ImageClicker> locate(
             const std::vector<std::unique_ptr<Until>> &startUntilList = {},
             const std::vector<std::unique_ptr<Until>> &runUntilList = {},
@@ -109,6 +123,7 @@ public:
             float startWait = 0,
             float finishWait = 0
     );
+
 
     [[nodiscard]] std::string toString() const;
 };

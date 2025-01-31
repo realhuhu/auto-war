@@ -1,5 +1,6 @@
 #include "battle.h"
 
+
 void countryArena() {
     auto config = parseIntConfig("国家争霸", "input", state.config);
 
@@ -12,7 +13,7 @@ void countryArena() {
     clicker = std::make_unique<ImageClicker>("/国家争霸/争霸战图标.png");
 
     clearUntil(startUntil, clickUntil, runUntil);
-    runUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+    runUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
             "/国家争霸/争霸战标题.png", "/国家争霸/未开启.png"
     }));
     clicker = clicker->clickIfFound(startUntil, clickUntil, runUntil);
@@ -40,7 +41,7 @@ void countryArena() {
 
         clearUntil(startUntil, clickUntil, runUntil);
         startUntil.emplace_back(std::make_unique<UntilImage>("/国家争霸/可攻击.png"));
-        runUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+        runUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
                 "/国家争霸/跳过战斗.png", "/国家争霸/购买次数.png"
         }));
         clicker = clicker->click(startUntil, clickUntil, runUntil,
@@ -88,7 +89,7 @@ void worldArena() {
     clicker = std::make_unique<ImageClicker>("/世界争霸/争霸战图标.png");
 
     clearUntil(startUntil, clickUntil, runUntil);
-    runUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+    runUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
             "/世界争霸/争霸战标题.png", "/世界争霸/未开启.png"
     }));
     clicker = clicker->clickIfFound(startUntil, clickUntil, runUntil);
@@ -110,7 +111,7 @@ void worldArena() {
 
         clearUntil(startUntil, clickUntil, runUntil);
         startUntil.emplace_back(std::make_unique<UntilImage>("/世界争霸/可攻击.png"));
-        runUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+        runUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
                 "/世界争霸/跳过战斗.png", "/世界争霸/购买次数.png"
         }));
         clicker = clicker->click(startUntil, clickUntil, runUntil,
@@ -161,7 +162,7 @@ void exterminateEnemy() {
         clicker = std::make_unique<ImageClicker>("/剿灭将领/剿灭将领.png");
 
         clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+        runUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
                 "/剿灭将领/剿灭将领标题.png", "/剿灭将领/等级不足.png"
         }));
         clicker = clicker->click(startUntil, clickUntil, runUntil);
@@ -229,7 +230,7 @@ void exterminateEnemy() {
         clicker = clicker->locate(startUntil, runUntil);
 
         clearUntil(startUntil, clickUntil, runUntil);
-        clickUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+        clickUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
                 "/剿灭将领/确定.png", "/剿灭将领/次数不足.png"
         }));
         clicker = clicker->click(startUntil, clickUntil, runUntil);
@@ -255,6 +256,8 @@ void exterminateEnemy() {
 }
 
 void armsCompound() {
+    auto config = parseBoolConfig("军备合成", "checkbox", state.config);
+
     std::unique_ptr<ImageClicker> clicker;
 
     std::vector<std::unique_ptr<Until>> startUntil;
@@ -284,14 +287,20 @@ void armsCompound() {
         clicker = clicker->clickIfFound(startUntil, clickUntil, runUntil);
 
         clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilImage>(choice<std::string>({
-                                                                                       "/军备合成/碎甲弹.png",
-                                                                                       "/军备合成/高爆弹.png",
-                                                                                       "/军备合成/电磁炮.png",
-                                                                                       "/军备合成/破甲弹.png",
-                                                                                       "/军备合成/陶瓷复合装甲.png"
-                                                                               })));
-        clicker = clicker->clickIfFound(startUntil, clickUntil, runUntil);
+        runUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
+                "/军备合成/滚动条A.png", "/军备合成/滚动条B.png"
+        }));
+        clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+        std::vector<std::string> candidates;
+        for (const auto &[key, value]: config) {
+            if (value) candidates.push_back(key);
+        }
+
+        clearUntil(startUntil, clickUntil, runUntil);
+        clickUntil.emplace_back(std::make_unique<UntilImage>("/军备合成/" + choice(candidates) + ".png"));
+        clicker = clicker->drag(startUntil, clickUntil);
+
 
         clearUntil(startUntil, clickUntil, runUntil);
         runUntil.emplace_back(std::make_unique<UntilImage>("/军备合成/合成军备.png"));
@@ -310,7 +319,7 @@ void armsCompound() {
         clicker = std::make_unique<ImageClicker>("/军备合成/开始战斗.png");
 
         clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+        runUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
                 "/军备合成/跳过战斗.png", "/军备合成/次数不足.png"
         }));
         clicker = clicker->click(startUntil, clickUntil, runUntil);
@@ -406,7 +415,7 @@ void countryWar() {
         clicker = std::make_unique<ImageClicker>("/国家战争/当前所在.png");
 
         clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilIfAnyImage>(std::initializer_list<const std::string>{
+        runUntil.emplace_back(std::make_unique<UntilIfAnyImage>(list{
                 "/国家战争/纽约.png", "/国家战争/芝加哥.png", "/国家战争/波尔多.png",
                 "/国家战争/马赛.png", "/国家战争/慕尼黑.png", "/国家战争/法兰克福.png",
                 "/国家战争/列宁格勒.png", "/国家战争/叶卡捷琳堡.png", "/国家战争/都灵.png",
@@ -503,7 +512,7 @@ void countryWar() {
             clicker = std::make_unique<ImageClicker>("/国家战争/召唤支援兵.png");
 
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+            runUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
                     "/国家战争/去购买.png", "/国家战争/确定.png"
             }));
             clicker = clicker->click(startUntil, clickUntil, runUntil);
@@ -535,7 +544,7 @@ void countryWar() {
         clearUntil(startUntil, clickUntil, runUntil);
         startUntil.emplace_back(
                 std::make_unique<UntilImage>("/国家战争/可战斗.png", Previous::NONE, false, Mode::RGB, 0.6));
-        runUntil.emplace_back(std::make_unique<UntilAnyImage>(std::initializer_list<const std::string>{
+        runUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
                 "/国家战争/恢复行动力.png", "/国家战争/跳过战斗.png", "/国家战争/确定.png"
         }));
         clicker = clicker->click(startUntil, clickUntil, runUntil);
