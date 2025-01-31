@@ -9,14 +9,16 @@
 #include "../flow/until.h"
 #include "../flow/runner.h"
 
-void countryWar();
-
 void countryArena();
 
 void worldArena();
 
+void exterminateEnemy();
+
 void armsCompound();
 
-void exterminateEnemy();
+void countryWar();
+
+void loopCountryWar();
 
 #endif // QT_BATTLE_H

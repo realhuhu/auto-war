@@ -71,6 +71,7 @@ private:
 
     QStringList commandBattle;
     QStringList commandDaily;
+    QStringList commandSpecial;
     QMap<QString, std::function<void()>> tasks;
 
     QString previousLog;

@@ -420,18 +420,18 @@ void countryWar() {
                 "/国家战争/马赛.png", "/国家战争/慕尼黑.png", "/国家战争/法兰克福.png",
                 "/国家战争/列宁格勒.png", "/国家战争/叶卡捷琳堡.png", "/国家战争/都灵.png",
                 "/国家战争/米兰.png", "/国家战争/伯明翰.png", "/国家战争/曼彻斯特.png"
-        }, Previous::RIGHT));
+        }, Previous::RIGHT_CENTER));
         clicker = clicker->locate(startUntil, runUntil);
 
         if (!clicker->founded()) {
-            emit Emitter::instance()->log("请先移动到与摩多城相邻的城", "red");
             clicker = std::make_unique<ImageClicker>("/国家战争/返回基地.png");
 
             clearUntil(startUntil, clickUntil, runUntil);
             runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/国家.png"));
             clicker->click(startUntil, clickUntil, runUntil);
-            break;
+            throw std::runtime_error("请先移动到与摩多城相邻的城");
         }
+
         auto city = QFileInfo(QString::fromStdString(clicker->templatePath)).baseName();
         emit Emitter::instance()->log(QString::fromStdString("当前所在: " + city.toStdString()), "blue");
 
@@ -585,4 +585,63 @@ void countryWar() {
         runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/前往.png"));
         clicker->click(startUntil, clickUntil, runUntil);
     }
+}
+
+void loopCountryWar() {
+    auto config = parseBoolConfig("开卡国战", "checkbox", state.config);
+
+    std::unique_ptr<ImageClicker> clicker;
+
+    std::vector<std::unique_ptr<Until>> startUntil;
+    std::vector<std::unique_ptr<Until>> clickUntil;
+    std::vector<std::unique_ptr<Until>> runUntil;
+
+    while (!state.stopFlag.load()) {
+        countryWar();
+
+        clicker = std::make_unique<ImageClicker>("/开卡国战/背包.png");
+
+        clearUntil(startUntil, clickUntil, runUntil);
+        clickUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
+                "/开卡国战/滚动条A.png", "/开卡国战/滚动条B.png"
+        }));
+        clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+        std::vector<std::string> candidates;
+
+        if (config["行动力恢复卡"]) {
+            candidates.emplace_back("/开卡国战/行动力恢复卡.png");
+        }
+
+        if (config["国战恢复卡"]) {
+            candidates.emplace_back("/开卡国战/国战恢复卡.png");
+        }
+
+        if (candidates.empty()) break;
+
+        clearUntil(startUntil, clickUntil, runUntil);
+        clickUntil.emplace_back(std::make_unique<UntilAnyImage>(candidates));
+        clicker = clicker->drag(startUntil, clickUntil);
+
+        if (!clicker->founded())break;
+
+        clearUntil(startUntil, clickUntil, runUntil);
+        runUntil.emplace_back(std::make_unique<UntilImage>("/开卡国战/使用.png"));
+        clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+        clearUntil(startUntil, clickUntil, runUntil);
+        runUntil.emplace_back(std::make_unique<UntilImage>("/开卡国战/使用.png", Previous::INNER, true));
+        runUntil.emplace_back(std::make_unique<UntilImage>("/开卡国战/关闭窗口.png"));
+        clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+        clearUntil(startUntil, clickUntil, runUntil);
+        runUntil.emplace_back(std::make_unique<UntilImage>("/开卡国战/关闭窗口.png", Previous::INNER, true));
+        clicker->click(startUntil, clickUntil, runUntil);
+    }
+
+    clicker = std::make_unique<ImageClicker>("/开卡国战/关闭窗口.png");
+
+    clearUntil(startUntil, clickUntil, runUntil);
+    runUntil.emplace_back(std::make_unique<UntilImage>("/开卡国战/关闭窗口.png", Previous::INNER, true));
+    clicker->click(startUntil, clickUntil, runUntil);
 }

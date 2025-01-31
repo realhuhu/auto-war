@@ -80,10 +80,24 @@ std::vector<Segment> Until::filter(const std::vector<Segment> &positions, std::u
                 result.push_back(position);
             }
             break;
+        case Previous::LEFT_CENTER:
+            for (const auto &position: positions) {
+                if (!(position.on(*previous, "horizontal") == "center")) continue;
+                if (!(position.on(*previous, "vertical") == "left")) continue;
+                result.push_back(position);
+            }
+            break;
         case Previous::TOP_CENTER:
             for (const auto &position: positions) {
                 if (!(position.on(*previous, "horizontal") == "top")) continue;
                 if (!(position.on(*previous, "vertical") == "center")) continue;
+                result.push_back(position);
+            }
+            break;
+        case Previous::RIGHT_CENTER:
+            for (const auto &position: positions) {
+                if (!(position.on(*previous, "horizontal") == "center")) continue;
+                if (!(position.on(*previous, "vertical") == "right")) continue;
                 result.push_back(position);
             }
             break;

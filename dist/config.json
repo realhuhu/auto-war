@@ -260,6 +260,25 @@
         ],
         "tips": ""
     },
+    "开卡国战": {
+        "checkbox": [
+            {
+                "order": 0,
+                "text": "行动力恢复卡",
+                "value": true
+            },
+            {
+                "order": 1,
+                "text": "国战恢复卡",
+                "value": true
+            }
+        ],
+        "input": [
+        ],
+        "select": [
+        ],
+        "tips": ""
+    },
     "战争学院": {
         "checkbox": [
             {

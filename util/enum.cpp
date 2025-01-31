@@ -10,8 +10,12 @@ std::string PreviousToString(Previous previous) {
             return "右侧";
         case Previous::DOWN:
             return "下方";
+        case Previous::LEFT_CENTER:
+            return "正左侧";
         case Previous::TOP_CENTER:
             return "正上方";
+        case Previous::RIGHT_CENTER:
+            return "正右侧";
         case Previous::DOWN_CENTER:
             return "正下方";
         case Previous::INNER:

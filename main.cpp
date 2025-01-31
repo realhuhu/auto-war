@@ -79,6 +79,9 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
                                        "矿区争夺", "月卡领取", "公会建筑"
                                });
 
+    tasks["开卡国战"] = loopCountryWar;
+    commandSpecial = QStringList({"开卡国战"});
+
     hook = nullptr;
     isWaiting = false;
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
@@ -170,33 +173,39 @@ void MainWindow::selectCommand() {
 
     auto *battleGroupBox = new QGroupBox("自动战斗", &selectDialog);
     auto *dailyGroupBox = new QGroupBox("日常任务", &selectDialog);
-    auto *autoRunBox = new QGroupBox("一键执行", &selectDialog);
-    auto *otherFunctionBox = new QGroupBox("其它功能", &selectDialog);
+    auto *autoRunGroupBox = new QGroupBox("一键执行", &selectDialog);
+    auto *specialGroupBox = new QGroupBox("特殊功能", &selectDialog);
+    auto *otherFunctionGroupBox = new QGroupBox("其它", &selectDialog);
 
     battleGroupBox->setStyleSheet(style);
     dailyGroupBox->setStyleSheet(style);
-    autoRunBox->setStyleSheet(style);
-    otherFunctionBox->setStyleSheet(style);
+    autoRunGroupBox->setStyleSheet(style);
+    specialGroupBox->setStyleSheet(style);
+    otherFunctionGroupBox->setStyleSheet(style);
 
     auto *battleLayout = new QGridLayout(battleGroupBox);
     auto *dailyLayout = new QGridLayout(dailyGroupBox);
-    auto *autoRunLayout = new QGridLayout(autoRunBox);
-    auto *otherFunctionLayout = new QGridLayout(otherFunctionBox);
+    auto *autoRunLayout = new QGridLayout(autoRunGroupBox);
+    auto *specialLayout = new QGridLayout(specialGroupBox);
+    auto *otherFunctionLayout = new QGridLayout(otherFunctionGroupBox);
 
     battleLayout->setSpacing(5);
     dailyLayout->setSpacing(5);
     autoRunLayout->setSpacing(5);
+    specialLayout->setSpacing(5);
     otherFunctionLayout->setSpacing(5);
 
     for (int i = 0; i < 4; ++i) {
         battleLayout->setColumnMinimumWidth(i, 100);
         dailyLayout->setColumnMinimumWidth(i, 100);
         autoRunLayout->setColumnMinimumWidth(i, 100);
+        specialLayout->setColumnMinimumWidth(i, 100);
         otherFunctionLayout->setColumnMinimumWidth(i, 100);
 
         battleLayout->setColumnStretch(i, 1);
         dailyLayout->setColumnStretch(i, 1);
         autoRunLayout->setColumnStretch(i, 1);
+        specialLayout->setColumnStretch(i, 1);
         otherFunctionLayout->setColumnStretch(i, 1);
     }
 
@@ -280,6 +289,32 @@ void MainWindow::selectCommand() {
         }
     }
 
+    row = col = 0;
+    for (const auto &command: commandSpecial) {
+        auto *customBtn = new ButtonWithSetting(command, state.config.contains(command));
+        customBtn->getTextButton()->setAutoDefault(false);
+        customBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+        connect(customBtn->getTextButton(), &QPushButton::clicked, [this, command, &selectDialog]() {
+            selectDialog.accept();
+            runCommand(command);
+        });
+
+        if (customBtn->getSettingButton()) {
+            connect(customBtn->getSettingButton(), &QToolButton::clicked, [this, command]() {
+                setCommand(command);
+            });
+        }
+
+        specialLayout->addWidget(customBtn, row, col);
+
+        col += 1;
+        if (col >= 4) {
+            col = 0;
+            row++;
+        }
+    }
+
     auto *viewBtn = new ButtonWithSetting("查看截屏", false);
     auto *clickerBtn = new ButtonWithSetting("连点器", false);
 
@@ -318,8 +353,9 @@ void MainWindow::selectCommand() {
 
     layout->addWidget(battleGroupBox);
     layout->addWidget(dailyGroupBox);
-    layout->addWidget(autoRunBox);
-    layout->addWidget(otherFunctionBox);
+    layout->addWidget(autoRunGroupBox);
+    layout->addWidget(specialGroupBox);
+    layout->addWidget(otherFunctionGroupBox);
 
     selectDialog.exec();
 }
@@ -622,7 +658,7 @@ void MainWindow::setCommand(const QString &command) {
             [this, command, &checkboxItems, &inputItems, &settingDialog, &selectItems, commandConfig]() {
 
                 QJsonArray newCheckboxArray;
-                for (const auto &item : checkboxItems) {
+                for (const auto &item: checkboxItems) {
                     newCheckboxArray.append(QJsonObject{
                             {"order", std::get<0>(item)},
                             {"text",  std::get<1>(item)},
@@ -631,7 +667,7 @@ void MainWindow::setCommand(const QString &command) {
                 }
 
                 QJsonArray newInputArray;
-                for (const auto &item : inputItems) {
+                for (const auto &item: inputItems) {
                     newInputArray.append(QJsonObject{
                             {"order", std::get<0>(item)},
                             {"text",  std::get<1>(item)},
@@ -640,7 +676,7 @@ void MainWindow::setCommand(const QString &command) {
                 }
 
                 QJsonArray newSelectArray;
-                for (const auto &item : selectItems) {
+                for (const auto &item: selectItems) {
                     newSelectArray.append(QJsonObject{
                             {"order",   std::get<0>(item)},
                             {"text",    std::get<1>(item)},
@@ -651,9 +687,9 @@ void MainWindow::setCommand(const QString &command) {
 
                 QJsonObject newCommandConfig;
                 newCommandConfig["checkbox"] = newCheckboxArray;
-                newCommandConfig["input"]    = newInputArray;
-                newCommandConfig["select"]   = newSelectArray;
-                newCommandConfig["tips"]     = commandConfig["tips"].toString();
+                newCommandConfig["input"] = newInputArray;
+                newCommandConfig["select"] = newSelectArray;
+                newCommandConfig["tips"] = commandConfig["tips"].toString();
 
                 state.config[command] = newCommandConfig;
 
