@@ -804,7 +804,7 @@ void weeklyTask() {
         if (!clicker->founded()) break;
 
         clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilImage>("/周任务/领取.png", Previous::INNER, true));
+        clickUntil.emplace_back(std::make_unique<UntilImage>("/周任务/领取.png", Previous::INNER, true));
         clicker->click(startUntil, clickUntil, runUntil);
     }
 
