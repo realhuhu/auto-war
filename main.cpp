@@ -105,7 +105,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-    if (state.currentThread && state.currentThread->isRunning()) {
+    if (state.currentThread) {
         state.stopFlag.store(true);
         state.currentThread->quit();
         state.currentThread->wait();
@@ -361,7 +361,7 @@ void MainWindow::selectCommand() {
 }
 
 void MainWindow::stopCommand() {
-    if (!state.currentThread || !state.currentThread->isRunning()) {
+    if (!state.currentThread) {
         onLogText("当前无命令正在执行");
         return;
     }
@@ -369,13 +369,10 @@ void MainWindow::stopCommand() {
     state.stopFlag.store(true);
     state.currentThread->quit();
     state.currentThread->wait();
-    state.currentThread = nullptr;
     onLogText("命令已停止执行");
 }
 
-void MainWindow::clearText() {
-    outputText->clear();
-}
+void MainWindow::clearText() { outputText->clear(); }
 
 void MainWindow::runCommand(const QString &command) {
     if (!state.hwnd) {
@@ -387,8 +384,6 @@ void MainWindow::runCommand(const QString &command) {
         state.stopFlag.store(true);
         state.currentThread->quit();
         state.currentThread->wait();
-        state.currentThread = nullptr;
-        return;
     }
 
     state.stopFlag.store(false);
@@ -399,10 +394,6 @@ void MainWindow::runCommand(const QString &command) {
         try {
             func();
             emit logMessage("运行完成", "red");
-            if (state.currentThread) {
-                state.currentThread->quit();
-                state.currentThread = nullptr;
-            }
         } catch (const std::exception &e) {
             if (!state.stopFlag.load()) {
                 emit logMessage("出错了: " + QString(e.what()), "red");
@@ -410,15 +401,11 @@ void MainWindow::runCommand(const QString &command) {
             } else {
                 emit logMessage("运行完成", "red");
             }
-
-            if (state.currentThread) {
-                state.currentThread->quit();
-                state.currentThread = nullptr;
-            }
         }
     });
 
     QObject::connect(state.currentThread, &QThread::finished, state.currentThread, &QThread::deleteLater);
+    connect(state.currentThread, &QObject::destroyed, this, []() { state.currentThread = nullptr; });
     state.currentThread->start();
 
     onLogText("开始执行命令: " + command, "blue");
@@ -434,7 +421,6 @@ void MainWindow::batchRunCommand(const QString &command) {
         state.stopFlag.store(true);
         state.currentThread->quit();
         state.currentThread->wait();
-        state.currentThread = nullptr;
         return;
     }
 
@@ -480,26 +466,17 @@ void MainWindow::batchRunCommand(const QString &command) {
             }
 
             emit logMessage("一键执行完成", "red");
-
-            if (state.currentThread) {
-                state.currentThread->quit();
-                state.currentThread = nullptr;
-            }
         } catch (const std::exception &e) {
             if (!state.stopFlag.load()) {
                 emit logMessage("一键执行错误", "red");
             } else {
                 emit logMessage("一键执行完成", "red");
             }
-
-            if (state.currentThread) {
-                state.currentThread->quit();
-                state.currentThread = nullptr;
-            }
         }
     });
 
     QObject::connect(state.currentThread, &QThread::finished, state.currentThread, &QThread::deleteLater);
+    connect(state.currentThread, &QObject::destroyed, this, []() { state.currentThread = nullptr; });
     state.currentThread->start();
 }
 

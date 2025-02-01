@@ -104,6 +104,7 @@ void ClickerDialog::closeEvent(QCloseEvent *) {
 
     if (clickThread) {
         clickThread->stop();
+        clickThread->quit();
         clickThread->wait();
     }
 
@@ -219,6 +220,7 @@ void ClickerDialog::endClick() {
 
     textEdit->append("正在终止");
     clickThread->stop();
+    clickThread->quit();
     clickThread->wait();
     textEdit->append("已结束点击");
 }

@@ -11,7 +11,7 @@ LabeledSpinBox::LabeledSpinBox(
     label = new QLabel(text + ":");
     spinBox = new QSpinBox();
     spinBox->setValue(value);
-    spinBox->setMinimum(1);
+    spinBox->setMinimum(0);
     spinBox->setFixedWidth(100);
     label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     spinBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
