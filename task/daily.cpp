@@ -398,7 +398,7 @@ void guild() {
             clicker = clicker->click(startUntil, clickUntil, runUntil, similaritySelector, 0, 1);
 
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/公会领奖/确定.png", Previous::NONE, true));
+            clickUntil.emplace_back(std::make_unique<UntilImage>("/公会领奖/确定.png", Previous::NONE, true));
             runUntil.emplace_back(std::make_unique<UntilImage>("/公会领奖/关闭公会捐献窗口.png"));
             clicker->click(startUntil, clickUntil, runUntil);
         }
@@ -409,7 +409,6 @@ void guild() {
         runUntil.emplace_back(std::make_unique<UntilImage>("/公会领奖/关闭公会捐献窗口.png", Previous::INNER, true));
         clicker->click(startUntil, clickUntil, runUntil);
     }
-
 
     clicker = std::make_unique<ImageClicker>("/公会领奖/公会争霸.png");
 

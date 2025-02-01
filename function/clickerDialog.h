@@ -23,9 +23,19 @@ class ClickThread : public QThread {
 Q_OBJECT
 
 public:
-    explicit ClickThread(const std::vector<POINT> &points, HWND hwnd, int interval = 100, QObject *parent = nullptr);
+    explicit ClickThread(
+            const std::vector<POINT> &points,
+            HWND hwnd,
+            int interval = 100,
+            int rounds = 0,
+            QObject *parent = nullptr
+    );
 
     void stop();
+
+signals:
+
+    void logText(const QString &text);
 
 protected:
     void run() override;
@@ -33,6 +43,7 @@ protected:
 private:
     HWND hwnd;
     int interval;
+    int rounds;
     std::vector<POINT> pointList;
     std::atomic<bool> stopFlag{false};
 };
@@ -44,6 +55,8 @@ public:
     explicit ClickerDialog(QWidget *parent = nullptr);
 
 private slots:
+
+    void updateTextEdit(const QString &text);
 
     void appendCoordinate(int x, int y);
 
@@ -63,6 +76,7 @@ private:
     bool isWaiting = false;
     QTextEdit *textEdit;
     QSpinBox *intervalSpinBox;
+    QSpinBox *roundsSpinBox;
     std::vector<POINT> pointList;
     ClickThread *clickThread = nullptr;
 

@@ -369,6 +369,7 @@ void MainWindow::stopCommand() {
     state.stopFlag.store(true);
     state.currentThread->quit();
     state.currentThread->wait();
+    state.currentThread = nullptr;
     onLogText("命令已停止执行");
 }
 

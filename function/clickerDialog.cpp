@@ -4,13 +4,20 @@ ClickThread::ClickThread(
         const std::vector<POINT> &points,
         HWND hwnd,
         int interval,
+        int rounds,
         QObject *parent
-) : QThread(parent), pointList(points), hwnd(hwnd), interval(interval) {}
+) : QThread(parent), pointList(points), hwnd(hwnd), interval(interval), rounds(rounds) {}
 
 void ClickThread::stop() { stopFlag.store(true); }
 
 void ClickThread::run() {
+    auto current = rounds;
     while (!stopFlag.load()) {
+        if (rounds) emit logText(QString("轮次: %1/%2").arg(
+                    QString::number(rounds - current + 1),
+                    QString::number(rounds))
+            );
+
         for (auto &point: pointList) {
             LPARAM lparam = (point.y << 16) | point.x;
             PostMessageW(hwnd, WM_LBUTTONDOWN, 0, lparam);
@@ -23,6 +30,13 @@ void ClickThread::run() {
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
         }
+
+        current--;
+
+        if (current == 0) {
+            emit logText("运行完成");
+            return;
+        }
     }
 }
 
@@ -32,16 +46,13 @@ ClickerDialog::ClickerDialog(QWidget *parent) : QDialog(parent) {
     this->setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
     auto *mainLayout = new QVBoxLayout(this);
+
     auto *buttonLayout = new QHBoxLayout(this);
 
     auto startRecordButton = new QPushButton("开始录制", this);
     auto endRecordButton = new QPushButton("结束录制", this);
     auto startClickButton = new QPushButton("循环点击", this);
     auto endClickButton = new QPushButton("结束点击", this);
-
-    textEdit = new QTextEdit(this);
-    textEdit->setReadOnly(true);
-    textEdit->setMinimumWidth(360);
 
     connect(startRecordButton, &QPushButton::clicked, this, &ClickerDialog::startRecord);
     connect(endRecordButton, &QPushButton::clicked, this, &ClickerDialog::endRecord);
@@ -54,22 +65,36 @@ ClickerDialog::ClickerDialog(QWidget *parent) : QDialog(parent) {
     buttonLayout->addWidget(endClickButton);
 
     mainLayout->addLayout(buttonLayout);
+
+    textEdit = new QTextEdit(this);
+    textEdit->setReadOnly(true);
+    textEdit->setMinimumWidth(360);
+
     mainLayout->addWidget(textEdit);
 
-    // 添加间隔设置行
-    auto *intervalLayout = new QHBoxLayout();
+    auto *footLayout = new QHBoxLayout();
+
     auto *intervalLabel = new QLabel("间隔", this);
     intervalSpinBox = new QSpinBox(this);
     intervalSpinBox->setRange(1, 10000); // 设置最小值和最大值
-    intervalSpinBox->setValue(100); // 设置默认值为100
+    intervalSpinBox->setValue(200); // 设置默认值为100
     auto *millisecondLabel = new QLabel("毫秒", this);
 
-    intervalLayout->addWidget(intervalLabel);
-    intervalLayout->addWidget(intervalSpinBox);
-    intervalLayout->addWidget(millisecondLabel);
-    intervalLayout->addStretch(); // 将内容靠右对齐
+    auto *roundsLabel = new QLabel("重复", this);
+    roundsSpinBox = new QSpinBox(this);
+    roundsSpinBox->setRange(0, 100000);  // 设置次数范围
+    roundsSpinBox->setValue(0);         // 默认次数
+    auto *roundsUnitLabel = new QLabel("轮", this);
 
-    mainLayout->addLayout(intervalLayout);
+    footLayout->addWidget(intervalLabel);
+    footLayout->addWidget(intervalSpinBox);
+    footLayout->addWidget(millisecondLabel);
+    footLayout->addStretch(); // 将内容靠右对齐
+    footLayout->addWidget(roundsLabel);
+    footLayout->addWidget(roundsSpinBox);
+    footLayout->addWidget(roundsUnitLabel);
+
+    mainLayout->addLayout(footLayout);
 
     this->setLayout(mainLayout);
 }
@@ -79,7 +104,7 @@ void ClickerDialog::closeEvent(QCloseEvent *) {
 
     if (clickThread) {
         clickThread->stop();
-        clickThread = nullptr;
+        clickThread->wait();
     }
 
     instance = nullptr;
@@ -87,6 +112,7 @@ void ClickerDialog::closeEvent(QCloseEvent *) {
     parentWidget()->showNormal();
 }
 
+void ClickerDialog::updateTextEdit(const QString &text) { textEdit->append(text); }
 
 void ClickerDialog::appendCoordinate(int x, int y) {
     RECT clientRect = {0};
@@ -161,33 +187,39 @@ void ClickerDialog::startClick() {
 
     textEdit->clear();
 
-    auto text = QString("循环点击(间隔%1毫秒): ").arg(intervalSpinBox->value());
+    auto text = QString("循环点击(间隔%1毫秒, %2轮): ").arg(
+            QString::number(intervalSpinBox->value()),
+            roundsSpinBox->value() > 0 ? QString::number(roundsSpinBox->value()) : "无限"
+    );
+
     for (auto &point: pointList) {
         text += QString("(%1, %2)").arg(point.x).arg(point.y);
     }
 
     textEdit->append(text);
 
-    clickThread = new ClickThread(pointList, state.hwnd, intervalSpinBox->value(), this);
+    clickThread = new ClickThread(
+            pointList, state.hwnd,
+            intervalSpinBox->value(),
+            roundsSpinBox->value(),
+            this
+    );
     connect(clickThread, &ClickThread::finished, clickThread, &QObject::deleteLater);
+    connect(clickThread, &QObject::destroyed, this, [this]() { clickThread = nullptr; });
+    connect(clickThread, &ClickThread::logText, this, &ClickerDialog::updateTextEdit);
     clickThread->start();
 }
 
 void ClickerDialog::endClick() {
+    // 先检查指针是否有效
     if (!clickThread) {
         textEdit->append("当前未开始连点");
         return;
     }
 
-    if (isWaiting) {
-        textEdit->append("请先完成录制");
-        return;
-    }
-
+    textEdit->append("正在终止");
     clickThread->stop();
     clickThread->wait();
-    clickThread = nullptr;
-
     textEdit->append("已结束点击");
 }
 
@@ -212,3 +244,4 @@ LRESULT CALLBACK ClickerDialog::MouseHookProc(int nCode, WPARAM wParam, LPARAM l
 }
 
 ClickerDialog *ClickerDialog::instance = nullptr;
+
