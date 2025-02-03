@@ -500,7 +500,7 @@ void countryWar() {
                                                    0.9,
                                                    0.5)
         );
-        clicker = clicker->click(startUntil, clickUntil, runUntil);
+        clicker = clicker->click(startUntil, clickUntil, runUntil, similaritySelector, 0.5);
 
         clearUntil(startUntil, clickUntil, runUntil);
         clickUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/城市信息.png"));

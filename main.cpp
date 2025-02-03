@@ -421,7 +421,6 @@ void MainWindow::batchRunCommand(const QString &command) {
         state.stopFlag.store(true);
         state.currentThread->quit();
         state.currentThread->wait();
-        return;
     }
 
     state.stopFlag.store(false);
