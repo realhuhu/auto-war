@@ -65,10 +65,10 @@ std::vector<Segment> singleFindPositions(
             segments.emplace_back(
                     imgFile->fileName().toStdString(),
                     result.at<float>(loc.y, loc.x),
-                    w * state.scale,
-                    h * state.scale,
-                    loc.x * state.scale,
-                    loc.y * state.scale
+                    static_cast<float >(w) * state.scale,
+                    static_cast<float >(h) * state.scale,
+                    static_cast<float >(loc.x) * state.scale,
+                    static_cast<float >(loc.y) * state.scale
             );
         }
         return segments;
@@ -87,10 +87,10 @@ std::vector<Segment> singleFindPositions(
             segments.emplace_back(
                     imgFile->fileName().toStdString(),
                     result.at<float>(loc.y, loc.x),
-                    w * state.scale,
-                    h * state.scale,
-                    loc.x * state.scale,
-                    loc.y * state.scale
+                    static_cast<float >(w) * state.scale,
+                    static_cast<float >(h) * state.scale,
+                    static_cast<float >(loc.x) * state.scale,
+                    static_cast<float >(loc.y) * state.scale
             );
         }
         return segments;
@@ -103,19 +103,27 @@ std::vector<Segment> CV::findPositions(
         float threshold,
         Mode mode
 ) {
-    auto absolutePath = QCoreApplication::applicationDirPath() + "/res" + QString::fromStdString(templatePath);
-
-    QFile imgFile(absolutePath);
-
-    if (!imgFile.open(QIODevice::ReadOnly)) throw std::runtime_error("文件不存在: " + absolutePath.toStdString());
+    QFile imgFile(QCoreApplication::applicationDirPath() + "/res" + QString::fromStdString(templatePath));
+    if (!imgFile.open(QIODevice::ReadOnly)) throw std::runtime_error("文件不存在: " + imgFile.fileName().toStdString());
 
     auto ps = singleFindPositions(rawImg, &imgFile, threshold, mode);
-
     if (!ps.empty()) return ps;
 
-    QFile tryImgFile(absolutePath.replace(".png", "1.png"));
+    auto tryPath = QString::fromStdString(templatePath).replace(".png", "1.png");
+    auto customPath = QString::fromStdString(templatePath).replace("/", "-");
+    QFile tryImgFile(QCoreApplication::applicationDirPath() + "/res" + tryPath);
+    QFile customImgFile(QCoreApplication::applicationDirPath() + "/自定义图片" + customPath);
+    if (!tryImgFile.open(QIODevice::ReadOnly) && !customImgFile.open(QIODevice::ReadOnly)) return ps;
 
-    if (!tryImgFile.open(QIODevice::ReadOnly)) return ps;
+    if (tryImgFile.open(QIODevice::ReadOnly)) {
+        ps = singleFindPositions(rawImg, &tryImgFile, threshold, mode);
+        if (!ps.empty()) return ps;
+    }
 
-    return singleFindPositions(rawImg, &tryImgFile, threshold, mode);
+    if (customImgFile.open(QIODevice::ReadOnly)) {
+        ps = singleFindPositions(rawImg, &customImgFile, threshold, mode);
+        if (!ps.empty()) return ps;
+    }
+
+    return {};
 }

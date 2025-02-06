@@ -18,6 +18,7 @@
 #include <QHBoxLayout>
 
 # include "../util/state.h"
+# include "../util/action.h"
 
 class ClickThread : public QThread {
 Q_OBJECT

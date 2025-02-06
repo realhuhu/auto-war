@@ -7,6 +7,7 @@
 #include "../util/enum.h"
 #include "../util/sleep.h"
 #include "../util/state.h"
+#include "../util/action.h"
 #include "../util/emitter.h"
 
 struct Segment {
@@ -37,7 +38,7 @@ struct Segment {
 
     [[nodiscard]] Segment copy() const;
 
-    friend bool operator==(const Segment& a, const Segment& b);
+    friend bool operator==(const Segment &a, const Segment &b);
 
     [[nodiscard]] virtual std::string toString() const;
 };

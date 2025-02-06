@@ -52,6 +52,8 @@ add_executable(qt
         function/imageDialog.h
         util/sleep.cpp
         util/sleep.h
+        util/action.cpp
+        util/action.h
 )
 
 target_link_libraries(qt ${OpenCV_LIBS})

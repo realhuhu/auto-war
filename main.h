@@ -39,11 +39,9 @@ signals:
 
     void logMessage(const QString &message, const QString &color = "black");
 
-    void logText(const QString &message, const QString &color = "red");
-
 private slots:
 
-    void onLogText(const QString &text, const QString &color = "red") const;
+    void log(const QString &text, const QString &color = "red") const;
 
     void onLogMessage(const QString &text, const QString &color = "black");
 

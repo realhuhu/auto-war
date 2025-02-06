@@ -1019,7 +1019,7 @@ void guildBuilding() {
 
     clearUntil(startUntil, clickUntil, runUntil);
     runUntil.emplace_back(std::make_unique<UntilImage>("/公会建筑/参与任务.png"));
-    clicker = clicker->click(startUntil, clickUntil, runUntil, similaritySelector, 1);
+    clicker = clicker->click(startUntil, clickUntil, runUntil, similaritySelector, 2);
 
     clearUntil(startUntil, clickUntil, runUntil);
     clickUntil.emplace_back(std::make_unique<UntilImage>("/公会建筑/勋章刷新.png", Previous::NONE, true));

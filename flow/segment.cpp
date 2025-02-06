@@ -42,11 +42,11 @@ void Segment::click(float wait, int offsetX, int offsetY, Click position) const 
             break;
     }
 
-    x += offsetX * state.scale;
-    y += offsetY * state.scale;
-    LPARAM lparam = (y << 16) | x;
-    PostMessageW(state.hwnd, WM_LBUTTONDOWN, 0, lparam);
-    PostMessageW(state.hwnd, WM_LBUTTONUP, 0, lparam);
+    x += static_cast<int>(static_cast<float>(offsetX) * state.scale);
+    y += static_cast<int>(static_cast<float>(offsetY) * state.scale);
+
+    Mouse::leftDown(state.hwnd, x, y);
+    Mouse::leftUp(state.hwnd, x, y);
 
     emit Emitter::instance()->log(QString::fromStdString("点击: (%1,%2)").arg(QString::number(x), QString::number(y)));
 
@@ -59,20 +59,16 @@ void Segment::drag(float wait, int distance) const {
     int xStart = xCenter;
     int yStart = yCenter;
 
-    int xEnd = xStart; // 垂直方向，x坐标不变
-    int yEnd = yStart + distance * state.scale;
+    int xEnd = xStart;
+    int yEnd = yStart + static_cast<int>(static_cast<float>(distance) * state.scale);
 
-    // 构造LPARAM参数，x在低16位，y在高16位
-    LPARAM from = (yStart << 16) | xStart;
-    LPARAM to = (yEnd << 16) | xEnd;
-
-    PostMessageW(state.hwnd, WM_LBUTTONDOWN, 0, from);
+    Mouse::leftDown(state.hwnd, xStart, yStart);
     sleep(0.1);
 
-    PostMessageW(state.hwnd, WM_MOUSEMOVE, MK_LBUTTON, to);
+    Mouse::moveTo(state.hwnd, xEnd, yEnd);
     sleep(0.1);
 
-    PostMessageW(state.hwnd, WM_LBUTTONUP, 0, to);
+    Mouse::leftUp(state.hwnd, xEnd, yEnd);
     sleep(0.1);
 
     emit Emitter::instance()->log(QString::fromStdString("拖动: 从(%1,%2)到(%3,%4)").arg(
@@ -110,11 +106,11 @@ Segment Segment::copy() const {
     return {path, similarity, w, h, x1, y1};
 }
 
-bool operator==(const Segment& a, const Segment& b) {
+bool operator==(const Segment &a, const Segment &b) {
     return (a.xCenter == b.xCenter) && (a.yCenter == b.yCenter);
 }
 
-bool operator!=(const Segment& a, const Segment& b) {
+bool operator!=(const Segment &a, const Segment &b) {
     return !(a == b);
 }
 

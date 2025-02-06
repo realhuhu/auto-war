@@ -24,12 +24,12 @@ ImageDialog::ImageDialog(QWidget *parent) : QDialog(parent), imageLabel(new QLab
     int originalWidth = image.width();
     int originalHeight = image.height();
 
-    float scaleWidth = static_cast<float>(maxWidth) / originalWidth;
-    float scaleHeight = static_cast<float>(maxHeight) / originalHeight;
+    float scaleWidth = static_cast<float>(maxWidth) / static_cast<float>(originalWidth);
+    float scaleHeight = static_cast<float>(maxHeight) / static_cast<float>(originalHeight);
 
     float scale = qMin(scaleWidth, scaleHeight);
-    int scaledWidth = static_cast<int>(originalWidth * scale);
-    int scaledHeight = static_cast<int>(originalHeight * scale);
+    int scaledWidth = static_cast<int>(static_cast<float>(originalWidth) * scale);
+    int scaledHeight = static_cast<int>(static_cast<float>(originalHeight) * scale);
 
     QImage scaledImage = image.scaled(scaledWidth, scaledHeight, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 

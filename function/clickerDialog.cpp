@@ -19,9 +19,8 @@ void ClickThread::run() {
             );
 
         for (auto &point: pointList) {
-            LPARAM lparam = (point.y << 16) | point.x;
-            PostMessageW(hwnd, WM_LBUTTONDOWN, 0, lparam);
-            PostMessageW(hwnd, WM_LBUTTONUP, 0, lparam);
+            Mouse::leftDown(hwnd, point.x, point.y);
+            Mouse::leftUp(hwnd, point.x, point.y);
 
             auto sleepDuration = std::chrono::milliseconds(interval);
             auto startTime = std::chrono::steady_clock::now();
@@ -76,20 +75,20 @@ ClickerDialog::ClickerDialog(QWidget *parent) : QDialog(parent) {
 
     auto *intervalLabel = new QLabel("间隔", this);
     intervalSpinBox = new QSpinBox(this);
-    intervalSpinBox->setRange(1, 10000); // 设置最小值和最大值
-    intervalSpinBox->setValue(200); // 设置默认值为100
+    intervalSpinBox->setRange(1, 10000);
+    intervalSpinBox->setValue(200);
     auto *millisecondLabel = new QLabel("毫秒", this);
 
     auto *roundsLabel = new QLabel("重复", this);
     roundsSpinBox = new QSpinBox(this);
-    roundsSpinBox->setRange(0, 100000);  // 设置次数范围
-    roundsSpinBox->setValue(0);         // 默认次数
+    roundsSpinBox->setRange(0, 100000);
+    roundsSpinBox->setValue(0);
     auto *roundsUnitLabel = new QLabel("轮", this);
 
     footLayout->addWidget(intervalLabel);
     footLayout->addWidget(intervalSpinBox);
     footLayout->addWidget(millisecondLabel);
-    footLayout->addStretch(); // 将内容靠右对齐
+    footLayout->addStretch();
     footLayout->addWidget(roundsLabel);
     footLayout->addWidget(roundsSpinBox);
     footLayout->addWidget(roundsUnitLabel);
@@ -205,14 +204,13 @@ void ClickerDialog::startClick() {
             roundsSpinBox->value(),
             this
     );
-    connect(clickThread, &ClickThread::finished, clickThread, &QObject::deleteLater);
-    connect(clickThread, &QObject::destroyed, this, [this]() { clickThread = nullptr; });
+    connect(clickThread, &QThread::finished, clickThread, &QThread::deleteLater);
+    connect(clickThread, &QThread::destroyed, this, [this]() { clickThread = nullptr; });
     connect(clickThread, &ClickThread::logText, this, &ClickerDialog::updateTextEdit);
     clickThread->start();
 }
 
 void ClickerDialog::endClick() {
-    // 先检查指针是否有效
     if (!clickThread) {
         textEdit->append("当前未开始连点");
         return;
@@ -232,7 +230,6 @@ LRESULT CALLBACK ClickerDialog::MouseHookProc(int nCode, WPARAM wParam, LPARAM l
         HWND hwnd = WindowFromPoint(pMouseStruct->pt);
 
         if (hwnd == state.hwnd) {
-            // 跨线程安全更新 UI
             QMetaObject::invokeMethod(
                     instance,
                     "appendCoordinate",

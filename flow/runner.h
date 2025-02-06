@@ -7,6 +7,7 @@
 #include "../util/state.h"
 #include "../util/enum.h"
 #include "../util/sleep.h"
+#include "../util/action.h"
 #include "../util/emitter.h"
 #include "cv.h"
 #include "until.h"
@@ -63,12 +64,8 @@ public:
             const std::vector<std::unique_ptr<Until>> &clickUntilList,
             int offsetX = 0,
             int offsetY = 0,
-            Click position = Click::CENTER
-    );
-
-    void _drag(
-            const Selector &selector,
-            const std::vector<std::unique_ptr<Until>> &clickUntilList
+            Click position = Click::CENTER,
+            float interval = 1
     );
 
     void _finish(float finishWait, const std::vector<std::unique_ptr<Until>> &runUntilList);
@@ -92,7 +89,8 @@ public:
             float finishWait = 0,
             int offsetX = 0,
             int offsetY = 0,
-            Click position = Click::CENTER
+            Click position = Click::CENTER,
+            float interval = 1
     );
 
     std::unique_ptr<ImageClicker> clickIfFound(
@@ -104,7 +102,8 @@ public:
             float finishWait = 0,
             int offsetX = 0,
             int offsetY = 0,
-            Click position = Click::CENTER
+            Click position = Click::CENTER,
+            float interval = 1
     );
 
 

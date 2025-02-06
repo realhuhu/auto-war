@@ -11,7 +11,7 @@ float getScale() {
     DEVMODE devMode = {};
     devMode.dmSize = sizeof(DEVMODE);
     EnumDisplaySettings(info.szDevice, ENUM_CURRENT_SETTINGS, &devMode);
-    return static_cast<float>(devMode.dmPelsWidth) / (info.rcMonitor.right - info.rcMonitor.left);
+    return static_cast<float>(devMode.dmPelsWidth) / static_cast<float>(info.rcMonitor.right - info.rcMonitor.left);
 }
 
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
@@ -85,17 +85,17 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     hook = nullptr;
     isWaiting = false;
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-    onLogText("使用方法: 先获取窗口，再执行命令", "blue");
+    log("使用方法: 先获取窗口，再执行命令", "blue");
 
     connect(this, &MainWindow::logMessage, this, &MainWindow::onLogMessage);
     connect(Emitter::instance(), &Emitter::log, this, &MainWindow::onLogMessage);
 
 
-    onLogText(QString::fromStdString("当前缩放率: ") + QString::number(state.scale));
+    log(QString::fromStdString("当前缩放率: ") + QString::number(state.scale));
 
     QFile file(QCoreApplication::applicationDirPath() + configFile);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        onLogText("无法打开配置文件: config.json");
+        log("无法打开配置文件: config.json");
     } else {
         auto jsonData = file.readAll();
         auto doc = QJsonDocument::fromJson(jsonData);
@@ -116,7 +116,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     QWidget::closeEvent(event);
 }
 
-void MainWindow::onLogText(const QString &text, const QString &color) const {
+void MainWindow::log(const QString &text, const QString &color) const {
     outputText->append(QString("<div style=\"color:%1;\">%2</div>").arg(color, text));
 }
 
@@ -143,12 +143,12 @@ void MainWindow::onLogMessage(const QString &text, const QString &color) {
 }
 
 void MainWindow::startCapture() {
-    onLogText("请用鼠标点击游戏窗口");
+    log("请用鼠标点击游戏窗口");
 
     isWaiting = true;
     hook = SetWindowsHookEx(WH_MOUSE_LL, MouseHookProc, nullptr, 0);
 
-    if (hook == nullptr) onLogText("Failed to set hook");
+    if (hook == nullptr) log("Failed to set hook");
 }
 
 void MainWindow::selectCommand() {
@@ -326,7 +326,7 @@ void MainWindow::selectCommand() {
 
     connect(viewBtn->getTextButton(), &QToolButton::clicked, [this, &selectDialog]() {
         if (!state.hwnd) {
-            onLogText("请先获取游戏窗口!");
+            log("请先获取游戏窗口!");
             selectDialog.accept();
             return;
         }
@@ -336,7 +336,7 @@ void MainWindow::selectCommand() {
 
     connect(clickerBtn->getTextButton(), &QToolButton::clicked, [this, &selectDialog]() {
         if (!state.hwnd) {
-            onLogText("请先获取游戏窗口!");
+            log("请先获取游戏窗口!");
             selectDialog.accept();
             return;
         }
@@ -362,21 +362,21 @@ void MainWindow::selectCommand() {
 
 void MainWindow::stopCommand() {
     if (!state.currentThread) {
-        onLogText("当前无命令正在执行");
+        log("当前无命令正在执行");
         return;
     }
 
     state.stopFlag.store(true);
     state.currentThread->quit();
     state.currentThread->wait();
-    onLogText("命令已停止执行");
+    log("命令已停止执行");
 }
 
 void MainWindow::clearText() { outputText->clear(); }
 
 void MainWindow::runCommand(const QString &command) {
     if (!state.hwnd) {
-        onLogText("请先获取游戏窗口!");
+        log("请先获取游戏窗口!");
         return;
     }
 
@@ -390,7 +390,7 @@ void MainWindow::runCommand(const QString &command) {
     state.currentThread = new QThread(this);
 
     auto func = tasks[command];
-    QObject::connect(state.currentThread, &QThread::started, [func, this]() {
+    connect(state.currentThread, &QThread::started, [func, this]() {
         try {
             func();
             emit logMessage("运行完成", "red");
@@ -404,16 +404,16 @@ void MainWindow::runCommand(const QString &command) {
         }
     });
 
-    QObject::connect(state.currentThread, &QThread::finished, state.currentThread, &QThread::deleteLater);
-    connect(state.currentThread, &QObject::destroyed, this, []() { state.currentThread = nullptr; });
+    connect(state.currentThread, &QThread::finished, state.currentThread, &QThread::deleteLater);
+    connect(state.currentThread, &QThread::destroyed, this, []() { state.currentThread = nullptr; });
     state.currentThread->start();
 
-    onLogText("开始执行命令: " + command, "blue");
+    log("开始执行命令: " + command, "blue");
 }
 
 void MainWindow::batchRunCommand(const QString &command) {
     if (!state.hwnd) {
-        onLogText("请先获取游戏窗口!");
+        log("请先获取游戏窗口!");
         return;
     }
 
@@ -426,7 +426,7 @@ void MainWindow::batchRunCommand(const QString &command) {
     state.stopFlag.store(false);
     state.currentThread = new QThread(this);
 
-    QObject::connect(state.currentThread, &QThread::started, [this, &command]() {
+    connect(state.currentThread, &QThread::started, [this, &command]() {
         try {
             emit logMessage("开始一键执行", "red");
 
@@ -474,8 +474,8 @@ void MainWindow::batchRunCommand(const QString &command) {
         }
     });
 
-    QObject::connect(state.currentThread, &QThread::finished, state.currentThread, &QThread::deleteLater);
-    connect(state.currentThread, &QObject::destroyed, this, []() { state.currentThread = nullptr; });
+    connect(state.currentThread, &QThread::finished, state.currentThread, &QThread::deleteLater);
+    connect(state.currentThread, &QThread::destroyed, this, []() { state.currentThread = nullptr; });
     state.currentThread->start();
 }
 
@@ -632,7 +632,7 @@ void MainWindow::setCommand(const QString &command) {
     connect(
             confirmButton,
             &QPushButton::clicked,
-            [this, command, &checkboxItems, &inputItems, &settingDialog, &selectItems, commandConfig]() {
+            [command, &checkboxItems, &inputItems, &settingDialog, &selectItems, commandConfig]() {
 
                 QJsonArray newCheckboxArray;
                 for (const auto &item: checkboxItems) {
@@ -720,9 +720,9 @@ void MainWindow::setCommand(const QString &command) {
                     QJsonDocument doc(state.config);
                     file.write(doc.toJson());
                     file.close();
-                    onLogText("配置保存成功", "blue");
+                    log("配置保存成功", "blue");
                 } else {
-                    onLogText("配置保存失败");
+                    log("配置保存失败");
                 }
 
                 settingDialog.accept();
@@ -743,17 +743,17 @@ LRESULT CALLBACK MainWindow::MouseHookProc(int nCode, WPARAM wParam, LPARAM lPar
 
                 GetWindowTextW(hwnd, buffer, 256);
                 if (hwnd) {
-                    window->onLogText(
+                    window->log(
                             QString("获取到窗口: ") + QString::fromWCharArray(buffer) + "(0x" +
                             QString::number(reinterpret_cast<qulonglong>(hwnd), 16) + ")", "blue"
                     );
-                    window->onLogText("请不要最小化游戏窗口！但可以放在其它窗口后面", "red");
+                    window->log("请不要最小化游戏窗口！但可以放在其它窗口后面", "red");
                     window->isWaiting = false;
                     state.hwnd = hwnd;
                     UnhookWindowsHookEx(window->hook);
                     window->hook = nullptr;
                 } else {
-                    window->onLogText("获取窗口句柄失败", "red");
+                    window->log("获取窗口句柄失败", "red");
                 }
             }
         }

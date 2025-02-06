@@ -94,7 +94,8 @@ void ImageClicker::_click(
         const std::vector<std::unique_ptr<Until>> &clickUntilList,
         int offsetX,
         int offsetY,
-        Click position
+        Click position,
+        float interval
 ) {
     auto start = std::chrono::high_resolution_clock::now();
     auto segment = selector(targetSegmentList);
@@ -130,7 +131,7 @@ void ImageClicker::_click(
 
         emit Emitter::instance()->log("CLICK不满足，继续循环点击");
 
-        sleep(1);
+        sleep(interval);
     }
 }
 
@@ -156,6 +157,8 @@ std::unique_ptr<ImageClicker> ImageClicker::_execute(
         const std::vector<std::unique_ptr<Until>> &clickUntilList,
         const std::vector<std::unique_ptr<Until>> &runUntilList
 ) {
+    Mouse::moveTo(state.hwnd, 0, 0);
+
     emit Emitter::instance()->log(QString::fromStdString(this->toString() + "开始" + name + "流程"), "green");
 
     _start(startWait, startUntilList);
@@ -166,7 +169,10 @@ std::unique_ptr<ImageClicker> ImageClicker::_execute(
 
     auto clicker = _createChain(clickUntilList, runUntilList);
 
+    Mouse::moveTo(state.hwnd, 0, 0);
+
     emit Emitter::instance()->log(QString::fromStdString(this->toString() + "结束" + name + "流程"), "green");
+
     return clicker;
 }
 
@@ -179,9 +185,10 @@ std::unique_ptr<ImageClicker> ImageClicker::click(
         float finishWait,
         int offsetX,
         int offsetY,
-        Click position
+        Click position,
+        float interval
 ) {
-    auto executor = [this, &selector, &clickUntilList, &offsetX, &offsetY, &position]() -> bool {
+    auto executor = [this, &selector, &clickUntilList, &offsetX, &offsetY, &position, &interval]() -> bool {
         if (targetSegmentList.empty()) throw std::runtime_error("未匹配到图像: " + this->templatePath);
 
         auto segment = selector(targetSegmentList);
@@ -193,7 +200,8 @@ std::unique_ptr<ImageClicker> ImageClicker::click(
                 clickUntilList,
                 offsetX,
                 offsetY,
-                position
+                position,
+                interval
         );
 
         return false;
@@ -219,9 +227,10 @@ std::unique_ptr<ImageClicker> ImageClicker::clickIfFound(
         float finishWait,
         int offsetX,
         int offsetY,
-        Click position
+        Click position,
+        float interval
 ) {
-    auto executor = [this, &selector, &clickUntilList, &offsetX, &offsetY, &position]() -> bool {
+    auto executor = [this, &selector, &clickUntilList, &offsetX, &offsetY, &position, &interval]() -> bool {
         if (targetSegmentList.empty()) {
             emit Emitter::instance()->log(
                     QString("未找到图片<img src='%2' alt='%3' height='14'>，开始下一流程").arg(
@@ -241,7 +250,8 @@ std::unique_ptr<ImageClicker> ImageClicker::clickIfFound(
                 clickUntilList,
                 offsetX,
                 offsetY,
-                position
+                position,
+                interval
         );
 
         return false;

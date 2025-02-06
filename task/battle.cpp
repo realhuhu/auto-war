@@ -367,7 +367,6 @@ void countryWar() {
 
         int hour = local_time->tm_hour;
 
-        // 判断是否在晚上8点到9点之间
         if ((hour >= 20 && hour < 21)) {
             clicker = std::make_unique<ImageClicker>("/国家战争/返回基地.png");
 
@@ -552,7 +551,7 @@ void countryWar() {
                                                                  0,
                                                                  0.9,
                                                                  0.5));
-        clicker = clicker->click(startUntil, clickUntil, runUntil, similaritySelector, 0.5);
+        clicker = clicker->click(startUntil, clickUntil, runUntil, similaritySelector, 0.5, 0, 0, 0, Click::CENTER, 3);
 
         clearUntil(startUntil, clickUntil, runUntil);
         clickUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/城市信息.png"));
