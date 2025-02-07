@@ -18,11 +18,15 @@ ImageClicker::ImageClicker(
 
 ImageClicker::ImageClicker(
         const std::vector<std::string> &imgPathList,
+        float wait,
         float threshold,
         float timeout,
         Mode mode
 ) : globalThreshold(threshold),
     globalTimeout(timeout) {
+
+    sleep(wait);
+
     for (const auto &imgPath: imgPathList) {
         auto ps = CV::findPositions(CV::getScreen(mode), imgPath, globalThreshold, mode);
         if (!ps.empty()) {
@@ -157,8 +161,6 @@ std::unique_ptr<ImageClicker> ImageClicker::_execute(
         const std::vector<std::unique_ptr<Until>> &clickUntilList,
         const std::vector<std::unique_ptr<Until>> &runUntilList
 ) {
-    Mouse::moveTo(state.hwnd, 0, 0);
-
     emit Emitter::instance()->log(QString::fromStdString(this->toString() + "开始" + name + "流程"), "green");
 
     _start(startWait, startUntilList);
@@ -168,8 +170,6 @@ std::unique_ptr<ImageClicker> ImageClicker::_execute(
     if (!skipFinish) _finish(finishWait, runUntilList);
 
     auto clicker = _createChain(clickUntilList, runUntilList);
-
-    Mouse::moveTo(state.hwnd, 0, 0);
 
     emit Emitter::instance()->log(QString::fromStdString(this->toString() + "结束" + name + "流程"), "green");
 
@@ -274,9 +274,11 @@ std::unique_ptr<ImageClicker> ImageClicker::drag(
         const std::vector<std::unique_ptr<Until>> &clickUntilList,
         const Selector &selector,
         float startWait,
-        float finishWait
+        float finishWait,
+        bool reverse,
+        int step
 ) {
-    auto executor = [this, &selector, &clickUntilList]() -> bool {
+    auto executor = [this, &selector, &clickUntilList, &reverse, &step]() -> bool {
         if (targetSegmentList.empty()) throw std::runtime_error("未匹配到图像: " + this->templatePath);
 
         auto beforeSegment = selector(targetSegmentList);
@@ -284,6 +286,20 @@ std::unique_ptr<ImageClicker> ImageClicker::drag(
         previousSegment = std::make_unique<Segment>(beforeSegment.copy());
 
         emit Emitter::instance()->log(QString::fromStdString("开始拖动: " + beforeSegment.toString()));
+
+        if (reverse) {
+            while (!state.stopFlag.load()) {
+                beforeSegment.drag(0.1, 100);
+                auto afterSegment = selector(CV::findPositions(CV::getScreen(), templatePath));
+
+                if (beforeSegment == afterSegment) {
+                    emit Emitter::instance()->log("已拖动到底，结束拖动");
+                    break;
+                }
+
+                beforeSegment = afterSegment;
+            }
+        }
 
         while (!state.stopFlag.load()) {
             if (clickUntilList.empty()) break;
@@ -301,7 +317,7 @@ std::unique_ptr<ImageClicker> ImageClicker::drag(
                 break;
             }
 
-            beforeSegment.drag(0.1, 10);
+            beforeSegment.drag(0.1, reverse ? -step : step);
             auto afterSegment = selector(CV::findPositions(CV::getScreen(), templatePath));
 
             if (beforeSegment == afterSegment) {

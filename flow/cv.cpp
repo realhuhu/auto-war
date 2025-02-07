@@ -40,6 +40,7 @@ std::vector<Segment> singleFindPositions(
 ) {
     cv::Mat templateImg;
     QByteArray byteArray = imgFile->readAll();
+    imgFile->close();
     std::vector<char> data(byteArray.data(), byteArray.data() + byteArray.size());
 
     if (mode == Mode::RGB) {
@@ -115,15 +116,40 @@ std::vector<Segment> CV::findPositions(
     QFile customImgFile(QCoreApplication::applicationDirPath() + "/自定义图片" + customPath);
     if (!tryImgFile.open(QIODevice::ReadOnly) && !customImgFile.open(QIODevice::ReadOnly)) return ps;
 
-    if (tryImgFile.open(QIODevice::ReadOnly)) {
+    if (tryImgFile.isOpen()) {
         ps = singleFindPositions(rawImg, &tryImgFile, threshold, mode);
         if (!ps.empty()) return ps;
     }
 
-    if (customImgFile.open(QIODevice::ReadOnly)) {
+    if (customImgFile.isOpen()) {
         ps = singleFindPositions(rawImg, &customImgFile, threshold, mode);
         if (!ps.empty()) return ps;
     }
 
     return {};
+}
+
+bool CV::hasBlack(const cv::Mat &binaryImage) {
+    int rows = binaryImage.rows;
+    int cols = binaryImage.cols;
+
+    for (int y = 0; y < rows; ++y) {
+        for (int x = 0; x < cols; ++x) {
+            if (binaryImage.at<uchar>(y, x) == 0) return true;
+        }
+    }
+
+    return false;
+}
+
+bool CV::identical(const cv::Mat &binaryImage1, const cv::Mat &binaryImage2) {
+    CV_Assert(binaryImage1.size() == binaryImage2.size() && binaryImage1.type() == binaryImage2.type());
+
+    for (int y = 0; y < binaryImage1.rows; ++y) {
+        for (int x = 0; x < binaryImage1.cols; ++x) {
+            if (binaryImage1.at<uchar>(y, x) != binaryImage2.at<uchar>(y, x)) return false;
+        }
+    }
+
+    return true;
 }

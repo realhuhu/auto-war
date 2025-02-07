@@ -31,6 +31,7 @@ public:
 
     explicit ImageClicker(
             const std::vector<std::string> &imgPathList,
+            float wait = 0,
             float threshold = 0.9,
             float timeout = 60,
             Mode mode = Mode::GRAY
@@ -112,7 +113,9 @@ public:
             const std::vector<std::unique_ptr<Until>> &clickUntilList = {},
             const Selector &selector = similaritySelector,
             float startWait = 0,
-            float finishWait = 0
+            float finishWait = 0,
+            bool reverse = false,
+            int step = 10
     );
 
     std::unique_ptr<ImageClicker> locate(

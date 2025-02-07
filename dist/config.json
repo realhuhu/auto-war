@@ -13,6 +13,25 @@
         ],
         "tips": "例如'打前5'就是在前五个里随机挑一个打"
     },
+    "公会战役": {
+        "checkbox": [
+            {
+                "order": 0,
+                "text": "领进度宝箱",
+                "value": true
+            }
+        ],
+        "input": [
+            {
+                "order": 0,
+                "text": "最高打等级",
+                "value": 35
+            }
+        ],
+        "select": [
+        ],
+        "tips": ""
+    },
     "公会领奖": {
         "checkbox": [
             {
@@ -398,6 +417,11 @@
             },
             {
                 "order": 4,
+                "text": "公会战役",
+                "value": true
+            },
+            {
+                "order": 5,
                 "text": "国家战争",
                 "value": true
             },
@@ -507,6 +531,11 @@
             },
             {
                 "order": 4,
+                "text": "公会战役",
+                "value": true
+            },
+            {
+                "order": 5,
                 "text": "国家战争",
                 "value": true
             },
@@ -616,6 +645,11 @@
             },
             {
                 "order": 4,
+                "text": "公会战役",
+                "value": false
+            },
+            {
+                "order": 5,
                 "text": "国家战争",
                 "value": false
             },
@@ -725,6 +759,11 @@
             },
             {
                 "order": 4,
+                "text": "公会战役",
+                "value": false
+            },
+            {
+                "order": 5,
                 "text": "国家战争",
                 "value": false
             },

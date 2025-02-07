@@ -548,7 +548,7 @@ void adviser() {
     if (config["免费抽奖"]) {
         while (!state.stopFlag.load()) {
             clicker = std::make_unique<ImageClicker>(
-                    std::vector<std::string>{"/参谋抽奖/参谋免费.png", "/参谋抽奖/必得免费.png"}
+                    std::vector<std::string>{"/参谋抽奖/参谋免费.png", "/参谋抽奖/必得免费.png"}, 2
             );
 
             if (!clicker->founded())break;
@@ -1010,7 +1010,7 @@ void guildBuilding() {
     clicker = clicker->click(startUntil, clickUntil, runUntil);
 
     clearUntil(startUntil, clickUntil, runUntil);
-    clickUntil.emplace_back(std::make_unique<UntilImage>("/公会建筑/公会建筑标题.png"));
+    runUntil.emplace_back(std::make_unique<UntilImage>("/公会建筑/公会建筑标题.png"));
     clicker = clicker->click(startUntil, clickUntil, runUntil);
 
     clearUntil(startUntil, clickUntil, runUntil);
@@ -1019,7 +1019,7 @@ void guildBuilding() {
 
     clearUntil(startUntil, clickUntil, runUntil);
     runUntil.emplace_back(std::make_unique<UntilImage>("/公会建筑/参与任务.png"));
-    clicker = clicker->click(startUntil, clickUntil, runUntil, similaritySelector, 2);
+    clicker = clicker->click(startUntil, clickUntil, runUntil);
 
     clearUntil(startUntil, clickUntil, runUntil);
     clickUntil.emplace_back(std::make_unique<UntilImage>("/公会建筑/勋章刷新.png", Previous::NONE, true));

@@ -363,3 +363,28 @@ std::string UntilIfAnyImage::toString() const {
 
     return start.toStdString();
 }
+
+UntilCustom::UntilCustom(
+        UntilCustomFunc func,
+        Previous onPrevious,
+        bool reverse,
+        Mode mode,
+        float finishWait,
+        float threshold,
+        float interval,
+        float timeout
+) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, mode), func(std::move(func)) {
+    imgPath = "";
+}
+
+std::string UntilCustom::toString() const { return "自定义Until"; }
+
+bool UntilCustom::flag(std::unique_ptr<Segment> &previous) {
+    auto foundedSegments = func(previous, mode, threshold);
+
+    if (foundedSegments.empty()) return false;
+
+    targetSegmentList = foundedSegments;
+    return true;
+}
+

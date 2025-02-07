@@ -170,4 +170,26 @@ public:
     void loop(std::unique_ptr<Segment> &previous, float globalTimeout) override;
 };
 
+using UntilCustomFunc = std::function<std::vector<Segment>(std::unique_ptr<Segment> &previous, Mode mode,float threshold)>;
+
+class UntilCustom : public Until {
+public:
+    UntilCustomFunc func;
+
+    explicit UntilCustom(
+            UntilCustomFunc func,
+            Previous onPrevious = Previous::NONE,
+            bool reverse = false,
+            Mode mode = Mode::GRAY,
+            float finishWait = 0,
+            float threshold = 0.9,
+            float interval = 0.1,
+            float timeout = -1
+    );
+
+    [[nodiscard]] std::string toString() const override;
+
+    bool flag(std::unique_ptr<Segment> &previous) override;
+};
+
 #endif // QT_UNTIL_H

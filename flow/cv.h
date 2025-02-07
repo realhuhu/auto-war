@@ -24,6 +24,10 @@ public:
             float threshold = 0.9,
             Mode mode = Mode::GRAY
     );
+
+    static bool hasBlack(const cv::Mat &binaryImage);
+
+    static bool identical(const cv::Mat &binaryImage1, const cv::Mat &binaryImage2);
 };
 
 #endif // QT_CV_H

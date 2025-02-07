@@ -55,8 +55,9 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     tasks["剿灭将领"] = exterminateEnemy;
     tasks["国家争霸"] = countryArena;
     tasks["世界争霸"] = worldArena;
+    tasks["公会战役"] = guildWar;
     tasks["国家战争"] = countryWar;
-    commandBattle = QStringList({"国家争霸", "世界争霸", "剿灭将领", "军备合成", "国家战争"});
+    commandBattle = QStringList({"国家争霸", "世界争霸", "剿灭将领", "军备合成", "公会战役", "国家战争"});
 
     tasks["英雄中心"] = heroCenter;
     tasks["战争学院"] = warCenter;
@@ -392,7 +393,9 @@ void MainWindow::runCommand(const QString &command) {
     auto func = tasks[command];
     connect(state.currentThread, &QThread::started, [func, this]() {
         try {
+            Mouse::moveTo(state.hwnd, 0, 0);
             func();
+            Mouse::moveTo(state.hwnd, 0, 0);
             emit logMessage("运行完成", "red");
         } catch (const std::exception &e) {
             if (!state.stopFlag.load()) {
@@ -449,7 +452,9 @@ void MainWindow::batchRunCommand(const QString &command) {
 
                     try {
                         emit logMessage("开始运行: " + subCommand, "blue");
+                        Mouse::moveTo(state.hwnd, 0, 0);
                         tasks[subCommand]();
+                        Mouse::moveTo(state.hwnd, 0, 0);
                         emit logMessage("运行完成: " + subCommand, "blue");
                     } catch (const std::exception &e) {
                         if (!state.stopFlag.load()) {
