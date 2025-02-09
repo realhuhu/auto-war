@@ -9,9 +9,9 @@
 #include "../flow/until.h"
 #include "../flow/runner.h"
 
-void warCenter();
-
 void heroCenter();
+
+void warCenter();
 
 void countryChest();
 
@@ -25,18 +25,21 @@ void equipment();
 
 void arms();
 
-void guild();
-
-void dailyTask();
-
-void weeklyTask();
-
 void signIn();
 
 void oreField();
 
 void monthlyCard();
 
+void otherActivity();
+
+void dailyTask();
+
+void weeklyTask();
+
+void guild();
+
 void guildBuilding();
+
 
 #endif //QT_DAILY_H

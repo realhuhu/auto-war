@@ -62,22 +62,24 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     tasks["英雄中心"] = heroCenter;
     tasks["战争学院"] = warCenter;
     tasks["国家宝箱"] = countryChest;
-    tasks["公会领奖"] = guild;
     tasks["将领抽奖"] = admiral;
     tasks["参谋抽奖"] = adviser;
     tasks["火炮抽奖"] = mortar;
     tasks["配件抽奖"] = equipment;
     tasks["军备抽奖"] = arms;
-    tasks["每日任务"] = dailyTask;
-    tasks["周任务"] = weeklyTask;
     tasks["每日签到"] = signIn;
     tasks["矿区争夺"] = oreField;
     tasks["月卡领取"] = monthlyCard;
+    tasks["其它活动"] = otherActivity;
+    tasks["每日任务"] = dailyTask;
+    tasks["周任务"] = weeklyTask;
+    tasks["公会领奖"] = guild;
     tasks["公会建筑"] = guildBuilding;
     commandDaily = QStringList({
-                                       "英雄中心", "战争学院", "国家宝箱", "公会领奖", "将领抽奖", "参谋抽奖",
-                                       "火炮抽奖", "配件抽奖", "军备抽奖", "每日任务", "周任务", "每日签到",
-                                       "矿区争夺", "月卡领取", "公会建筑"
+                                       "英雄中心", "战争学院", "国家宝箱", "将领抽奖",
+                                       "参谋抽奖", "火炮抽奖", "配件抽奖", "军备抽奖",
+                                       "每日签到", "矿区争夺", "月卡领取", "其它活动",
+                                       "每日任务", "周任务", "公会领奖", "公会建筑"
                                });
 
     tasks["开卡国战"] = loopCountryWar;
@@ -106,13 +108,13 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
+    if (hook) UnhookWindowsHookEx(hook);
+
     if (state.currentThread) {
         state.stopFlag.store(true);
         state.currentThread->quit();
         state.currentThread->wait();
     }
-
-    if (hook) UnhookWindowsHookEx(hook);
 
     QWidget::closeEvent(event);
 }
@@ -319,7 +321,7 @@ void MainWindow::selectCommand() {
     auto *viewBtn = new ButtonWithSetting("查看截屏", false);
     auto *clickerBtn = new ButtonWithSetting("连点器", false);
     auto *activityBtn = new ButtonWithSetting("活动预告", false);
-    auto *folderBtn = new ButtonWithSetting("程序文件夹", false);
+    auto *folderBtn = new ButtonWithSetting("安装位置", false);
 
     viewBtn->getTextButton()->setAutoDefault(false);
     clickerBtn->getTextButton()->setAutoDefault(false);
@@ -364,7 +366,7 @@ void MainWindow::selectCommand() {
 
         if (!QDesktopServices::openUrl(QUrl::fromLocalFile(dirPath))) {
             log("无法打开程序所在目录：" + dirPath + ", 请手动打开");
-        }else{
+        } else {
             log("已打开程序所在目录：" + dirPath);
         }
         selectDialog.accept();

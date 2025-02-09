@@ -393,6 +393,30 @@
         ],
         "tips": ""
     },
+    "其它活动": {
+        "checkbox": [
+            {
+                "order": 0,
+                "text": "七天乐",
+                "value": true
+            },
+            {
+                "order": 1,
+                "text": "捕猎火鸡",
+                "value": true
+            },
+            {
+                "order": 2,
+                "text": "探索藏宝库",
+                "value": true
+            }
+        ],
+        "input": [
+        ],
+        "select": [
+        ],
+        "tips": ""
+    },
     "预设1": {
         "checkbox": [
             {
@@ -482,21 +506,26 @@
             },
             {
                 "order": 17,
-                "text": "每日任务",
+                "text": "其它活动",
                 "value": true
             },
             {
                 "order": 18,
-                "text": "周任务",
+                "text": "每日任务",
                 "value": true
             },
             {
                 "order": 19,
-                "text": "公会领奖",
+                "text": "周任务",
                 "value": true
             },
             {
                 "order": 20,
+                "text": "公会领奖",
+                "value": true
+            },
+            {
+                "order": 21,
                 "text": "公会建筑",
                 "value": true
             }
@@ -596,21 +625,26 @@
             },
             {
                 "order": 17,
-                "text": "每日任务",
+                "text": "其它活动",
                 "value": false
             },
             {
                 "order": 18,
-                "text": "周任务",
+                "text": "每日任务",
                 "value": false
             },
             {
                 "order": 19,
-                "text": "公会领奖",
+                "text": "周任务",
                 "value": false
             },
             {
                 "order": 20,
+                "text": "公会领奖",
+                "value": false
+            },
+            {
+                "order": 21,
                 "text": "公会建筑",
                 "value": false
             }
@@ -710,21 +744,26 @@
             },
             {
                 "order": 17,
-                "text": "每日任务",
+                "text": "其它活动",
                 "value": true
             },
             {
                 "order": 18,
-                "text": "周任务",
+                "text": "每日任务",
                 "value": true
             },
             {
                 "order": 19,
-                "text": "公会领奖",
+                "text": "周任务",
                 "value": true
             },
             {
                 "order": 20,
+                "text": "公会领奖",
+                "value": true
+            },
+            {
+                "order": 21,
                 "text": "公会建筑",
                 "value": true
             }
@@ -824,21 +863,26 @@
             },
             {
                 "order": 17,
-                "text": "每日任务",
+                "text": "其它活动",
                 "value": false
             },
             {
                 "order": 18,
-                "text": "周任务",
+                "text": "每日任务",
                 "value": false
             },
             {
                 "order": 19,
-                "text": "公会领奖",
+                "text": "周任务",
                 "value": false
             },
             {
                 "order": 20,
+                "text": "公会领奖",
+                "value": false
+            },
+            {
+                "order": 21,
                 "text": "公会建筑",
                 "value": false
             }
