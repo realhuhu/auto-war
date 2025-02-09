@@ -19,6 +19,7 @@
 #include <QJsonObject>
 #include <QApplication>
 #include <QJsonDocument>
+#include <QDesktopServices>
 
 #include "util/state.h"
 #include "util/emitter.h"
@@ -29,6 +30,7 @@
 #include "widget/buttonWithSetting.h"
 #include "function/imageDialog.h"
 #include "function/clickerDialog.h"
+#include "function/activityDialog.h"
 
 class MainWindow : public QWidget {
 Q_OBJECT

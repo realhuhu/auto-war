@@ -11,53 +11,55 @@ set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
 
 
 find_package(OpenCV REQUIRED)
-find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets REQUIRED)
+find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets Network REQUIRED)
 
 qt5_add_resources(qrc_FILES resources.qrc)
 
 add_executable(qt
         WIN32
-        flow/cv.h
-        flow/until.h
-        flow/runner.h
-        flow/segment.h
-        flow/cv.cpp
-        flow/until.cpp
-        flow/runner.cpp
-        flow/segment.cpp
-        task/battle.h
-        task/battle.cpp
+        ${qrc_FILES}
+        ico.o
         util/state.h
         util/state.cpp
-        main.h
-        main.cpp
+        util/sleep.h
+        util/sleep.cpp
+        util/action.h
+        util/action.cpp
         util/emitter.h
-        ico.o
-        task/daily.h
-        task/daily.cpp
-        task/common.h
-        task/common.cpp
-        ${qrc_FILES}
         util/enum.h
         util/enum.cpp
-        function/clickerDialog.h
-        function/clickerDialog.cpp
+        flow/cv.h
+        flow/cv.cpp
+        flow/until.h
+        flow/until.cpp
+        flow/runner.h
+        flow/runner.cpp
+        flow/segment.h
+        flow/segment.cpp
         widget/buttonWithSetting.h
         widget/buttonWithSetting.cpp
-        widget/labeledSpinBox.cpp
         widget/labeledSpinBox.h
+        widget/labeledSpinBox.cpp
         widget/labeledComboBox.h
         widget/labeledComboBox.cpp
+        task/common.h
+        task/common.cpp
+        task/battle.h
+        task/battle.cpp
+        task/daily.h
+        task/daily.cpp
+        function/clickerDialog.h
+        function/clickerDialog.cpp
         function/imageDialog.cpp
         function/imageDialog.h
-        util/sleep.cpp
-        util/sleep.h
-        util/action.cpp
-        util/action.h
+        function/activityDialog.h
+        function/activityDialog.cpp
+        main.h
+        main.cpp
 )
 
 target_link_libraries(qt ${OpenCV_LIBS})
-target_link_libraries(qt Qt5::Core Qt5::Gui Qt5::Widgets)
+target_link_libraries(qt Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network)
 set_target_properties(qt PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/dist")
 
 if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
