@@ -159,8 +159,11 @@ std::unique_ptr<ImageClicker> ImageClicker::_execute(
         float finishWait,
         const std::vector<std::unique_ptr<Until>> &startUntilList,
         const std::vector<std::unique_ptr<Until>> &clickUntilList,
-        const std::vector<std::unique_ptr<Until>> &runUntilList
+        const std::vector<std::unique_ptr<Until>> &runUntilList,
+        bool homing
 ) {
+    if (homing) Mouse::moveTo(state.hwnd, 0, 0);
+
     emit Emitter::instance()->log(QString::fromStdString(this->toString() + "开始" + name + "流程"), "green");
 
     _start(startWait, startUntilList);
@@ -172,6 +175,8 @@ std::unique_ptr<ImageClicker> ImageClicker::_execute(
     auto clicker = _createChain(clickUntilList, runUntilList);
 
     emit Emitter::instance()->log(QString::fromStdString(this->toString() + "结束" + name + "流程"), "green");
+
+    if (homing) Mouse::moveTo(state.hwnd, 0, 0);
 
     return clicker;
 }
@@ -186,7 +191,8 @@ std::unique_ptr<ImageClicker> ImageClicker::click(
         int offsetX,
         int offsetY,
         Click position,
-        float interval
+        float interval,
+        bool homing
 ) {
     auto executor = [this, &selector, &clickUntilList, &offsetX, &offsetY, &position, &interval]() -> bool {
         if (targetSegmentList.empty()) throw std::runtime_error("未匹配到图像: " + this->templatePath);
@@ -214,7 +220,8 @@ std::unique_ptr<ImageClicker> ImageClicker::click(
             finishWait,
             startUntilList,
             clickUntilList,
-            runUntilList
+            runUntilList,
+            homing
     );
 }
 
@@ -228,7 +235,8 @@ std::unique_ptr<ImageClicker> ImageClicker::clickIfFound(
         int offsetX,
         int offsetY,
         Click position,
-        float interval
+        float interval,
+        bool homing
 ) {
     auto executor = [this, &selector, &clickUntilList, &offsetX, &offsetY, &position, &interval]() -> bool {
         if (targetSegmentList.empty()) {
@@ -264,7 +272,8 @@ std::unique_ptr<ImageClicker> ImageClicker::clickIfFound(
             finishWait,
             startUntilList,
             clickUntilList,
-            runUntilList
+            runUntilList,
+            homing
     );
 }
 
@@ -276,7 +285,8 @@ std::unique_ptr<ImageClicker> ImageClicker::drag(
         float startWait,
         float finishWait,
         bool reverse,
-        int step
+        int step,
+        bool homing
 ) {
     auto executor = [this, &selector, &clickUntilList, &reverse, &step]() -> bool {
         if (targetSegmentList.empty()) throw std::runtime_error("未匹配到图像: " + this->templatePath);
@@ -340,7 +350,8 @@ std::unique_ptr<ImageClicker> ImageClicker::drag(
             finishWait,
             startUntilList,
             clickUntilList,
-            {}
+            {},
+            homing
     );
 }
 
@@ -349,7 +360,8 @@ std::unique_ptr<ImageClicker> ImageClicker::locate(
         const std::vector<std::unique_ptr<Until>> &runUntilList,
         const Selector &selector,
         float startWait,
-        float finishWait
+        float finishWait,
+        bool homing
 ) {
     auto executor = [this, &selector]() -> bool {
         if (targetSegmentList.empty()) throw std::runtime_error("未匹配到图像: " + this->templatePath);
@@ -370,7 +382,8 @@ std::unique_ptr<ImageClicker> ImageClicker::locate(
             finishWait,
             startUntilList,
             {},
-            runUntilList
+            runUntilList,
+            homing
     );
 }
 

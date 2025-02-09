@@ -25,7 +25,7 @@
             {
                 "order": 0,
                 "text": "最高打等级",
-                "value": 35
+                "value": 55
             }
         ],
         "select": [
@@ -52,6 +52,30 @@
             {
                 "order": 3,
                 "text": "领取公会战役宝箱",
+                "value": true
+            }
+        ],
+        "input": [
+        ],
+        "select": [
+        ],
+        "tips": ""
+    },
+    "其它活动": {
+        "checkbox": [
+            {
+                "order": 0,
+                "text": "七天乐",
+                "value": true
+            },
+            {
+                "order": 1,
+                "text": "捕猎火鸡",
+                "value": true
+            },
+            {
+                "order": 2,
+                "text": "探索藏宝库",
                 "value": true
             }
         ],
@@ -393,30 +417,6 @@
         ],
         "tips": ""
     },
-    "其它活动": {
-        "checkbox": [
-            {
-                "order": 0,
-                "text": "七天乐",
-                "value": true
-            },
-            {
-                "order": 1,
-                "text": "捕猎火鸡",
-                "value": true
-            },
-            {
-                "order": 2,
-                "text": "探索藏宝库",
-                "value": true
-            }
-        ],
-        "input": [
-        ],
-        "select": [
-        ],
-        "tips": ""
-    },
     "预设1": {
         "checkbox": [
             {
@@ -442,7 +442,7 @@
             {
                 "order": 4,
                 "text": "公会战役",
-                "value": true
+                "value": false
             },
             {
                 "order": 5,
@@ -561,7 +561,7 @@
             {
                 "order": 4,
                 "text": "公会战役",
-                "value": true
+                "value": false
             },
             {
                 "order": 5,

@@ -78,7 +78,9 @@ public:
             float finishWait,
             const std::vector<std::unique_ptr<Until>> &startUntilList,
             const std::vector<std::unique_ptr<Until>> &clickUntilList,
-            const std::vector<std::unique_ptr<Until>> &runUntilList
+            const std::vector<std::unique_ptr<Until>> &runUntilList,
+            bool homing
+
     );
 
     std::unique_ptr<ImageClicker> click(
@@ -91,7 +93,8 @@ public:
             int offsetX = 0,
             int offsetY = 0,
             Click position = Click::CENTER,
-            float interval = 1
+            float interval = 1,
+            bool homing = true
     );
 
     std::unique_ptr<ImageClicker> clickIfFound(
@@ -104,7 +107,8 @@ public:
             int offsetX = 0,
             int offsetY = 0,
             Click position = Click::CENTER,
-            float interval = 1
+            float interval = 1,
+            bool homing = true
     );
 
 
@@ -115,7 +119,8 @@ public:
             float startWait = 0,
             float finishWait = 0,
             bool reverse = false,
-            int step = 10
+            int step = 10,
+            bool homing = true
     );
 
     std::unique_ptr<ImageClicker> locate(
@@ -123,7 +128,8 @@ public:
             const std::vector<std::unique_ptr<Until>> &runUntilList = {},
             const Selector &selector = similaritySelector,
             float startWait = 0,
-            float finishWait = 0
+            float finishWait = 0,
+            bool homing = true
     );
 
 

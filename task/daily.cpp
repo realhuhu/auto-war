@@ -833,8 +833,26 @@ void otherActivity() {
                 clicker = clicker->click(startUntil, clickUntil, runUntil);
 
                 clearUntil(startUntil, clickUntil, runUntil);
-                runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/捕猎一次.png"));
+                runUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
+                        "/其它活动/捕猎一次.png", "/其它活动/好友未上线.png"
+                }));
                 clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+                if (clicker->templatePath == "/其它活动/好友未上线.png") {
+                    clicker = std::make_unique<ImageClicker>("/其它活动/关闭窗口.png");
+
+                    clearUntil(startUntil, clickUntil, runUntil);
+                    runUntil.emplace_back(
+                            std::make_unique<UntilImage>("/其它活动/关闭窗口.png", Previous::INNER, true));
+                    runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/返回基地.png"));
+                    clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+                    clearUntil(startUntil, clickUntil, runUntil);
+                    runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/捕猎火鸡.png"));
+                    clicker->click(startUntil, clickUntil, runUntil);
+
+                    continue;
+                }
 
                 clearUntil(startUntil, clickUntil, runUntil);
                 clickUntil.emplace_back(std::make_unique<UntilAnyImage>(list{

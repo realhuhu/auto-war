@@ -111,9 +111,10 @@ std::vector<Segment> CV::findPositions(
     if (!ps.empty()) return ps;
 
     auto tryPath = QString::fromStdString(templatePath).replace(".png", "1.png");
-    auto customPath = QString::fromStdString(templatePath).replace("/", "-");
+    auto customPath = QString::fromStdString(templatePath).mid(1).replace("/", "-");
     QFile tryImgFile(QCoreApplication::applicationDirPath() + "/res" + tryPath);
-    QFile customImgFile(QCoreApplication::applicationDirPath() + "/自定义图片" + customPath);
+    QFile customImgFile(QCoreApplication::applicationDirPath() + "/自定义图片/" + customPath);
+
     if (!tryImgFile.open(QIODevice::ReadOnly) && !customImgFile.open(QIODevice::ReadOnly)) return ps;
 
     if (tryImgFile.isOpen()) {

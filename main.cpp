@@ -419,9 +419,7 @@ void MainWindow::runCommand(const QString &command) {
     auto func = tasks[command];
     connect(state.currentThread, &QThread::started, [func, this]() {
         try {
-            Mouse::moveTo(state.hwnd, 0, 0);
             func();
-            Mouse::moveTo(state.hwnd, 0, 0);
             emit logMessage("运行完成", "red");
         } catch (const std::exception &e) {
             if (!state.stopFlag.load()) {
@@ -478,9 +476,7 @@ void MainWindow::batchRunCommand(const QString &command) {
 
                     try {
                         emit logMessage("开始运行: " + subCommand, "blue");
-                        Mouse::moveTo(state.hwnd, 0, 0);
                         tasks[subCommand]();
-                        Mouse::moveTo(state.hwnd, 0, 0);
                         emit logMessage("运行完成: " + subCommand, "blue");
                     } catch (const std::exception &e) {
                         if (!state.stopFlag.load()) {
@@ -795,7 +791,6 @@ LRESULT CALLBACK MainWindow::MouseHookProc(int nCode, WPARAM wParam, LPARAM lPar
 int main(int argc, char *argv[]) {
     state.scale = getScale();
 
-    qRegisterMetaType<QTextCursor>("QTextCursor");
     QApplication app(argc, argv);
     MainWindow window;
     window.show();
