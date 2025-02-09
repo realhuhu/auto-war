@@ -275,7 +275,7 @@ void armsCompound() {
         clicker = clicker->clickIfFound(startUntil, clickUntil, runUntil);
 
         clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilImage>("/军备合成/选择品质.png"));
+        clickUntil.emplace_back(std::make_unique<UntilImage>("/军备合成/选择品质.png"));
         clicker = clicker->clickIfFound(startUntil, clickUntil, runUntil);
 
         clearUntil(startUntil, clickUntil, runUntil);
@@ -663,12 +663,10 @@ void guildWar() {
 
         clearUntil(startUntil, clickUntil, runUntil);
         runUntil.emplace_back(std::make_unique<UntilImage>("/公会战役/查看成员排名.png"));
-        runUntil.emplace_back(std::make_unique<UntilIfImage>("/公会战役/进入战场.png"));
+        runUntil.emplace_back(
+                std::make_unique<UntilIfImage>("/公会战役/进入战场.png", Previous::NONE, false, Mode::RGB,0,0.98));
         clicker = clicker->click(startUntil, clickUntil, runUntil);
 
-        clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilImage>("/公会战役/一键领奖.png"));
-        clicker = clicker->click(startUntil, clickUntil, runUntil);
 
         if (!clicker->founded()) {
             clicker = std::make_unique<ImageClicker>("/公会战役/关闭公会争霸窗口.png");
@@ -679,6 +677,10 @@ void guildWar() {
             clicker->click(startUntil, clickUntil, runUntil);
             return;
         }
+
+        clearUntil(startUntil, clickUntil, runUntil);
+        runUntil.emplace_back(std::make_unique<UntilImage>("/公会战役/一键领奖.png"));
+        clicker = clicker->click(startUntil, clickUntil, runUntil);
     }
 
     clearUntil(startUntil, clickUntil, runUntil);
