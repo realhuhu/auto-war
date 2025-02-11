@@ -77,6 +77,11 @@
                 "order": 2,
                 "text": "探索藏宝库",
                 "value": true
+            },
+            {
+                "order": 3,
+                "text": "在线领好礼",
+                "value": true
             }
         ],
         "input": [
@@ -397,6 +402,20 @@
             }
         ],
         "tips": "技能训练随机选择技能升级"
+    },
+    "矿区争夺": {
+        "checkbox": [
+            {
+                "order": 0,
+                "text": "只刷新不打",
+                "value": true
+            }
+        ],
+        "input": [
+        ],
+        "select": [
+        ],
+        "tips": ""
     },
     "英雄中心": {
         "checkbox": [

@@ -626,6 +626,8 @@ void signIn() {
 }
 
 void oreField() {
+    auto config = parseBoolConfig("矿区争夺", "checkbox", state.config);
+
     std::unique_ptr<ImageClicker> clicker;
 
     std::vector<std::unique_ptr<Until>> startUntil;
@@ -673,6 +675,17 @@ void oreField() {
                 "/矿区争夺/确定.png", "/矿区争夺/占领.png", "/矿区争夺/抢占.png"
         }));
         clicker = clicker->click(startUntil, clickUntil, runUntil, positionSelector("xCenter", "max"), 0, 1, 0, -26);
+
+        if (config["只刷新不打"]) {
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/矿区争夺/关闭窗口.png"));
+            clicker = clicker->locate(startUntil, runUntil);
+
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/矿区争夺/关闭窗口.png", Previous::INNER, true));
+            clicker->click(startUntil, clickUntil, runUntil);
+            return;
+        }
 
         if (clicker->templatePath == "/矿区争夺/确定.png") {
             clearUntil(startUntil, clickUntil, runUntil);
@@ -899,6 +912,39 @@ void otherActivity() {
             runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png", Previous::INNER, true));
             runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png"));
             clicker = clicker->click(startUntil, clickUntil, runUntil, positionSelector("xCenter", "min"));
+
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png", Previous::INNER, true));
+            clicker->click(startUntil, clickUntil, runUntil);
+        }
+    }
+
+    if (config["在线领好礼"]) {
+        clicker = std::make_unique<ImageClicker>("/其它活动/在线领好礼.png");
+
+        if (clicker->founded()) {
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/在线领好礼标题.png",
+                                                               Previous::NONE, false, Mode::RGB, 0, 0.98));
+            runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/免费领取.png"));
+            clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+            auto targetList = clicker->targetSegmentList;
+
+            for (const auto &i: targetList) {
+                clicker = std::make_unique<ImageClicker>("/其它活动/免费领取.png", i);
+                runUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
+                        "/其它活动/领取成功.png", "/其它活动/时间已到.png"
+                }));
+                runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png"));
+                clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+                clearUntil(startUntil, clickUntil, runUntil);
+                runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png", Previous::INNER, true));
+                clicker->click(startUntil, clickUntil, runUntil, positionSelector("xCenter", "min"));
+            }
+
+            clicker = std::make_unique<ImageClicker>("/其它活动/关闭窗口.png");
 
             clearUntil(startUntil, clickUntil, runUntil);
             runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png", Previous::INNER, true));
