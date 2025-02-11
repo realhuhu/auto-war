@@ -1,4 +1,4 @@
-#ifndef QT_DAILY_H
+﻿#ifndef QT_DAILY_H
 #define QT_DAILY_H
 
 #include "common.h"

@@ -1,4 +1,4 @@
-#include "enum.h"
+﻿#include "enum.h"
 
 std::string PreviousToString(Previous previous) {
     switch (previous) {

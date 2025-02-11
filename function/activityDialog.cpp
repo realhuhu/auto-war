@@ -1,4 +1,4 @@
-# include "activityDialog.h"
+﻿# include "activityDialog.h"
 
 ActivityResultDialog::ActivityResultDialog(QWidget *parent) : QDialog(parent) {
     this->setWindowTitle("活动预告");

@@ -1,4 +1,4 @@
-#include "until.h"
+﻿#include "until.h"
 
 Until::Until(
         float threshold,

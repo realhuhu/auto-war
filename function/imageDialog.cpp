@@ -1,4 +1,4 @@
-#include "imageDialog.h"
+﻿#include "imageDialog.h"
 
 ImageDialog::ImageDialog(QWidget *parent) : QDialog(parent), imageLabel(new QLabel(this)) {
     this->setWindowTitle("查看截屏");

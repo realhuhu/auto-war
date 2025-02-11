@@ -1,4 +1,4 @@
-#ifndef QT_UNTIL_H
+﻿#ifndef QT_UNTIL_H
 #define QT_UNTIL_H
 
 #include <vector>

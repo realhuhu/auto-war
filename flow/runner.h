@@ -1,4 +1,4 @@
-#ifndef QT_RUNNER_H
+﻿#ifndef QT_RUNNER_H
 #define QT_RUNNER_H
 
 #include <QString>

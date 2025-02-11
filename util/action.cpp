@@ -1,4 +1,4 @@
-# include "action.h"
+﻿# include "action.h"
 
 void Mouse::moveTo(HWND hwnd, int x, int y) {
     LPARAM lparam = (y << 16) | x;

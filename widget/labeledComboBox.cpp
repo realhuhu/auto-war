@@ -1,4 +1,4 @@
-#include "LabeledComboBox.h"
+﻿#include "LabeledComboBox.h"
 
 LabeledComboBox::LabeledComboBox(
         const QString &text,

@@ -1,4 +1,4 @@
-#ifndef QT_SEGMENT_H
+﻿#ifndef QT_SEGMENT_H
 #define QT_SEGMENT_H
 
 #include <random>

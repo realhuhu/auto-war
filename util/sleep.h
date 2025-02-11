@@ -1,4 +1,4 @@
-#ifndef QT_SLEEP_H
+﻿#ifndef QT_SLEEP_H
 #define QT_SLEEP_H
 
 #include <chrono>

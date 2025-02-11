@@ -1,17 +1,18 @@
 cmake_minimum_required(VERSION 3.27)
 project(qt)
+add_definitions(-DUNICODE -D_UNICODE)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-set(OpenCV_DIR "D:/opencv/dist/install")
-set(CMAKE_PREFIX_PATH "C:/Qt/Qt5.14.2/5.14.2/mingw73_64")
-set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
+set(CMAKE_PREFIX_PATH "D:/Qt/5.15.2/msvc2019_64")
 
-
-find_package(OpenCV REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets Network REQUIRED)
+
+set(OpenCV_DIR "D:/opencv/dist_vc/install")
+include(D:/opencv/dist_vc/install/OpenCVConfig.cmake)
+find_package(OpenCV REQUIRED)
 
 qt5_add_resources(qrc_FILES resources.qrc)
 
@@ -60,7 +61,8 @@ add_executable(qt
 
 target_link_libraries(qt ${OpenCV_LIBS})
 target_link_libraries(qt Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network)
-set_target_properties(qt PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/dist")
+set_target_properties(qt PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}")
+
 
 if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(DEBUG_SUFFIX)

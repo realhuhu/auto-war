@@ -1,4 +1,4 @@
-#include "clickerDialog.h"
+﻿#include "clickerDialog.h"
 
 ClickThread::ClickThread(
         const std::vector<POINT> &points,

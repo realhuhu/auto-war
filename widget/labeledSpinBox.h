@@ -1,4 +1,4 @@
-#ifndef QT_LABELEDSPINBOX_H
+﻿#ifndef QT_LABELEDSPINBOX_H
 #define QT_LABELEDSPINBOX_H
 
 #include <QLabel>

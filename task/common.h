@@ -1,4 +1,4 @@
-#ifndef QT_COMMON_H
+﻿#ifndef QT_COMMON_H
 #define QT_COMMON_H
 
 #include <map>

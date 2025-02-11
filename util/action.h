@@ -1,4 +1,4 @@
-#ifndef QT_ACTION_H
+﻿#ifndef QT_ACTION_H
 #define QT_ACTION_H
 
 #include <windows.h>

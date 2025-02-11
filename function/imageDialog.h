@@ -1,4 +1,4 @@
-#ifndef QT_IMAGEDIALOG_H
+﻿#ifndef QT_IMAGEDIALOG_H
 #define QT_IMAGEDIALOG_H
 
 #include <QLabel>

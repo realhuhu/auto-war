@@ -1,4 +1,4 @@
-#include "LabeledSpinBox.h"
+﻿#include "LabeledSpinBox.h"
 
 LabeledSpinBox::LabeledSpinBox(
         const QString &text,

@@ -1,4 +1,4 @@
-#include "runner.h"
+﻿#include "runner.h"
 
 ImageClicker::ImageClicker(
         const std::string &imgPath,

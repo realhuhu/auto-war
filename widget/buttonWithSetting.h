@@ -1,4 +1,4 @@
-#ifndef QT_BUTTONWITHSETTING_H
+﻿#ifndef QT_BUTTONWITHSETTING_H
 #define QT_BUTTONWITHSETTING_H
 
 #include <QString>

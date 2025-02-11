@@ -1,4 +1,4 @@
-#ifndef QT_CLICKERDIALOG_H
+﻿#ifndef QT_CLICKERDIALOG_H
 #define QT_CLICKERDIALOG_H
 
 #include <vector>

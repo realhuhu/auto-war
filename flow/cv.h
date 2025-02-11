@@ -1,4 +1,4 @@
-#ifndef QT_CV_H
+﻿#ifndef QT_CV_H
 #define QT_CV_H
 
 #include <windows.h>

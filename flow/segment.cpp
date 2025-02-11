@@ -1,4 +1,4 @@
-#include "segment.h"
+﻿#include "segment.h"
 
 Segment::Segment(
         std::string p,
@@ -192,7 +192,7 @@ Selector orderedRandomSelector(
 
         std::vector<Segment> new_vector(
                 sortedSegments.begin(),
-                sortedSegments.begin() + std::min(top, sortedSegments.size())
+                sortedSegments.begin() + (std::min)(top, sortedSegments.size())
         );
 
         return choice(new_vector);

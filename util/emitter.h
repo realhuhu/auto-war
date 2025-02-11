@@ -1,4 +1,4 @@
-#ifndef QT_EMITTER_H
+﻿#ifndef QT_EMITTER_H
 #define QT_EMITTER_H
 
 #include <QObject>

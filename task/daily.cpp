@@ -1,4 +1,4 @@
-#include "daily.h"
+﻿#include "daily.h"
 
 void heroCenter() {
     auto config = parseBoolConfig("英雄中心", "checkbox", state.config);
@@ -1222,7 +1222,7 @@ void guildBuilding() {
 
     auto it = iterator.begin();
 
-    while (it != iterator.end() and !state.stopFlag.load()) {
+    while (it != iterator.end() && !state.stopFlag.load()) {
         it->click();
 
         clicker = std::make_unique<ImageClicker>("/公会建筑/领取奖励.png", 0, 0.9, 60, Mode::RGB);

@@ -1,4 +1,4 @@
-#ifndef QT_ENUM_H
+﻿#ifndef QT_ENUM_H
 #define QT_ENUM_H
 
 #include <iostream>

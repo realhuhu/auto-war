@@ -1,4 +1,4 @@
-#ifndef QT_ACTIVITYDIALOG_H
+﻿#ifndef QT_ACTIVITYDIALOG_H
 #define QT_ACTIVITYDIALOG_H
 
 #include <QTimer>

@@ -1,4 +1,4 @@
-#ifndef QT_BATTLE_H
+﻿#ifndef QT_BATTLE_H
 #define QT_BATTLE_H
 
 #include "common.h"

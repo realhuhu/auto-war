@@ -1,4 +1,4 @@
-#include "buttonWithSetting.h"
+﻿#include "buttonWithSetting.h"
 
 ButtonWithSetting::ButtonWithSetting(
         const QString &text,

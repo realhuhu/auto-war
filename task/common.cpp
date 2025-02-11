@@ -1,4 +1,4 @@
-#include "common.h"
+﻿#include "common.h"
 
 std::map<std::string, bool> parseBoolConfig(
         const QString &category,

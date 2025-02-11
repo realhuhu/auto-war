@@ -1,4 +1,4 @@
-#ifndef QT_STATE_H
+﻿#ifndef QT_STATE_H
 #define QT_STATE_H
 
 #include <atomic>

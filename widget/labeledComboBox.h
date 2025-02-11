@@ -1,4 +1,4 @@
-#ifndef QT_LABELEDCOMBOBOX_H
+﻿#ifndef QT_LABELEDCOMBOBOX_H
 #define QT_LABELEDCOMBOBOX_H
 
 #include <QLabel>

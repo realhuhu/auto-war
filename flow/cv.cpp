@@ -1,4 +1,4 @@
-#include "cv.h"
+﻿#include "cv.h"
 
 cv::Mat CV::getScreen(Mode mode) {
     RECT rect;
