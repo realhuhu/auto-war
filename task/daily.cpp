@@ -281,7 +281,7 @@ void countryChest() {
 
     if (config["领取战功奖励"]) {
         while (!state.stopFlag.load()) {
-            clicker = std::make_unique<ImageClicker>("/国家宝箱/战功进度宝箱.png", 0.5, 0.9, 60, Mode::RGB);
+            clicker = std::make_unique<ImageClicker>("/国家宝箱/战功进度宝箱.png", 0.5, 0.95, 60, Mode::RGB);
 
             if (!clicker->founded())break;
 
@@ -924,9 +924,9 @@ void otherActivity() {
 
         if (clicker->founded()) {
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/在线领好礼标题.png",
-                                                               Previous::NONE, false, Mode::RGB, 0, 0.98));
-            runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/免费领取.png"));
+            runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/在线领好礼标题.png"));
+            runUntil.emplace_back(
+                    std::make_unique<UntilImage>("/其它活动/免费领取.png", Previous::NONE, false, Mode::RGB, 0, 0.95));
             clicker = clicker->click(startUntil, clickUntil, runUntil);
 
             auto targetList = clicker->targetSegmentList;
@@ -934,7 +934,7 @@ void otherActivity() {
             for (const auto &i: targetList) {
                 clicker = std::make_unique<ImageClicker>("/其它活动/免费领取.png", i);
                 runUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
-                        "/其它活动/领取成功.png", "/其它活动/时间已到.png"
+                        "/其它活动/领取成功.png", "/其它活动/时间已到.png", "/其它活动/时间未到.png"
                 }));
                 runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png"));
                 clicker = clicker->click(startUntil, clickUntil, runUntil);
@@ -967,7 +967,7 @@ void dailyTask() {
     clicker->click(startUntil, clickUntil, runUntil);
 
     for (const auto &i: std::vector<std::string>{"1", "3", "5", "8", "10"}) {
-        clicker = std::make_unique<ImageClicker>("/每日任务/" + i + "0活跃度.png", 0, 0.9, 60, Mode::RGB);
+        clicker = std::make_unique<ImageClicker>("/每日任务/" + i + "0活跃度.png", 0, 0.95, 60, Mode::RGB);
 
         if (!clicker->founded())continue;
 
@@ -1015,7 +1015,7 @@ void weeklyTask() {
     clicker->click(startUntil, clickUntil, runUntil);
 
     while (!state.stopFlag.load()) {
-        clicker = std::make_unique<ImageClicker>("/周任务/领取.png", 0, 0.9, 60, Mode::RGB);
+        clicker = std::make_unique<ImageClicker>("/周任务/领取.png", 0, 0.95, 60, Mode::RGB);
 
         if (!clicker->founded()) break;
 
@@ -1225,7 +1225,7 @@ void guildBuilding() {
     while (it != iterator.end() && !state.stopFlag.load()) {
         it->click();
 
-        clicker = std::make_unique<ImageClicker>("/公会建筑/领取奖励.png", 0, 0.9, 60, Mode::RGB);
+        clicker = std::make_unique<ImageClicker>("/公会建筑/领取奖励.png", 0, 0.95, 60, Mode::RGB);
 
         clearUntil(startUntil, clickUntil, runUntil);
         runUntil.emplace_back(std::make_unique<UntilImage>("/公会建筑/确定领取.png"));

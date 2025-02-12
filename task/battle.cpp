@@ -30,7 +30,7 @@ void countryArena() {
         return;
     }
 
-    clicker = std::make_unique<ImageClicker>("/国家争霸/领取积分.png", 0, 0.9, 60, Mode::RGB);
+    clicker = std::make_unique<ImageClicker>("/国家争霸/领取积分.png", 0, 0.95, 60, Mode::RGB);
 
     clearUntil(startUntil, clickUntil, runUntil);
     runUntil.emplace_back(std::make_unique<UntilImage>("/国家争霸/领取积分.png", Previous::INNER, true, Mode::RGB));
@@ -429,7 +429,7 @@ void countryWar() {
             clickUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/连续登录.png"));
             clicker->click(startUntil, clickUntil, runUntil);
 
-            clicker = std::make_unique<ImageClicker>("/国家战争/领取连续登录奖励.png", 2, 0.9, 60, Mode::RGB);
+            clicker = std::make_unique<ImageClicker>("/国家战争/领取连续登录奖励.png", 2, 0.95, 60, Mode::RGB);
 
             if (clicker->founded()) {
                 clearUntil(startUntil, clickUntil, runUntil);
