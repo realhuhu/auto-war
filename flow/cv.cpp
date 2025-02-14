@@ -115,7 +115,8 @@ std::vector<Segment> CV::findPositions(
     QFile tryImgFile(QCoreApplication::applicationDirPath() + "/res" + tryPath);
     QFile customImgFile(QCoreApplication::applicationDirPath() + "/自定义图片/" + customPath);
 
-    if (!tryImgFile.open(QIODevice::ReadOnly) && !customImgFile.open(QIODevice::ReadOnly)) return ps;
+    tryImgFile.open(QIODevice::ReadOnly);
+    customImgFile.open(QIODevice::ReadOnly);
 
     if (tryImgFile.isOpen()) {
         ps = singleFindPositions(rawImg, &tryImgFile, threshold, mode);
