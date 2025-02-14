@@ -357,6 +357,12 @@ void MainWindow::selectCommand() {
     });
 
     connect(replaceBtn->getTextButton(), &QToolButton::clicked, [this, &selectDialog]() {
+        if (!state.hwnd) {
+            log("请先获取游戏窗口!");
+            selectDialog.accept();
+            return;
+        }
+
         auto *dialog = new ReplaceDialog(this);
         selectDialog.accept();
         this->showMinimized();

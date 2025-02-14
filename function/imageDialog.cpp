@@ -14,24 +14,12 @@ ImageDialog::ImageDialog(QWidget *parent) : QDialog(parent), imageLabel(new QLab
             QImage::Format_RGB888
     );
 
-    int maxWidth = 400;
-    int maxHeight = 400;
-
     auto *layout = new QVBoxLayout(this);
-    imageLabel->setMaximumSize(maxWidth, maxHeight);
+    imageLabel->setFixedWidth(400);
+    imageLabel->setFixedHeight(300);
     layout->addWidget(imageLabel);
 
-    int originalWidth = image.width();
-    int originalHeight = image.height();
-
-    float scaleWidth = static_cast<float>(maxWidth) / static_cast<float>(originalWidth);
-    float scaleHeight = static_cast<float>(maxHeight) / static_cast<float>(originalHeight);
-
-    float scale = qMin(scaleWidth, scaleHeight);
-    int scaledWidth = static_cast<int>(static_cast<float>(originalWidth) * scale);
-    int scaledHeight = static_cast<int>(static_cast<float>(originalHeight) * scale);
-
-    QImage scaledImage = image.scaled(scaledWidth, scaledHeight, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QImage scaledImage = image.scaled(imageLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
     imageLabel->setPixmap(QPixmap::fromImage(scaledImage));
 }

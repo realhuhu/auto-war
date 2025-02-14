@@ -1,16 +1,23 @@
 ﻿#ifndef QT_REPLACEDIALOG_H
 #define QT_REPLACEDIALOG_H
 
+#include <windows.h>
+
 #include <QLabel>
 #include <QScreen>
 #include <QDialog>
+#include <QPixmap>
 #include <QPainter>
+#include <QFileDialog>
 #include <QPushButton>
 #include <QMainWindow>
 #include <QMouseEvent>
 #include <QVBoxLayout>
 #include <QApplication>
 #include <QGuiApplication>
+
+# include "../flow/cv.h"
+# include "../util/state.h"
 
 class ScreenshotArea : public QWidget {
 Q_OBJECT
@@ -19,7 +26,7 @@ public:
 
 signals:
 
-    void screenshotCaptured(const QPixmap &pixmap);
+    void screenshotCaptured(const QPoint p1, const QPoint p2);
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
@@ -48,10 +55,20 @@ private slots:
 
     void captureScreenshot() const;
 
-    void showScreenshot(const QPixmap &pixmap);
+    void showScreenshot(QPoint p1, QPoint p2);
+
+    void openFile();
+
+    void saveFile();
 
 private:
-    QLabel *label;
+    QLabel *fileLabel;
+    QLabel *tipLabel;
+    QLabel *selectedImageLabel;
+    QLabel *croppedImageLabel;
+    cv::Mat croppedImage;
+    QString selectedPath;
+
     void closeEvent(QCloseEvent *) override;
 };
 
