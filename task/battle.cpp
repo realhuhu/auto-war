@@ -707,13 +707,27 @@ void guildWar() {
             }
         }
 
+        CustomFilter filter = [](const Segment &segment) {
+            auto screen = CV::getScreen();
+            auto ps = CV::findPositions(screen, "/公会战役/据点关闭.png");
+
+            if (ps.empty()) return true;
+
+            auto p = similaritySelector(ps);
+            if (segment.on(p, "vertical") == "center" && segment.on(p, "horizontal") == "down") return false;
+
+            return true;
+        };
+
         clicker = std::make_unique<ImageClicker>("/公会战役/前往.png");
 
         clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(
-                std::make_unique<UntilImage>("/公会战役/据点.png", Previous::NONE, false, Mode::RGB, 0, 0.98));
-        runUntil.emplace_back(
-                std::make_unique<UntilImageStable>("/公会战役/据点.png", Previous::NONE, false, Mode::RGB, 0, 0.98));
+        runUntil.emplace_back(std::make_unique<UntilImage>(
+                "/公会战役/据点.png", Previous::NONE, false, Mode::RGB, 0, 0.98, 0.2, -1, filter
+        ));
+        runUntil.emplace_back(std::make_unique<UntilImageStable>(
+                "/公会战役/据点.png", Previous::NONE, false, Mode::RGB, 0, 0.98, 0.2, -1, filter
+        ));
         clicker = clicker->click(startUntil, clickUntil, runUntil);
 
         clearUntil(startUntil, clickUntil, runUntil);

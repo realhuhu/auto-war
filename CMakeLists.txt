@@ -57,6 +57,8 @@ add_executable(qt
         function/activityDialog.cpp
         main.h
         main.cpp
+        function/replaceDialog.h
+        function/replaceDialog.cpp
 )
 
 target_link_libraries(qt ${OpenCV_LIBS})

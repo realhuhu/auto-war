@@ -114,7 +114,7 @@ void ClickerDialog::closeEvent(QCloseEvent *) {
 
 void ClickerDialog::updateTextEdit(const QString &text) { textEdit->append(text); }
 
-void ClickerDialog::appendCoordinate(int x, int y) {
+[[maybe_unused]] void ClickerDialog::appendCoordinate(int x, int y) {
     RECT clientRect = {0};
     POINT topLeft = {0, 0};
 

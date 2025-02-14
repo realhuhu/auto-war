@@ -59,7 +59,7 @@ private slots:
 
     void updateTextEdit(const QString &text);
 
-    void appendCoordinate(int x, int y);
+    [[maybe_unused]] void appendCoordinate(int x, int y);
 
     void startRecord();
 

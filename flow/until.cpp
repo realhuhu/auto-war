@@ -1,5 +1,7 @@
 ﻿#include "until.h"
 
+#include <utility>
+
 Until::Until(
         float threshold,
         Previous onPrevious,
@@ -7,14 +9,16 @@ Until::Until(
         float finishWait,
         float timeout,
         bool reverse,
-        Mode mode
+        Mode mode,
+        CustomFilter condition
 ) : threshold(threshold),
     onPrevious(onPrevious),
     interval(interval),
     timeout(timeout),
     finishWait(finishWait),
     reverse(reverse),
-    mode(mode) {}
+    mode(mode),
+    customFilter(std::move(condition)) {}
 
 void Until::loop(std::unique_ptr<Segment> &previous, float globalTimeout) {
     auto start = std::chrono::high_resolution_clock::now();
@@ -45,7 +49,7 @@ bool Until::fulfilled(std::unique_ptr<Segment> &previous) {
 }
 
 std::vector<Segment> Until::filter(const std::vector<Segment> &positions, std::unique_ptr<Segment> &previous) const {
-    if (onPrevious == Previous::NONE) return positions;
+    if (onPrevious == Previous::NONE && !customFilter) return positions;
 
     if (!previous) throw std::runtime_error("Previous segment为空" + this->toString());
 
@@ -59,24 +63,28 @@ std::vector<Segment> Until::filter(const std::vector<Segment> &positions, std::u
         case Previous::LEFT:
             for (const auto &position: positions) {
                 if (!(position.on(*previous, "vertical") == "left")) continue;
+                if (customFilter && !customFilter(position)) continue;
                 result.push_back(position);
             }
             break;
         case Previous::RIGHT:
             for (const auto &position: positions) {
                 if (!(position.on(*previous, "vertical") == "right")) continue;
+                if (customFilter && !customFilter(position)) continue;
                 result.push_back(position);
             }
             break;
         case Previous::TOP:
             for (const auto &position: positions) {
                 if (!(position.on(*previous, "horizontal") == "top")) continue;
+                if (customFilter && !customFilter(position)) continue;
                 result.push_back(position);
             }
             break;
         case Previous::DOWN:
             for (const auto &position: positions) {
                 if (!(position.on(*previous, "horizontal") == "down")) continue;
+                if (customFilter && !customFilter(position)) continue;
                 result.push_back(position);
             }
             break;
@@ -84,6 +92,7 @@ std::vector<Segment> Until::filter(const std::vector<Segment> &positions, std::u
             for (const auto &position: positions) {
                 if (!(position.on(*previous, "horizontal") == "center")) continue;
                 if (!(position.on(*previous, "vertical") == "left")) continue;
+                if (customFilter && !customFilter(position)) continue;
                 result.push_back(position);
             }
             break;
@@ -91,6 +100,7 @@ std::vector<Segment> Until::filter(const std::vector<Segment> &positions, std::u
             for (const auto &position: positions) {
                 if (!(position.on(*previous, "horizontal") == "top")) continue;
                 if (!(position.on(*previous, "vertical") == "center")) continue;
+                if (customFilter && !customFilter(position)) continue;
                 result.push_back(position);
             }
             break;
@@ -98,6 +108,7 @@ std::vector<Segment> Until::filter(const std::vector<Segment> &positions, std::u
             for (const auto &position: positions) {
                 if (!(position.on(*previous, "horizontal") == "center")) continue;
                 if (!(position.on(*previous, "vertical") == "right")) continue;
+                if (customFilter && !customFilter(position)) continue;
                 result.push_back(position);
             }
             break;
@@ -105,6 +116,7 @@ std::vector<Segment> Until::filter(const std::vector<Segment> &positions, std::u
             for (const auto &position: positions) {
                 if (!(position.on(*previous, "horizontal") == "down")) continue;
                 if (!(position.on(*previous, "vertical") == "center")) continue;
+                if (customFilter && !customFilter(position)) continue;
                 result.push_back(position);
             }
             break;
@@ -112,11 +124,15 @@ std::vector<Segment> Until::filter(const std::vector<Segment> &positions, std::u
             for (const auto &position: positions) {
                 if (!(position.on(*previous, "horizontal") == "center")) continue;
                 if (!(position.on(*previous, "vertical") == "center")) continue;
+                if (customFilter && !customFilter(position)) continue;
                 result.push_back(position);
             }
             break;
         case Previous::NONE:
-            return positions;
+            for (const auto &position: positions) {
+                if (customFilter && !customFilter(position)) continue;
+                result.push_back(position);
+            }
     }
 
     emit Emitter::instance()->log(
@@ -150,8 +166,9 @@ UntilImage::UntilImage(
         float finishWait,
         float threshold,
         float interval,
-        float timeout
-) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, mode) {
+        float timeout,
+        CustomFilter condition
+) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, mode, std::move(condition)) {
     this->imgPath = imgPath;
 }
 
@@ -192,8 +209,9 @@ UntilAnyImage::UntilAnyImage(
         float finishWait,
         float threshold,
         float interval,
-        float timeout
-) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, mode) {
+        float timeout,
+        CustomFilter condition
+) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, mode, std::move(condition)) {
     for (const auto &i: imgList) {
         imgPathList.push_back(i);
     }
@@ -207,8 +225,9 @@ UntilAnyImage::UntilAnyImage(
         float finishWait,
         float threshold,
         float interval,
-        float timeout
-) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, mode) {
+        float timeout,
+        CustomFilter condition
+) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, mode, std::move(condition)) {
     for (const auto &i: imgList) {
         imgPathList.push_back(i);
     }
@@ -252,8 +271,9 @@ UntilImageStable::UntilImageStable(
         float finishWait,
         float threshold,
         float interval,
-        float timeout
-) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, mode) {
+        float timeout,
+        CustomFilter condition
+) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, mode, std::move(condition)) {
     this->imgPath = std::move(imgPath);
 }
 
@@ -310,8 +330,9 @@ UntilIfImage::UntilIfImage(
         float finishWait,
         float threshold,
         float interval,
-        float timeout
-) : UntilImage(imgPath, onPrevious, reverse, mode, finishWait, threshold, interval, timeout) {}
+        float timeout,
+        CustomFilter condition
+) : UntilImage(imgPath, onPrevious, reverse, mode, finishWait, threshold, interval, timeout, std::move(condition)) {}
 
 void UntilIfImage::loop(std::unique_ptr<Segment> &previous, float globalTimeout) {
     this->fulfilled(previous);
@@ -334,8 +355,9 @@ UntilIfAnyImage::UntilIfAnyImage(
         float finishWait,
         float threshold,
         float interval,
-        float timeout
-) : UntilAnyImage(imgList, onPrevious, reverse, mode, finishWait, threshold, interval, timeout) {}
+        float timeout,
+        CustomFilter condition
+) : UntilAnyImage(imgList, onPrevious, reverse, mode, finishWait, threshold, interval, timeout, std::move(condition)) {}
 
 UntilIfAnyImage::UntilIfAnyImage(
         const std::vector<std::string> &imgList,
@@ -345,8 +367,9 @@ UntilIfAnyImage::UntilIfAnyImage(
         float finishWait,
         float threshold,
         float interval,
-        float timeout
-) : UntilAnyImage(imgList, onPrevious, reverse, mode, finishWait, threshold, interval, timeout) {}
+        float timeout,
+        CustomFilter condition
+) : UntilAnyImage(imgList, onPrevious, reverse, mode, finishWait, threshold, interval, timeout, std::move(condition)) {}
 
 void UntilIfAnyImage::loop(std::unique_ptr<Segment> &previous, float globalTimeout) {
     this->fulfilled(previous);
@@ -372,8 +395,10 @@ UntilCustom::UntilCustom(
         float finishWait,
         float threshold,
         float interval,
-        float timeout
-) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, mode), func(std::move(func)) {
+        float timeout,
+        CustomFilter condition
+) : Until(threshold, onPrevious, interval, finishWait, timeout, reverse, mode, std::move(condition)),
+    func(std::move(func)) {
     imgPath = "";
 }
 

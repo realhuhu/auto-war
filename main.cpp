@@ -318,19 +318,22 @@ void MainWindow::selectCommand() {
     }
 
     auto *viewBtn = new ButtonWithSetting("查看截屏", false);
+    auto *folderBtn = new ButtonWithSetting("安装位置", false);
+    auto *replaceBtn = new ButtonWithSetting("替换图片", false);
     auto *clickerBtn = new ButtonWithSetting("连点器", false);
     auto *activityBtn = new ButtonWithSetting("活动预告", false);
-    auto *folderBtn = new ButtonWithSetting("安装位置", false);
 
     viewBtn->getTextButton()->setAutoDefault(false);
+    folderBtn->getTextButton()->setAutoDefault(false);
+    replaceBtn->getTextButton()->setAutoDefault(false);
     clickerBtn->getTextButton()->setAutoDefault(false);
     activityBtn->getTextButton()->setAutoDefault(false);
-    folderBtn->getTextButton()->setAutoDefault(false);
 
     viewBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    folderBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    replaceBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     clickerBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     activityBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    folderBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
     connect(viewBtn->getTextButton(), &QToolButton::clicked, [this, &selectDialog]() {
         if (!state.hwnd) {
@@ -340,6 +343,24 @@ void MainWindow::selectCommand() {
         }
         auto *dialog = new ImageDialog(this);
         dialog->exec();
+    });
+
+    connect(folderBtn->getTextButton(), &QToolButton::clicked, [this, &selectDialog]() {
+        QString dirPath = QCoreApplication::applicationDirPath();
+
+        if (!QDesktopServices::openUrl(QUrl::fromLocalFile(dirPath))) {
+            log("无法打开程序所在目录：" + dirPath + ", 请手动打开");
+        } else {
+            log("已打开程序所在目录：" + dirPath);
+        }
+        selectDialog.accept();
+    });
+
+    connect(replaceBtn->getTextButton(), &QToolButton::clicked, [this, &selectDialog]() {
+        auto *dialog = new ReplaceDialog(this);
+        selectDialog.accept();
+        this->showMinimized();
+        dialog->show();
     });
 
     connect(clickerBtn->getTextButton(), &QToolButton::clicked, [this, &selectDialog]() {
@@ -360,22 +381,12 @@ void MainWindow::selectCommand() {
         dialog->exec();
     });
 
-    connect(folderBtn->getTextButton(), &QToolButton::clicked, [this, &selectDialog]() {
-        QString dirPath = QCoreApplication::applicationDirPath();
-
-        if (!QDesktopServices::openUrl(QUrl::fromLocalFile(dirPath))) {
-            log("无法打开程序所在目录：" + dirPath + ", 请手动打开");
-        } else {
-            log("已打开程序所在目录：" + dirPath);
-        }
-        selectDialog.accept();
-    });
-
 
     otherFunctionLayout->addWidget(viewBtn, 0, 0);
-    otherFunctionLayout->addWidget(clickerBtn, 0, 1);
-    otherFunctionLayout->addWidget(activityBtn, 0, 2);
-    otherFunctionLayout->addWidget(folderBtn, 0, 3);
+    otherFunctionLayout->addWidget(folderBtn, 0, 1);
+    otherFunctionLayout->addWidget(replaceBtn, 0, 2);
+    otherFunctionLayout->addWidget(clickerBtn, 0, 3);
+    otherFunctionLayout->addWidget(activityBtn, 1, 0);
 
     layout->addWidget(battleGroupBox);
     layout->addWidget(dailyGroupBox);

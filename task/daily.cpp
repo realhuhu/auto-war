@@ -816,43 +816,81 @@ void otherActivity() {
 
         if (clicker->founded()) {
             clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/捕猎一次.png"));
+            runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/捕猎火鸡标题.png"));
+            runUntil.emplace_back(
+                    std::make_unique<UntilIfImage>("/其它活动/捕猎一次.png", Previous::NONE, false, Mode::RGB, 0.95));
             clicker = clicker->click(startUntil, clickUntil, runUntil);
 
-            clearUntil(startUntil, clickUntil, runUntil);
-            clickUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/超级玉米不足.png"));
-            runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png"));
-            clicker = clicker->click(startUntil, clickUntil, runUntil);
-
-            clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png", Previous::INNER, true));
-            runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png"));
-            clicker = clicker->click(startUntil, clickUntil, runUntil, positionSelector("xCenter", "min"));
-
-            clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png", Previous::INNER, true));
-            clicker->click(startUntil, clickUntil, runUntil);
-
-            clicker = std::make_unique<ImageClicker>("/其它活动/好友基地.png");
-            auto targetSegmentList = clicker->targetSegmentList;
-
-            bool finished = false;
-            for (const auto &i: targetSegmentList) {
-                clicker = std::make_unique<ImageClicker>("/其它活动/好友基地.png", i);
+            if (!clicker->founded()) {
+                clicker = std::make_unique<ImageClicker>("/其它活动/关闭窗口.png");
 
                 clearUntil(startUntil, clickUntil, runUntil);
-                runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/返回基地.png"));
-                runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/捕猎火鸡.png"));
+                runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png", Previous::INNER, true));
+                clicker->click(startUntil, clickUntil, runUntil);
+            } else {
+                clearUntil(startUntil, clickUntil, runUntil);
+                clickUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/超级玉米不足.png"));
+                runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png"));
                 clicker = clicker->click(startUntil, clickUntil, runUntil);
 
                 clearUntil(startUntil, clickUntil, runUntil);
-                runUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
-                        "/其它活动/捕猎一次.png", "/其它活动/好友未上线.png"
-                }));
-                clicker = clicker->click(startUntil, clickUntil, runUntil);
+                runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png", Previous::INNER, true));
+                runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png"));
+                clicker = clicker->click(startUntil, clickUntil, runUntil, positionSelector("xCenter", "min"));
 
-                if (clicker->templatePath == "/其它活动/好友未上线.png") {
+                clearUntil(startUntil, clickUntil, runUntil);
+                runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png", Previous::INNER, true));
+                clicker->click(startUntil, clickUntil, runUntil);
+
+                clicker = std::make_unique<ImageClicker>("/其它活动/好友基地.png");
+                auto targetSegmentList = clicker->targetSegmentList;
+
+                bool finished = false;
+                for (const auto &i: targetSegmentList) {
+                    clicker = std::make_unique<ImageClicker>("/其它活动/好友基地.png", i);
+
+                    clearUntil(startUntil, clickUntil, runUntil);
+                    runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/返回基地.png"));
+                    runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/捕猎火鸡.png"));
+                    clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+                    clearUntil(startUntil, clickUntil, runUntil);
+                    runUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
+                            "/其它活动/捕猎一次.png", "/其它活动/好友未上线.png"
+                    }));
+                    clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+                    if (clicker->templatePath == "/其它活动/好友未上线.png") {
+                        clicker = std::make_unique<ImageClicker>("/其它活动/关闭窗口.png");
+
+                        clearUntil(startUntil, clickUntil, runUntil);
+                        runUntil.emplace_back(
+                                std::make_unique<UntilImage>("/其它活动/关闭窗口.png", Previous::INNER, true));
+                        runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/返回基地.png"));
+                        clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+                        clearUntil(startUntil, clickUntil, runUntil);
+                        runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/捕猎火鸡.png"));
+                        clicker->click(startUntil, clickUntil, runUntil);
+
+                        continue;
+                    }
+
+                    clearUntil(startUntil, clickUntil, runUntil);
+                    clickUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
+                            "/其它活动/捕猎上限.png", "/其它活动/普通玉米不足.png"
+                    }));
+                    clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+                    if (clicker->templatePath == "/其它活动/普通玉米不足.png") finished = true;
+
                     clicker = std::make_unique<ImageClicker>("/其它活动/关闭窗口.png");
+
+                    clearUntil(startUntil, clickUntil, runUntil);
+                    runUntil.emplace_back(
+                            std::make_unique<UntilImage>("/其它活动/关闭窗口.png", Previous::INNER, true));
+                    runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png"));
+                    clicker = clicker->click(startUntil, clickUntil, runUntil, positionSelector("xCenter", "min"));
 
                     clearUntil(startUntil, clickUntil, runUntil);
                     runUntil.emplace_back(
@@ -864,35 +902,10 @@ void otherActivity() {
                     runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/捕猎火鸡.png"));
                     clicker->click(startUntil, clickUntil, runUntil);
 
-                    continue;
+                    if (finished) break;
                 }
-
-                clearUntil(startUntil, clickUntil, runUntil);
-                clickUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
-                        "/其它活动/捕猎上限.png", "/其它活动/普通玉米不足.png"
-                }));
-                clicker = clicker->click(startUntil, clickUntil, runUntil);
-
-                if (clicker->templatePath == "/其它活动/普通玉米不足.png") finished = true;
-
-                clicker = std::make_unique<ImageClicker>("/其它活动/关闭窗口.png");
-
-                clearUntil(startUntil, clickUntil, runUntil);
-                runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png", Previous::INNER, true));
-                runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png"));
-                clicker = clicker->click(startUntil, clickUntil, runUntil, positionSelector("xCenter", "min"));
-
-                clearUntil(startUntil, clickUntil, runUntil);
-                runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png", Previous::INNER, true));
-                runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/返回基地.png"));
-                clicker = clicker->click(startUntil, clickUntil, runUntil);
-
-                clearUntil(startUntil, clickUntil, runUntil);
-                runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/捕猎火鸡.png"));
-                clicker->click(startUntil, clickUntil, runUntil);
-
-                if (finished) break;
             }
+
         }
     }
 

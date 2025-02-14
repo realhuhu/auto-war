@@ -14,6 +14,8 @@
 #include "cv.h"
 #include "segment.h"
 
+using CustomFilter = std::function<bool(const Segment &)>;
+
 class Until {
 public:
     std::string imgPath;
@@ -25,6 +27,7 @@ public:
     bool reverse;
     Mode mode;
     std::vector<Segment> targetSegmentList;
+    CustomFilter customFilter;
 
     explicit Until(
             float threshold = 0.9,
@@ -33,7 +36,8 @@ public:
             float finishWait = 0,
             float timeout = -1,
             bool reverse = false,
-            Mode mode = Mode::GRAY
+            Mode mode = Mode::GRAY,
+            CustomFilter condition = nullptr
     );
 
     virtual void loop(std::unique_ptr<Segment> &previous, float globalTimeout);
@@ -62,7 +66,8 @@ public:
             float finishWait = 0,
             float threshold = 0.9,
             float interval = 0.1,
-            float timeout = -1
+            float timeout = -1,
+            CustomFilter condition = nullptr
     );
 
     bool flag(std::unique_ptr<Segment> &previous) override;
@@ -82,7 +87,8 @@ public:
             float finishWait = 0,
             float threshold = 0.9,
             float interval = 0.1,
-            float timeout = -1
+            float timeout = -1,
+            CustomFilter condition = nullptr
     );
 
     explicit UntilAnyImage(
@@ -93,7 +99,8 @@ public:
             float finishWait = 0,
             float threshold = 0.9,
             float interval = 0.1,
-            float timeout = -1
+            float timeout = -1,
+            CustomFilter condition = nullptr
     );
 
     bool flag(std::unique_ptr<Segment> &previous) override;
@@ -113,7 +120,8 @@ public:
             float finishWait = 0,
             float threshold = 0.9,
             float interval = 0.2,
-            float timeout = -1
+            float timeout = -1,
+            CustomFilter condition = nullptr
     );
 
     void preHook(std::unique_ptr<Segment> &previous) override;
@@ -133,7 +141,8 @@ public:
             float finishWait = 0,
             float threshold = 0.9,
             float interval = 0.1,
-            float timeout = -1
+            float timeout = -1,
+            CustomFilter condition = nullptr
     );
 
     [[nodiscard]] std::string toString() const override;
@@ -151,7 +160,8 @@ public:
             float finishWait = 0,
             float threshold = 0.9,
             float interval = 0.1,
-            float timeout = -1
+            float timeout = -1,
+            CustomFilter condition = nullptr
     );
 
     explicit UntilIfAnyImage(
@@ -162,7 +172,8 @@ public:
             float finishWait = 0,
             float threshold = 0.9,
             float interval = 0.1,
-            float timeout = -1
+            float timeout = -1,
+            CustomFilter condition = nullptr
     );
 
     [[nodiscard]] std::string toString() const override;
@@ -170,7 +181,8 @@ public:
     void loop(std::unique_ptr<Segment> &previous, float globalTimeout) override;
 };
 
-using UntilCustomFunc = std::function<std::vector<Segment>(std::unique_ptr<Segment> &previous, Mode mode,float threshold)>;
+using UntilCustomFunc = std::function<std::vector<Segment>(std::unique_ptr<Segment> &previous, Mode mode,
+                                                           float threshold)>;
 
 class UntilCustom : public Until {
 public:
@@ -184,7 +196,8 @@ public:
             float finishWait = 0,
             float threshold = 0.9,
             float interval = 0.1,
-            float timeout = -1
+            float timeout = -1,
+            CustomFilter condition = nullptr
     );
 
     [[nodiscard]] std::string toString() const override;

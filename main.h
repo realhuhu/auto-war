@@ -30,6 +30,7 @@
 #include "widget/buttonWithSetting.h"
 #include "function/imageDialog.h"
 #include "function/clickerDialog.h"
+#include "function/replaceDialog.h"
 #include "function/activityDialog.h"
 
 class MainWindow : public QWidget {
