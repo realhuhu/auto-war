@@ -59,6 +59,8 @@ add_executable(qt
         main.cpp
         function/replaceDialog.h
         function/replaceDialog.cpp
+        task/guildWar.h
+        task/guildWar.cpp
 )
 
 target_link_libraries(qt ${OpenCV_LIBS})

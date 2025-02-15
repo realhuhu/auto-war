@@ -25,6 +25,7 @@
 #include "util/emitter.h"
 #include "task/daily.h"
 #include "task/battle.h"
+#include "task/guildWar.h"
 #include "widget/labeledSpinBox.h"
 #include "widget/labeledComboBox.h"
 #include "widget/buttonWithSetting.h"

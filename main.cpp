@@ -404,12 +404,13 @@ void MainWindow::selectCommand() {
 }
 
 void MainWindow::stopCommand() {
+    state.stopFlag.store(true);
+
     if (!state.currentThread) {
         log("当前无命令正在执行");
         return;
     }
 
-    state.stopFlag.store(true);
     state.currentThread->quit();
     state.currentThread->wait();
     log("命令已停止执行");

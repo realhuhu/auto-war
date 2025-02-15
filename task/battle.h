@@ -19,7 +19,6 @@ void armsCompound();
 
 void countryWar();
 
-void guildWar();
 
 void loopCountryWar();
 
