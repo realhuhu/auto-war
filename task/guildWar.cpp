@@ -420,9 +420,9 @@ void guildWar() {
             std::unique_ptr<Segment> stronghold;
 
             if (mainFinished) {
-                stronghold = locateMain();
-            } else {
                 stronghold = locateInfinite();
+            } else {
+                stronghold = locateMain();
             }
 
             if (!stronghold) {
