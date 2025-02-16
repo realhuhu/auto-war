@@ -4,6 +4,7 @@
 #include <windows.h>
 
 #include <QLabel>
+#include <QTimer>
 #include <QScreen>
 #include <QDialog>
 #include <QPixmap>
@@ -24,6 +25,8 @@ Q_OBJECT
 public:
     explicit ScreenshotArea(QWidget *parent = nullptr);
 
+    ~ScreenshotArea() override;
+
 signals:
 
     void screenshotCaptured(const QPoint p1, const QPoint p2);
@@ -39,11 +42,21 @@ protected:
 
     void keyPressEvent(QKeyEvent *event) override;
 
+    void updateScreenCache();
+
 private:
+    QTimer *refreshTimer;      // 新增刷新定时器
+    QPixmap cachedScreen;      // 缓存屏幕图像
+    QElapsedTimer frameTimer;  // 帧率计时器
+
     QPoint origin;
     QPoint current;
     QPoint mousePos;
     bool selecting = false;
+
+    void showEvent(QShowEvent *event) override;
+
+    void closeEvent(QCloseEvent *event) override;
 };
 
 class ReplaceDialog : public QDialog {

@@ -62,6 +62,7 @@ std::vector<Segment> singleFindPositions(
         std::vector<Segment> segments;
         int w = templateImg.cols;
         int h = templateImg.rows;
+        segments.reserve(locations.size());
         for (const auto &loc: locations) {
             segments.emplace_back(
                     imgFile->fileName().toStdString(),
@@ -84,6 +85,7 @@ std::vector<Segment> singleFindPositions(
         std::vector<Segment> segments;
         int w = templateImg.cols;
         int h = templateImg.rows;
+        segments.reserve(locations.size());
         for (const auto &loc: locations) {
             segments.emplace_back(
                     imgFile->fileName().toStdString(),

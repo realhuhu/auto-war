@@ -406,7 +406,7 @@ void countryWar() {
             if (clicker->founded()) {
                 clearUntil(startUntil, clickUntil, runUntil);
                 runUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
-                        "/国家战争/未购买vip月卡.png", "/国家战争/已成功领取.png"
+                        "/国家战争/未开通vip.png", "/国家战争/未购买vip月卡.png", "/国家战争/已成功领取.png"
                 }));
                 runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/关闭窗口.png"));
                 clicker = clicker->click(startUntil, clickUntil, runUntil);
@@ -477,7 +477,8 @@ void countryWar() {
             clearUntil(startUntil, clickUntil, runUntil);
             runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/国家.png"));
             clicker->click(startUntil, clickUntil, runUntil);
-            throw std::runtime_error("请先移动到与摩多城相邻的城");
+            state.errorList.emplace_back("国家战争: 已提前结束，请先移动到与摩多城相邻的城");
+            return;
         }
 
         auto city = QFileInfo(QString::fromStdString(clicker->templatePath)).baseName();
@@ -591,10 +592,10 @@ void countryWar() {
         }
 
         clearUntil(startUntil, clickUntil, runUntil);
-        startUntil.emplace_back(
-                std::make_unique<UntilImage>("/国家战争/可战斗.png", Previous::NONE, false, Mode::RGB, 0.6));
+        startUntil.emplace_back(std::make_unique<UntilImage>(
+                "/国家战争/可战斗.png", Previous::NONE, false, Mode::RGB, 0.6));
         runUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
-                "/国家战争/恢复行动力.png", "/国家战争/跳过战斗.png", "/国家战争/确定.png"
+                "/国家战争/恢复行动力.png", "/国家战争/跳过战斗.png", "/国家战争/战斗CD中.png"
         }));
         clicker = clicker->click(startUntil, clickUntil, runUntil);
 
@@ -618,7 +619,11 @@ void countryWar() {
             break;
         }
 
-        if (clicker->templatePath == "/国家战争/确定.png") {
+        if (clicker->templatePath == "/国家战争/战斗CD中.png") {
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/确定.png", Previous::DOWN));
+            clicker = clicker->locate(startUntil, runUntil);
+
             clearUntil(startUntil, clickUntil, runUntil);
             runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/确定.png", Previous::INNER, true));
             clicker->click(startUntil, clickUntil, runUntil);
@@ -626,13 +631,26 @@ void countryWar() {
         }
 
         clearUntil(startUntil, clickUntil, runUntil);
-        clickUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/结束战斗.png"));
+        clickUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
+                "/国家战争/结束战斗.png", "/国家战争/国家排行榜.png"
+        }));
         clicker = clicker->click(startUntil, clickUntil, runUntil);
 
-        clearUntil(startUntil, clickUntil, runUntil);
-        runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/结束战斗.png", Previous::INNER, true));
-        runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/前往.png"));
-        clicker->click(startUntil, clickUntil, runUntil);
+        if (clicker->templatePath == "/国家战争/国家排行榜.png") {
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/关闭窗口.png"));
+            clicker = clicker->locate(startUntil, runUntil);
+
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/关闭窗口.png", Previous::INNER, true));
+            runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/前往.png"));
+            clicker->click(startUntil, clickUntil, runUntil);
+        } else {
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/结束战斗.png", Previous::INNER, true));
+            runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/前往.png"));
+            clicker->click(startUntil, clickUntil, runUntil);
+        }
     }
 }
 

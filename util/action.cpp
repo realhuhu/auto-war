@@ -8,11 +8,11 @@ void Mouse::moveTo(HWND hwnd, int x, int y) {
 
 void Mouse::leftDown(HWND hwnd, int x, int y) {
     LPARAM lparam = (y << 16) | x;
-    PostMessageW(hwnd, WM_LBUTTONDOWN, 0, lparam);
+    PostMessageW(hwnd, WM_LBUTTONDOWN, MK_LBUTTON, lparam);
 }
 
 
 void Mouse::leftUp(HWND hwnd, int x, int y) {
     LPARAM lparam = (y << 16) | x;
-    PostMessageW(hwnd, WM_LBUTTONUP, 0, lparam);
+    PostMessageW(hwnd, WM_LBUTTONUP, MK_LBUTTON, lparam);
 }

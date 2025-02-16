@@ -12,6 +12,7 @@ struct State {
     float scale = 1;
     QThread *currentThread = nullptr;
     std::atomic<bool> stopFlag{false};
+    std::vector<std::string> errorList = {};
     QJsonObject config;
 };
 

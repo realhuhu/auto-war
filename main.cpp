@@ -93,7 +93,8 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     connect(Emitter::instance(), &Emitter::log, this, &MainWindow::onLogMessage);
 
 
-    log(QString::fromStdString("当前缩放率: ") + QString::number(state.scale));
+    log(QString("当前缩放率:%1").arg(QString::number(state.scale)));
+    log("QQ游戏支持任意缩放率，其他客户端(如浏览器、360游戏)可能需要调整为100%缩放再打开辅助!");
 
     QFile file(QCoreApplication::applicationDirPath() + configFile);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -424,6 +425,7 @@ void MainWindow::runCommand(const QString &command) {
         return;
     }
 
+    state.errorList.clear();
     if (state.currentThread) {
         state.stopFlag.store(true);
         state.currentThread->quit();
@@ -437,6 +439,11 @@ void MainWindow::runCommand(const QString &command) {
     connect(state.currentThread, &QThread::started, [func, this]() {
         try {
             func();
+            if (!state.errorList.empty()) {
+                for (const auto &i: state.errorList) {
+                    emit logMessage(QString::fromStdString(i), "red");
+                }
+            }
             emit logMessage("运行完成", "red");
         } catch (const std::exception &e) {
             if (!state.stopFlag.load()) {
@@ -461,6 +468,7 @@ void MainWindow::batchRunCommand(const QString &command) {
         return;
     }
 
+    state.errorList.clear();
     if (state.currentThread) {
         state.stopFlag.store(true);
         state.currentThread->quit();
@@ -508,9 +516,19 @@ void MainWindow::batchRunCommand(const QString &command) {
                 }
             }
 
+            if (!state.errorList.empty()) {
+                for (const auto &i: state.errorList) {
+                    emit logMessage(QString::fromStdString(i), "red");
+                }
+            }
             emit logMessage("一键执行完成", "red");
         } catch (const std::exception &e) {
             if (!state.stopFlag.load()) {
+                if (!state.errorList.empty()) {
+                    for (const auto &i: state.errorList) {
+                        emit logMessage(QString::fromStdString(i), "red");
+                    }
+                }
                 emit logMessage("一键执行错误", "red");
             } else {
                 emit logMessage("一键执行完成", "red");
@@ -806,7 +824,7 @@ LRESULT CALLBACK MainWindow::MouseHookProc(int nCode, WPARAM wParam, LPARAM lPar
 }
 
 int main(int argc, char *argv[]) {
-    state.scale = getScale();
+//    state.scale = getScale();
 
     QApplication app(argc, argv);
     MainWindow window;

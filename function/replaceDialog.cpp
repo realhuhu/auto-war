@@ -7,6 +7,18 @@ ScreenshotArea::ScreenshotArea(QWidget *parent) : QWidget(parent) {
     setAttribute(Qt::WA_DeleteOnClose);
     setMouseTracking(true);
     grabKeyboard();
+
+    refreshTimer = new QTimer(this);
+    connect(refreshTimer, &QTimer::timeout, this, [this]() {
+        updateScreenCache();
+        update();
+    });
+    refreshTimer->start(33); // 约30fps
+    frameTimer.start();
+}
+
+ScreenshotArea::~ScreenshotArea() {
+    refreshTimer->stop();
 }
 
 void ScreenshotArea::mousePressEvent(QMouseEvent *event) {
@@ -35,18 +47,70 @@ void ScreenshotArea::mouseReleaseEvent(QMouseEvent *event) {
     }
 }
 
+void ScreenshotArea::updateScreenCache() {
+    // 仅当鼠标移动超过5像素或超过50ms时更新缓存
+    if (frameTimer.elapsed() > 50) {
+        cachedScreen = QGuiApplication::primaryScreen()->grabWindow(
+                0,
+                mousePos.x() - 25,
+                mousePos.y() - 25,
+                50,
+                50
+        );
+        frameTimer.restart();
+    }
+}
+
+
 void ScreenshotArea::paintEvent(QPaintEvent *) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
     // 绘制全屏半透明遮罩
-    painter.setBrush(QColor(0, 0, 0, 100));
+    painter.setBrush(QColor(0, 0, 0, 16));
     painter.drawRect(rect());
 
-    // 绘制十字线
-    painter.setPen(QPen(Qt::white, 1, Qt::DotLine));
-    painter.drawLine(QPoint(0, mousePos.y()), QPoint(width(), mousePos.y()));
-    painter.drawLine(QPoint(mousePos.x(), 0), QPoint(mousePos.x(), height()));
+    const int zoomSize = 25;
+    const int zoomScale = 4;
+    const int magnifierSize = zoomSize * 2 * zoomScale;
+
+    if (!cachedScreen.isNull() && !mousePos.isNull()) {
+        // 使用预缩放的图像
+        QPixmap magnified = cachedScreen.scaled(
+                magnifierSize,
+                magnifierSize,
+                Qt::KeepAspectRatio,
+                Qt::SmoothTransformation
+        );
+
+        // 计算绘制位置（添加位置缓存优化）
+        static QPoint lastDrawPos;
+        QPoint drawPos = mousePos + QPoint(25, 25);
+        // 位置变化超过5像素才重新计算
+        if ((drawPos - lastDrawPos).manhattanLength() > 5) {
+            if (drawPos.x() + magnifierSize > width())
+                drawPos.setX(mousePos.x() - 25 - magnifierSize);
+            if (drawPos.y() + magnifierSize > height())
+                drawPos.setY(mousePos.y() - 25 - magnifierSize);
+            lastDrawPos = drawPos;
+        }
+
+        // 使用硬件加速组合绘制
+        painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+        painter.drawPixmap(drawPos, magnified);
+
+        // 绘制边框和十字线（优化绘制顺序）
+        painter.setPen(QPen(Qt::blue, 1));
+        painter.drawRect(QRect(drawPos, magnified.size()));
+
+        QPoint center = drawPos + QPoint(magnified.width() / 2, magnified.height() / 2);
+        painter.setPen(QPen(Qt::cyan, 1, Qt::DotLine));
+        painter.drawLine(center - QPoint(zoomSize * zoomScale, 0),
+                         center + QPoint(zoomSize * zoomScale, 0));
+        painter.drawLine(center - QPoint(0, zoomSize * zoomScale),
+                         center + QPoint(0, zoomSize * zoomScale));
+    }
+
 
     if (selecting) {
         // 绘制选择区域
@@ -55,7 +119,7 @@ void ScreenshotArea::paintEvent(QPaintEvent *) {
         painter.drawRect(selectRect);
 
         painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
-        painter.setPen(QPen(Qt::red, 2));
+        painter.setPen(QPen(Qt::red, 1));
         painter.drawRect(selectRect);
     }
 }
@@ -66,6 +130,15 @@ void ScreenshotArea::keyPressEvent(QKeyEvent *event) {
     }
 }
 
+void ScreenshotArea::showEvent(QShowEvent *event) {
+    QWidget::showEvent(event);
+    QApplication::setOverrideCursor(Qt::CrossCursor); // 隐藏光标
+}
+
+void ScreenshotArea::closeEvent(QCloseEvent *event) {
+    QApplication::restoreOverrideCursor(); // 恢复光标
+    QWidget::closeEvent(event);
+}
 
 ReplaceDialog::ReplaceDialog(QWidget *parent) : QDialog(parent) {
     setWindowTitle("替换图片");
@@ -154,6 +227,10 @@ void ReplaceDialog::openFile() {
             return;
         }
 
+        if (filePath.endsWith("1.png")) {
+            filePath.replace("1.png", ".png");
+            tipLabel->setText("xxx1.png无需替换，已换为同名图片");
+        }
         selectedPath = filePath;
 
         QPixmap pixmap(filePath);

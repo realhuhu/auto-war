@@ -233,11 +233,11 @@ void warCenter() {
 
             clicker = std::make_unique<ImageClicker>("/战争学院/占领演习场.png");
 
-            if (!clicker->founded()) return;
-
-            clearUntil(startUntil, clickUntil, runUntil);
-            runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/演习中.png"));
-            clicker->click(startUntil, clickUntil, runUntil);
+            if (clicker->founded()) {
+                clearUntil(startUntil, clickUntil, runUntil);
+                runUntil.emplace_back(std::make_unique<UntilImage>("/战争学院/演习中.png"));
+                clicker->click(startUntil, clickUntil, runUntil);
+            }
         }
     }
 
