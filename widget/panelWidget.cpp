@@ -1,19 +1,8 @@
-﻿#include "main.h"
+﻿#include "panelWidget.h"
 
 auto configFile = "/config.json";
 
-float getScale() {
-    MONITORINFOEX info = {};
-    POINT ptZero = {0, 0};
-    info.cbSize = sizeof(info);
-    GetMonitorInfo(MonitorFromPoint(ptZero, MONITOR_DEFAULTTOPRIMARY), &info);
-    DEVMODE devMode = {};
-    devMode.dmSize = sizeof(DEVMODE);
-    EnumDisplaySettings(info.szDevice, ENUM_CURRENT_SETTINGS, &devMode);
-    return static_cast<float>(devMode.dmPelsWidth) / static_cast<float>(info.rcMonitor.right - info.rcMonitor.left);
-}
-
-MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
+PanelWidget::PanelWidget(QWidget *parent) : QWidget(parent) {
     setWindowTitle("红警自动");
     resize(480, 320);
 
@@ -34,10 +23,10 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     auto *stopButton = new QPushButton("停止命令");
     auto *clearButton = new QPushButton("清空输出");
 
-    connect(captureButton, &QPushButton::clicked, this, &MainWindow::startCapture);
-    connect(executeButton, &QPushButton::clicked, this, &MainWindow::selectCommand);
-    connect(stopButton, &QPushButton::clicked, this, &MainWindow::stopCommand);
-    connect(clearButton, &QPushButton::clicked, this, &MainWindow::clearText);
+    connect(captureButton, &QPushButton::clicked, this, &PanelWidget::startCapture);
+    connect(executeButton, &QPushButton::clicked, this, &PanelWidget::selectCommand);
+    connect(stopButton, &QPushButton::clicked, this, &PanelWidget::stopCommand);
+    connect(clearButton, &QPushButton::clicked, this, &PanelWidget::clearText);
 
     controlLayout->addWidget(captureButton);
     controlLayout->addWidget(executeButton);
@@ -89,8 +78,8 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     log("使用方法: 先获取窗口，再执行命令", "blue");
 
-    connect(this, &MainWindow::logMessage, this, &MainWindow::onLogMessage);
-    connect(Emitter::instance(), &Emitter::log, this, &MainWindow::onLogMessage);
+    connect(this, &PanelWidget::logMessage, this, &PanelWidget::onLogMessage);
+    connect(Emitter::instance(), &Emitter::log, this, &PanelWidget::onLogMessage);
 
 
     log(QString("当前缩放率:%1").arg(QString::number(state.scale)));
@@ -107,7 +96,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     }
 }
 
-void MainWindow::closeEvent(QCloseEvent *event) {
+void PanelWidget::closeEvent(QCloseEvent *event) {
     if (hook) UnhookWindowsHookEx(hook);
 
     if (state.currentThread) {
@@ -119,11 +108,11 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     QWidget::closeEvent(event);
 }
 
-void MainWindow::log(const QString &text, const QString &color) const {
+void PanelWidget::log(const QString &text, const QString &color) const {
     outputText->append(QString("<div style=\"color:%1;\">%2</div>").arg(color, text));
 }
 
-void MainWindow::onLogMessage(const QString &text, const QString &color) {
+void PanelWidget::onLogMessage(const QString &text, const QString &color) {
     if (state.stopFlag.load()) return;
 
     if (previousLog == text) return;
@@ -145,7 +134,7 @@ void MainWindow::onLogMessage(const QString &text, const QString &color) {
     previousLog = text;
 }
 
-void MainWindow::startCapture() {
+void PanelWidget::startCapture() {
     log("请用鼠标点击游戏窗口");
 
     isWaiting = true;
@@ -154,7 +143,7 @@ void MainWindow::startCapture() {
     if (hook == nullptr) log("Failed to set hook");
 }
 
-void MainWindow::selectCommand() {
+void PanelWidget::selectCommand() {
     QDialog selectDialog(this);
     selectDialog.setWindowTitle("选择命令");
     selectDialog.setWindowFlags(selectDialog.windowFlags() & ~Qt::WindowContextHelpButtonHint);
@@ -404,7 +393,7 @@ void MainWindow::selectCommand() {
     selectDialog.exec();
 }
 
-void MainWindow::stopCommand() {
+void PanelWidget::stopCommand() {
     state.stopFlag.store(true);
 
     if (!state.currentThread) {
@@ -417,9 +406,9 @@ void MainWindow::stopCommand() {
     log("命令已停止执行");
 }
 
-void MainWindow::clearText() { outputText->clear(); }
+void PanelWidget::clearText() { outputText->clear(); }
 
-void MainWindow::runCommand(const QString &command) {
+void PanelWidget::runCommand(const QString &command) {
     if (!state.hwnd) {
         log("请先获取游戏窗口!");
         return;
@@ -462,7 +451,7 @@ void MainWindow::runCommand(const QString &command) {
     log("开始执行命令: " + command, "blue");
 }
 
-void MainWindow::batchRunCommand(const QString &command) {
+void PanelWidget::batchRunCommand(const QString &command) {
     if (!state.hwnd) {
         log("请先获取游戏窗口!");
         return;
@@ -541,7 +530,7 @@ void MainWindow::batchRunCommand(const QString &command) {
     state.currentThread->start();
 }
 
-void MainWindow::setCommand(const QString &command) {
+void PanelWidget::setCommand(const QString &command) {
     QDialog settingDialog(this);
     settingDialog.setWindowTitle("设置 " + command);
     settingDialog.setMinimumWidth(300);
@@ -794,10 +783,10 @@ void MainWindow::setCommand(const QString &command) {
     settingDialog.exec();
 }
 
-LRESULT CALLBACK MainWindow::MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK PanelWidget::MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
     if (nCode >= 0) {
         if (wParam == WM_LBUTTONDOWN) {
-            auto *window = qobject_cast<MainWindow *>(qApp->activeWindow());
+            auto *window = qobject_cast<PanelWidget *>(qApp->activeWindow());
             if (window && window->isWaiting) {
                 auto *pMouseStruct = (MSLLHOOKSTRUCT *) lParam;
                 HWND hwnd = WindowFromPoint(pMouseStruct->pt);
@@ -821,13 +810,4 @@ LRESULT CALLBACK MainWindow::MouseHookProc(int nCode, WPARAM wParam, LPARAM lPar
         }
     }
     return CallNextHookEx(nullptr, nCode, wParam, lParam);
-}
-
-int main(int argc, char *argv[]) {
-//    state.scale = getScale();
-
-    QApplication app(argc, argv);
-    MainWindow window;
-    window.show();
-    return QApplication::exec();
 }

@@ -21,23 +21,23 @@
 #include <QJsonDocument>
 #include <QDesktopServices>
 
-#include "util/state.h"
-#include "util/emitter.h"
-#include "task/daily.h"
-#include "task/battle.h"
-#include "task/guildWar.h"
-#include "widget/labeledSpinBox.h"
-#include "widget/labeledComboBox.h"
-#include "widget/buttonWithSetting.h"
-#include "function/imageDialog.h"
-#include "function/clickerDialog.h"
-#include "function/replaceDialog.h"
-#include "function/activityDialog.h"
+#include "../util/state.h"
+#include "../util/emitter.h"
+#include "../task/daily.h"
+#include "../task/battle.h"
+#include "../task/guildWar.h"
+#include "labeledSpinBox.h"
+#include "labeledComboBox.h"
+#include "buttonWithSetting.h"
+#include "../function/imageDialog.h"
+#include "../function/clickerDialog.h"
+#include "../function/replaceDialog.h"
+#include "../function/activityDialog.h"
 
-class MainWindow : public QWidget {
+class PanelWidget : public QWidget {
 Q_OBJECT
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    explicit PanelWidget(QWidget *parent = nullptr);
 
 signals:
 
