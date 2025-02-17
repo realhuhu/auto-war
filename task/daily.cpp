@@ -919,7 +919,7 @@ void otherActivity() {
 
             clearUntil(startUntil, clickUntil, runUntil);
             runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png"));
-            clicker = clicker->click(startUntil, clickUntil, runUntil);
+            clicker = clicker->click(startUntil, clickUntil, runUntil, similaritySelector, 1);
 
             clearUntil(startUntil, clickUntil, runUntil);
             runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png", Previous::INNER, true));

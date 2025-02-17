@@ -61,8 +61,8 @@ add_executable(AutoWarSimple
         function/activityDialog.cpp
         function/replaceDialog.h
         function/replaceDialog.cpp
-        main/simple.h
-        main/simple.cpp
+        simple.h
+        simple.cpp
 )
 
 target_link_libraries(AutoWarSimple ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network)
@@ -114,8 +114,8 @@ add_executable(AutoWarBrowser
         function/activityDialog.cpp
         function/replaceDialog.h
         function/replaceDialog.cpp
-        main/browser.h
-        main/browser.cpp
+        browser.h
+        browser.cpp
 )
 
 target_link_libraries(AutoWarBrowser ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network Qt5::WebEngineWidgets)

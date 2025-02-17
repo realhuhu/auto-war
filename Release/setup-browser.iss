@@ -41,7 +41,6 @@ Source: "{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; Permissions: 
 Source: "platforms\*"; DestDir: "{app}\platforms"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full
 Source: "res\*"; DestDir: "{app}\res"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full
 Source: "resources\*"; DestDir: "{app}\resources"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full
-Source: "translations\*"; DestDir: "{app}\translations"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full
 Source: "自定义图片\使用说明.txt"; DestDir: "{app}\自定义图片"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full
 Source: "*.dll"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
 Source: "config.json"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full

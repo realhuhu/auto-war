@@ -4,7 +4,7 @@
 #include <QWebEngineView>
 #include <QWebEngineSettings>
 
-#include "../widget/panelWidget.h"
+#include "widget/panelWidget.h"
 
 class BrowserWindow : public QWidget {
 Q_OBJECT
