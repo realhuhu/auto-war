@@ -2,17 +2,26 @@
 #define QT_BROWSER_H
 
 #include <QWebEngineView>
+#include <QWebEngineProfile>
 #include <QWebEngineSettings>
 
 #include "widget/panelWidget.h"
 
-class BrowserWindow : public QWidget {
+class AutoWarBrowser : public PanelWidget {
 Q_OBJECT
 public:
-    explicit BrowserWindow(QWidget *parent = nullptr);
+    explicit AutoWarBrowser(QWidget *parent = nullptr);
+
+    ~AutoWarBrowser();
+
+private slots:
+
+    void refresh();
 
 private:
-    PanelWidget *panel;
+    QWebEngineView *browser;
+
+    void closeEvent(QCloseEvent *event) override;
 };
 
 #endif //QT_BROWSER_H

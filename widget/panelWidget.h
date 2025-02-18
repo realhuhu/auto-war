@@ -37,23 +37,26 @@
 class PanelWidget : public QWidget {
 Q_OBJECT
 public:
+    QPushButton *executeButton = new QPushButton("执行命令");
+    QPushButton *stopButton = new QPushButton("停止命令");
+    QPushButton *clearButton = new QPushButton("清空输出");
+    QTextEdit *outputText = new QTextEdit();
+
     explicit PanelWidget(QWidget *parent = nullptr);
 
 signals:
 
     void logMessage(const QString &message, const QString &color = "black");
 
-private slots:
+public slots:
 
     void log(const QString &text, const QString &color = "red") const;
 
     void onLogMessage(const QString &text, const QString &color = "black");
 
-    void startCapture();
-
     void selectCommand();
 
-    void stopCommand();
+    void stopCommand() const;
 
     void clearText();
 
@@ -66,18 +69,12 @@ private slots:
     void closeEvent(QCloseEvent *event) override;
 
 private:
-    static LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam);
-
-    HHOOK hook;
-    bool isWaiting;
-
     QStringList commandBattle;
     QStringList commandDaily;
     QStringList commandSpecial;
     QMap<QString, std::function<void()>> tasks;
 
     QString previousLog;
-    QTextEdit *outputText;
 };
 
 #endif // MAINWINDOW_H

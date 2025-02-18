@@ -3,41 +3,11 @@
 auto configFile = "/config.json";
 
 PanelWidget::PanelWidget(QWidget *parent) : QWidget(parent) {
-    setWindowTitle("红警自动");
-    resize(480, 320);
-
-    QScreen *screen = QApplication::primaryScreen();
-    if (screen) {
-        QRect screenGeometry = screen->geometry();
-        int x = (screenGeometry.width() - width()) / 2;
-        int y = (screenGeometry.height() - height()) / 2;
-        move(x, y);
-    }
-
-    auto *mainLayout = new QVBoxLayout(this);
-
-    auto *controlLayout = new QHBoxLayout();
-
-    auto *captureButton = new QPushButton("获取窗口");
-    auto *executeButton = new QPushButton("执行命令");
-    auto *stopButton = new QPushButton("停止命令");
-    auto *clearButton = new QPushButton("清空输出");
-
-    connect(captureButton, &QPushButton::clicked, this, &PanelWidget::startCapture);
     connect(executeButton, &QPushButton::clicked, this, &PanelWidget::selectCommand);
     connect(stopButton, &QPushButton::clicked, this, &PanelWidget::stopCommand);
     connect(clearButton, &QPushButton::clicked, this, &PanelWidget::clearText);
 
-    controlLayout->addWidget(captureButton);
-    controlLayout->addWidget(executeButton);
-    controlLayout->addWidget(stopButton);
-    controlLayout->addWidget(clearButton);
-
-    mainLayout->addLayout(controlLayout);
-
-    outputText = new QTextEdit();
     outputText->setReadOnly(true);
-    mainLayout->addWidget(outputText);
 
     tasks["军备合成"] = armsCompound;
     tasks["剿灭将领"] = exterminateEnemy;
@@ -73,17 +43,8 @@ PanelWidget::PanelWidget(QWidget *parent) : QWidget(parent) {
     tasks["开卡国战"] = loopCountryWar;
     commandSpecial = QStringList({"开卡国战"});
 
-    hook = nullptr;
-    isWaiting = false;
-    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-    log("使用方法: 先获取窗口，再执行命令", "blue");
-
     connect(this, &PanelWidget::logMessage, this, &PanelWidget::onLogMessage);
     connect(Emitter::instance(), &Emitter::log, this, &PanelWidget::onLogMessage);
-
-
-    log(QString("当前缩放率:%1").arg(QString::number(state.scale)));
-    log("QQ游戏支持任意缩放率，其他客户端(如浏览器、360游戏)可能需要调整为100%缩放再打开辅助!");
 
     QFile file(QCoreApplication::applicationDirPath() + configFile);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -97,8 +58,6 @@ PanelWidget::PanelWidget(QWidget *parent) : QWidget(parent) {
 }
 
 void PanelWidget::closeEvent(QCloseEvent *event) {
-    if (hook) UnhookWindowsHookEx(hook);
-
     if (state.currentThread) {
         state.stopFlag.store(true);
         state.currentThread->quit();
@@ -132,15 +91,6 @@ void PanelWidget::onLogMessage(const QString &text, const QString &color) {
     ).arg(timeString, color, text));
 
     previousLog = text;
-}
-
-void PanelWidget::startCapture() {
-    log("请用鼠标点击游戏窗口");
-
-    isWaiting = true;
-    hook = SetWindowsHookEx(WH_MOUSE_LL, MouseHookProc, nullptr, 0);
-
-    if (hook == nullptr) log("Failed to set hook");
 }
 
 void PanelWidget::selectCommand() {
@@ -393,7 +343,7 @@ void PanelWidget::selectCommand() {
     selectDialog.exec();
 }
 
-void PanelWidget::stopCommand() {
+void PanelWidget::stopCommand() const {
     state.stopFlag.store(true);
 
     if (!state.currentThread) {
@@ -783,31 +733,3 @@ void PanelWidget::setCommand(const QString &command) {
     settingDialog.exec();
 }
 
-LRESULT CALLBACK PanelWidget::MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
-    if (nCode >= 0) {
-        if (wParam == WM_LBUTTONDOWN) {
-            auto *window = qobject_cast<PanelWidget *>(qApp->activeWindow());
-            if (window && window->isWaiting) {
-                auto *pMouseStruct = (MSLLHOOKSTRUCT *) lParam;
-                HWND hwnd = WindowFromPoint(pMouseStruct->pt);
-                wchar_t buffer[256] = {0};
-
-                GetWindowTextW(hwnd, buffer, 256);
-                if (hwnd) {
-                    window->log(
-                            QString("获取到窗口: ") + QString::fromWCharArray(buffer) + "(0x" +
-                            QString::number(reinterpret_cast<qulonglong>(hwnd), 16) + ")", "blue"
-                    );
-                    window->log("请不要最小化游戏窗口！但可以放在其它窗口后面", "red");
-                    window->isWaiting = false;
-                    state.hwnd = hwnd;
-                    UnhookWindowsHookEx(window->hook);
-                    window->hook = nullptr;
-                } else {
-                    window->log("获取窗口句柄失败", "red");
-                }
-            }
-        }
-    }
-    return CallNextHookEx(nullptr, nCode, wParam, lParam);
-}
