@@ -61,7 +61,14 @@ void heroCenter() {
 
             clearUntil(startUntil, clickUntil, runUntil);
             runUntil.emplace_back(std::make_unique<UntilImage>("/英雄中心/英雄列表.png"));
-            clicker->click(startUntil, clickUntil, runUntil, similaritySelector, 0, 1);
+            runUntil.emplace_back(std::make_unique<UntilIfImage>("/英雄中心/确定.png"));
+            clicker = clicker->click(startUntil, clickUntil, runUntil, similaritySelector, 0, 1);
+
+            if (clicker->founded()) {
+                clearUntil(startUntil, clickUntil, runUntil);
+                runUntil.emplace_back(std::make_unique<UntilIfImage>("/英雄中心/确定.png", Previous::NONE, true));
+                clicker->click(startUntil, clickUntil, runUntil);
+            }
         }
     }
 
@@ -1116,7 +1123,7 @@ void guild() {
         clicker->click(startUntil, clickUntil, runUntil);
 
         for (const auto &i: std::vector<std::string>{"第一档", "第二档", "第三档", "第四档", "第五档"}) {
-            clicker = std::make_unique<ImageClicker>("/公会领奖/" + i + ".png", 0, 0.95, 60, Mode::RGB);
+            clicker = std::make_unique<ImageClicker>("/公会领奖/" + i + ".png", 0, 0.98, 60, Mode::RGB);
 
             if (!clicker->founded()) continue;
 

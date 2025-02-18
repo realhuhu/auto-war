@@ -11,8 +11,8 @@ float getScale() {
     return static_cast<float>(devMode.dmPelsWidth) / static_cast<float>(info.rcMonitor.right - info.rcMonitor.left);
 }
 
-
 AutoWarSimple::AutoWarSimple(QWidget *parent) : PanelWidget(parent) {
+    instance = this;
     setWindowTitle("红警自动");
     resize(480, 320);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
@@ -52,40 +52,53 @@ void AutoWarSimple::startCapture() {
     if (hook == nullptr) log("Failed to set hook");
 }
 
-LRESULT CALLBACK AutoWarSimple::MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
-    if (nCode >= 0) {
-        if (wParam == WM_LBUTTONDOWN) {
-            auto *window = qobject_cast<AutoWarSimple *>(qApp->activeWindow());
-            if (window && window->isWaiting) {
-                auto *pMouseStruct = (MSLLHOOKSTRUCT *) lParam;
-                HWND hwnd = WindowFromPoint(pMouseStruct->pt);
-                wchar_t buffer[256] = {0};
+[[maybe_unused]] void AutoWarSimple::getHwnd(int x, int y) {
+    HWND hwnd = WindowFromPoint(POINT{x, y});
 
-                GetWindowTextW(hwnd, buffer, 256);
-                if (hwnd) {
-                    window->log(
-                            QString("获取到窗口: ") + QString::fromWCharArray(buffer) + "(0x" +
-                            QString::number(reinterpret_cast<qulonglong>(hwnd), 16) + ")", "blue"
-                    );
-                    window->log("请不要最小化游戏窗口！但可以放在其它窗口后面", "red");
-                    window->isWaiting = false;
-                    state.hwnd = hwnd;
-                    UnhookWindowsHookEx(window->hook);
-                    window->hook = nullptr;
-                } else {
-                    window->log("获取窗口句柄失败", "red");
-                }
-            }
-        }
+    if (!hwnd) {
+        log("获取窗口句柄失败", "red");
+        return;
     }
-    return CallNextHookEx(nullptr, nCode, wParam, lParam);
+
+    wchar_t buffer[256] = {0};
+    GetWindowTextW(hwnd, buffer, 256);
+
+    log(
+            QString("获取到窗口: ") + QString::fromWCharArray(buffer) + "(0x" +
+            QString::number(reinterpret_cast<qulonglong>(hwnd), 16) + ")", "blue"
+    );
+    log("请不要最小化游戏窗口！但可以放在其它窗口后面", "red");
+    state.hwnd = hwnd;
+
+    UnhookWindowsHookEx(hook);
+    hook = nullptr;
+    isWaiting = false;
 }
 
 void AutoWarSimple::closeEvent(QCloseEvent *event) {
     if (hook) UnhookWindowsHookEx(hook);
 
+    instance = nullptr;
+
     PanelWidget::closeEvent(event);
+
 }
+
+LRESULT CALLBACK AutoWarSimple::MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
+    if (nCode >= 0 && wParam == WM_LBUTTONDOWN && instance && instance->isWaiting) {
+        auto *pMouseStruct = (MSLLHOOKSTRUCT *) lParam;
+        QMetaObject::invokeMethod(
+                instance,
+                "getHwnd",
+                Qt::QueuedConnection,
+                Q_ARG(int, pMouseStruct->pt.x),
+                Q_ARG(int, pMouseStruct->pt.y)
+        );
+    }
+    return CallNextHookEx(nullptr, nCode, wParam, lParam);
+}
+
+AutoWarSimple *AutoWarSimple::instance = nullptr;
 
 int main(int argc, char *argv[]) {
     state.scale = getScale();

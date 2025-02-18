@@ -1,8 +1,10 @@
 ﻿#include "browser.h"
 
 
-AutoWarBrowser::AutoWarBrowser(QWidget *parent) {
+AutoWarBrowser::AutoWarBrowser(QWidget *parent) : PanelWidget(parent) {
     setWindowTitle("红警浏览器");
+    resize(this->width(), 965);
+    autoHide = false;
 
     auto *mainLayout = new QHBoxLayout(this);
     auto *panelLayout = new QVBoxLayout(this);
@@ -41,8 +43,23 @@ AutoWarBrowser::AutoWarBrowser(QWidget *parent) {
             QString::number(reinterpret_cast<qulonglong>(state.hwnd), 16) + ")", "blue"
     );
 
+    log("运行命令时由于在频繁点击浏览器，按钮可能需要连续快速点击才能触发!");
+    log("按快捷键Ctrl Q也可以停止命令", "blue");
+
     mainLayout->addWidget(browser);
     mainLayout->addLayout(panelLayout);
+
+    auto *quitAction = new QAction(tr("Quit"), this);
+    quitAction->setShortcut(QKeySequence("Ctrl+Q"));
+    connect(quitAction, &QAction::triggered, this, &AutoWarBrowser::stopCommand);
+    addAction(quitAction);
+}
+
+void AutoWarBrowser::refresh() {
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "刷新游戏", "确认刷新网页？", QMessageBox::Yes | QMessageBox::No);
+
+    if (reply == QMessageBox::Yes) browser->load(QUrl("https://qqgame.qq.com/webappframe/?appid=10407"));
 }
 
 void AutoWarBrowser::closeEvent(QCloseEvent *event) {
@@ -52,10 +69,6 @@ void AutoWarBrowser::closeEvent(QCloseEvent *event) {
     }
 
     PanelWidget::closeEvent(event);
-}
-
-void AutoWarBrowser::refresh() {
-    browser->load(QUrl("https://qqgame.qq.com/webappframe/?appid=10407"));
 }
 
 AutoWarBrowser::~AutoWarBrowser() {
@@ -106,4 +119,3 @@ int main(int argc, char *argv[]) {
 
     return result;
 }
-

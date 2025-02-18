@@ -98,20 +98,6 @@ ClickerDialog::ClickerDialog(QWidget *parent) : QDialog(parent) {
     this->setLayout(mainLayout);
 }
 
-void ClickerDialog::closeEvent(QCloseEvent *) {
-    if (hook) UnhookWindowsHookEx(hook);
-
-    if (clickThread) {
-        clickThread->stop();
-        clickThread->quit();
-        clickThread->wait();
-    }
-
-    instance = nullptr;
-
-    parentWidget()->showNormal();
-}
-
 void ClickerDialog::updateTextEdit(const QString &text) { textEdit->append(text); }
 
 [[maybe_unused]] void ClickerDialog::appendCoordinate(int x, int y) {
@@ -223,6 +209,19 @@ void ClickerDialog::endClick() {
     textEdit->append("已结束点击");
 }
 
+void ClickerDialog::closeEvent(QCloseEvent *) {
+    if (hook) UnhookWindowsHookEx(hook);
+
+    if (clickThread) {
+        clickThread->stop();
+        clickThread->quit();
+        clickThread->wait();
+    }
+
+    instance = nullptr;
+
+    parentWidget()->showNormal();
+}
 
 LRESULT CALLBACK ClickerDialog::MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
     if (nCode >= 0 && wParam == WM_LBUTTONDOWN && instance && instance->isWaiting) {

@@ -19,7 +19,6 @@ void armsCompound();
 
 void countryWar();
 
-
 void loopCountryWar();
 
 #endif // QT_BATTLE_H

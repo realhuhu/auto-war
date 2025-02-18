@@ -70,8 +70,6 @@ private slots:
     void endClick();
 
 private:
-    static LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam);
-
     static ClickerDialog *instance;
     HHOOK hook = nullptr;
     bool isWaiting = false;
@@ -82,6 +80,8 @@ private:
     ClickThread *clickThread = nullptr;
 
     void closeEvent(QCloseEvent *) override;
+
+    static LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam);
 };
 
 #endif //QT_CLICKERDIALOG_H

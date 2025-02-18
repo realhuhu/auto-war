@@ -6,14 +6,17 @@
 
 #include <QThread>
 #include <QJsonObject>
+#include <QMutexLocker>
 
 struct State {
     HWND hwnd = nullptr;
     float scale = 1;
-    QThread *currentThread = nullptr;
-    std::atomic<bool> stopFlag{false};
-    std::vector<std::string> errorList = {};
     QJsonObject config;
+    std::atomic<bool> stopFlag{false};
+    QThread *currentThread = nullptr;
+    QBasicMutex threadMutex;
+    std::vector<std::string> errorList = {};
+    QBasicMutex errorListMutex;
 };
 
 extern State state;

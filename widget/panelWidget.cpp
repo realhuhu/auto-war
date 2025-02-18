@@ -57,16 +57,6 @@ PanelWidget::PanelWidget(QWidget *parent) : QWidget(parent) {
     }
 }
 
-void PanelWidget::closeEvent(QCloseEvent *event) {
-    if (state.currentThread) {
-        state.stopFlag.store(true);
-        state.currentThread->quit();
-        state.currentThread->wait();
-    }
-
-    QWidget::closeEvent(event);
-}
-
 void PanelWidget::log(const QString &text, const QString &color) const {
     outputText->append(QString("<div style=\"color:%1;\">%2</div>").arg(color, text));
 }
@@ -92,6 +82,8 @@ void PanelWidget::onLogMessage(const QString &text, const QString &color) {
 
     previousLog = text;
 }
+
+void PanelWidget::clearText() const { outputText->clear(); }
 
 void PanelWidget::selectCommand() {
     QDialog selectDialog(this);
@@ -305,7 +297,7 @@ void PanelWidget::selectCommand() {
 
         auto *dialog = new ReplaceDialog(this);
         selectDialog.accept();
-        this->showMinimized();
+        if (autoHide) this->showMinimized();
         dialog->show();
     });
 
@@ -318,8 +310,8 @@ void PanelWidget::selectCommand() {
 
         auto *dialog = new ClickerDialog(this);
         selectDialog.accept();
-        this->showMinimized();
-        dialog->exec();
+        if (autoHide) this->showMinimized();
+        dialog->show();
     });
 
     connect(activityBtn->getTextButton(), &QToolButton::clicked, [this]() {
@@ -343,21 +335,6 @@ void PanelWidget::selectCommand() {
     selectDialog.exec();
 }
 
-void PanelWidget::stopCommand() const {
-    state.stopFlag.store(true);
-
-    if (!state.currentThread) {
-        log("当前无命令正在执行");
-        return;
-    }
-
-    state.currentThread->quit();
-    state.currentThread->wait();
-    log("命令已停止执行");
-}
-
-void PanelWidget::clearText() { outputText->clear(); }
-
 void PanelWidget::runCommand(const QString &command) {
     if (!state.hwnd) {
         log("请先获取游戏窗口!");
@@ -375,9 +352,10 @@ void PanelWidget::runCommand(const QString &command) {
     state.currentThread = new QThread(this);
 
     auto func = tasks[command];
-    connect(state.currentThread, &QThread::started, [func, this]() {
+    connect(state.currentThread, &QThread::started, this, [func, this]() {
         try {
             func();
+            QMutexLocker locker(&state.errorListMutex);
             if (!state.errorList.empty()) {
                 for (const auto &i: state.errorList) {
                     emit logMessage(QString::fromStdString(i), "red");
@@ -392,10 +370,16 @@ void PanelWidget::runCommand(const QString &command) {
                 emit logMessage("运行完成", "red");
             }
         }
+    }, Qt::DirectConnection); // 确保在新线程中执行
+
+    // 线程结束时自动清理
+    connect(state.currentThread, &QThread::finished, state.currentThread, &QThread::deleteLater);
+    // 只在销毁当前线程时置空指针
+    connect(state.currentThread, &QThread::destroyed, this, [this]() {
+        QMutexLocker locker(&state.threadMutex);
+        state.currentThread = nullptr;
     });
 
-    connect(state.currentThread, &QThread::finished, state.currentThread, &QThread::deleteLater);
-    connect(state.currentThread, &QThread::destroyed, this, []() { state.currentThread = nullptr; });
     state.currentThread->start();
 
     log("开始执行命令: " + command, "blue");
@@ -417,7 +401,7 @@ void PanelWidget::batchRunCommand(const QString &command) {
     state.stopFlag.store(false);
     state.currentThread = new QThread(this);
 
-    connect(state.currentThread, &QThread::started, [this, &command]() {
+    connect(state.currentThread, &QThread::started, this, [this, &command]() {
         try {
             emit logMessage("开始一键执行", "red");
 
@@ -455,6 +439,7 @@ void PanelWidget::batchRunCommand(const QString &command) {
                 }
             }
 
+            QMutexLocker locker(&state.errorListMutex);
             if (!state.errorList.empty()) {
                 for (const auto &i: state.errorList) {
                     emit logMessage(QString::fromStdString(i), "red");
@@ -463,6 +448,7 @@ void PanelWidget::batchRunCommand(const QString &command) {
             emit logMessage("一键执行完成", "red");
         } catch (const std::exception &e) {
             if (!state.stopFlag.load()) {
+                QMutexLocker locker(&state.errorListMutex);
                 if (!state.errorList.empty()) {
                     for (const auto &i: state.errorList) {
                         emit logMessage(QString::fromStdString(i), "red");
@@ -473,11 +459,29 @@ void PanelWidget::batchRunCommand(const QString &command) {
                 emit logMessage("一键执行完成", "red");
             }
         }
-    });
+    }, Qt::DirectConnection);
 
+    // 线程结束时自动清理
     connect(state.currentThread, &QThread::finished, state.currentThread, &QThread::deleteLater);
-    connect(state.currentThread, &QThread::destroyed, this, []() { state.currentThread = nullptr; });
+    // 只在销毁当前线程时置空指针
+    connect(state.currentThread, &QThread::destroyed, this, [this]() {
+        QMutexLocker locker(&state.threadMutex);
+        state.currentThread = nullptr;
+    });
     state.currentThread->start();
+}
+
+void PanelWidget::stopCommand() const {
+    state.stopFlag.store(true);
+
+    QMutexLocker locker(&state.threadMutex);
+    if (!state.currentThread) {
+        log("当前无命令正在执行");
+        return;
+    }
+
+    state.currentThread->quit();
+    log("命令已停止执行");
 }
 
 void PanelWidget::setCommand(const QString &command) {
@@ -733,3 +737,12 @@ void PanelWidget::setCommand(const QString &command) {
     settingDialog.exec();
 }
 
+void PanelWidget::closeEvent(QCloseEvent *event) {
+    if (state.currentThread) {
+        state.stopFlag.store(true);
+        state.currentThread->quit();
+        state.currentThread->wait();
+    }
+
+    QWidget::closeEvent(event);
+}

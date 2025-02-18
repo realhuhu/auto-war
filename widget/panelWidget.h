@@ -37,6 +37,8 @@
 class PanelWidget : public QWidget {
 Q_OBJECT
 public:
+    bool autoHide = true;
+
     QPushButton *executeButton = new QPushButton("执行命令");
     QPushButton *stopButton = new QPushButton("停止命令");
     QPushButton *clearButton = new QPushButton("清空输出");
@@ -54,17 +56,17 @@ public slots:
 
     void onLogMessage(const QString &text, const QString &color = "black");
 
+    void clearText() const;
+
     void selectCommand();
-
-    void stopCommand() const;
-
-    void clearText();
-
-    void setCommand(const QString &command);
 
     void runCommand(const QString &command);
 
     void batchRunCommand(const QString &command);
+
+    void stopCommand() const;
+
+    void setCommand(const QString &command);
 
     void closeEvent(QCloseEvent *event) override;
 

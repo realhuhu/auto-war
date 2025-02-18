@@ -10,8 +10,8 @@
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QNetworkReply>
-#include <QStandardItemModel>
 #include <QXmlStreamReader>
+#include <QStandardItemModel>
 #include <QNetworkAccessManager>
 
 struct ResultEntry {

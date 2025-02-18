@@ -1,6 +1,8 @@
 ﻿#ifndef QT_BROWSER_H
 #define QT_BROWSER_H
 
+#include <QAction>
+#include <QMessageBox>
 #include <QWebEngineView>
 #include <QWebEngineProfile>
 #include <QWebEngineSettings>
@@ -12,7 +14,7 @@ Q_OBJECT
 public:
     explicit AutoWarBrowser(QWidget *parent = nullptr);
 
-    ~AutoWarBrowser();
+    ~AutoWarBrowser() override;
 
 private slots:
 

@@ -4,8 +4,8 @@
 #include <QString>
 #include <QFileInfo>
 
-#include "../util/state.h"
 #include "../util/enum.h"
+#include "../util/state.h"
 #include "../util/sleep.h"
 #include "../util/action.h"
 #include "../util/emitter.h"

@@ -1,7 +1,5 @@
 ﻿#include "until.h"
 
-#include <utility>
-
 Until::Until(
         float threshold,
         Previous onPrevious,
