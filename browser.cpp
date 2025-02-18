@@ -13,6 +13,15 @@ BrowserWindow::BrowserWindow(QWidget *parent) {
 
     panel = new PanelWidget(this);
 
+    state.hwnd = reinterpret_cast<HWND>(view->winId());
+    wchar_t buffer[256] = {0};
+    GetWindowTextW(state.hwnd, buffer, 256);
+
+    emit panel->logMessage(
+            QString("获取到窗口: ") + QString::fromWCharArray(buffer) + "(0x" +
+            QString::number(reinterpret_cast<qulonglong>(state.hwnd), 16) + ")", "blue"
+    );
+
     mainLayout->addWidget(view);
     mainLayout->addWidget(panel);
 }
@@ -27,7 +36,6 @@ int main(int argc, char *argv[]) {
     if (cmd == nullptr) exit(0);
     argv = (char **) cmd;
     argv[argc++] = strdup(QByteArray("--register-pepper-plugins='pepflashplayer.dll;application/x-demo'").constData());
-
 
     QApplication app(argc, argv);
     BrowserWindow window;
