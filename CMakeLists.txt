@@ -14,12 +14,12 @@ set(OpenCV_DIR "D:/opencv/dist_vc/install")
 include(D:/opencv/dist_vc/install/OpenCVConfig.cmake)
 find_package(OpenCV REQUIRED)
 
-qt5_add_resources(qrc_FILES resources.qrc)
+qt5_add_resources(qrc_FILES resource/resource.qrc)
 
 add_executable(AutoWarSimple
         WIN32
         ${qrc_FILES}
-        ico.o
+        resource/ico/simple/ico.o
         util/state.h
         util/state.cpp
         util/sleep.h
@@ -72,7 +72,7 @@ set_target_properties(AutoWarSimple PROPERTIES OUTPUT_NAME 启动)
 add_executable(AutoWarBrowser
         WIN32
         ${qrc_FILES}
-        ico.o
+        resource/ico/browser/ico.o
         util/state.h
         util/state.cpp
         util/sleep.h

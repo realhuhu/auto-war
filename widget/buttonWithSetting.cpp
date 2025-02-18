@@ -16,7 +16,7 @@ ButtonWithSetting::ButtonWithSetting(
 
     if (showSettingButton) {
         settingButton = new QToolButton();
-        settingButton->setIcon(QIcon(":/resource/ui/setting.png"));
+        settingButton->setIcon(QIcon(":/ui/setting.png"));
         settingButton->setIconSize(QSize(16, 16));
         settingButton->setFixedHeight(25);
         settingButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);

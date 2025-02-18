@@ -85,7 +85,7 @@ void PanelWidget::onLogMessage(const QString &text, const QString &color) {
                 <div>
                 <span style="color:white;background-color:green;">&nbsp;%1&nbsp;</span>
                 <span style="color:%2;">%3</span>
-                <img src=":/resource/ui/transparent.png" height='14' width='1'>
+                <img src=":/ui/transparent.png" height='14' width='1'>
                 </div>
                 )"
     ).arg(timeString, color, text));
