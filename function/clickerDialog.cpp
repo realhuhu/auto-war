@@ -101,6 +101,11 @@ ClickerDialog::ClickerDialog(QWidget *parent) : QDialog(parent) {
 void ClickerDialog::updateTextEdit(const QString &text) { textEdit->append(text); }
 
 [[maybe_unused]] void ClickerDialog::appendCoordinate(int x, int y) {
+    if (WindowFromPoint(POINT{x, y}) != state.hwnd) {
+        textEdit->append("只能录制游戏窗口内的点击!");
+        return;
+    }
+
     RECT clientRect = {0};
     POINT topLeft = {0, 0};
 
@@ -226,17 +231,14 @@ void ClickerDialog::closeEvent(QCloseEvent *) {
 LRESULT CALLBACK ClickerDialog::MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
     if (nCode >= 0 && wParam == WM_LBUTTONDOWN && instance && instance->isWaiting) {
         auto *pMouseStruct = (MSLLHOOKSTRUCT *) lParam;
-        HWND hwnd = WindowFromPoint(pMouseStruct->pt);
 
-        if (hwnd == state.hwnd) {
-            QMetaObject::invokeMethod(
-                    instance,
-                    "appendCoordinate",
-                    Qt::QueuedConnection,
-                    Q_ARG(int, pMouseStruct->pt.x),
-                    Q_ARG(int, pMouseStruct->pt.y)
-            );
-        }
+        QMetaObject::invokeMethod(
+                instance,
+                "appendCoordinate",
+                Qt::QueuedConnection,
+                Q_ARG(int, pMouseStruct->pt.x),
+                Q_ARG(int, pMouseStruct->pt.y)
+        );
     }
     return CallNextHookEx(nullptr, nCode, wParam, lParam);
 }

@@ -971,6 +971,33 @@ void otherActivity() {
             clicker->click(startUntil, clickUntil, runUntil);
         }
     }
+
+    if (config["论军功兑好礼"]) {
+        clicker = std::make_unique<ImageClicker>("/其它活动/论军功兑好礼.png");
+
+        if (clicker->founded()) {
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/论军功兑好礼标题.png"));
+            runUntil.emplace_back(std::make_unique<UntilIfImage>(
+                    "/其它活动/兑换.png", Previous::NONE, false, Mode::RGB, 0, 0.95
+            ));
+            clicker = clicker->click(startUntil, clickUntil, runUntil);
+
+            if (clicker->founded()) {
+                clearUntil(startUntil, clickUntil, runUntil);
+                clickUntil.emplace_back(std::make_unique<UntilImage>(
+                        "/其它活动/兑换.png", Previous::NONE, true, Mode::RGB, 0, 0.95
+                ));
+                clicker->click(startUntil, clickUntil, runUntil);
+            }
+
+            clicker = std::make_unique<ImageClicker>("/其它活动/关闭窗口.png");
+
+            clearUntil(startUntil, clickUntil, runUntil);
+            runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png", Previous::INNER, true));
+            clicker->click(startUntil, clickUntil, runUntil);
+        }
+    }
 }
 
 void dailyTask() {

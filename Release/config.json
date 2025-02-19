@@ -93,6 +93,11 @@
                 "order": 3,
                 "text": "在线领好礼",
                 "value": true
+            },
+            {
+                "order": 4,
+                "text": "论军功兑好礼",
+                "value": true
             }
         ],
         "input": [
@@ -290,7 +295,17 @@
         "checkbox": [
             {
                 "order": 0,
-                "text": "8点时自动领体力",
+                "text": "8点领签到体力",
+                "value": true
+            },
+            {
+                "order": 1,
+                "text": "8点领VIP体力",
+                "value": true
+            },
+            {
+                "order": 2,
+                "text": "8点领VIP国战大礼",
                 "value": true
             }
         ],
@@ -298,7 +313,7 @@
         ],
         "select": [
         ],
-        "tips": "如果在晚上8-9点运行，自动领取签到与vip福利体力"
+        "tips": "如果在晚上8点后运行，自动领取签到、VIP福利体力、VIP国战大礼"
     },
     "将领抽奖": {
         "checkbox": [
