@@ -433,7 +433,7 @@ void countryWar() {
 
                 clearUntil(startUntil, clickUntil, runUntil);
                 runUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
-                        "/国家战争/非vip用户.png", "/国家战争/时间未到.png", "/国家战争/非vip用户.png"
+                        "/国家战争/非vip用户.png", "/国家战争/时间未到.png", "/国家战争/领取成功.png", "/国家战争/已领取过.png"
                 }));
                 runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/关闭窗口.png"));
                 clicker = clicker->click(startUntil, clickUntil, runUntil);
@@ -441,7 +441,7 @@ void countryWar() {
                 clearUntil(startUntil, clickUntil, runUntil);
                 runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/关闭窗口.png", Previous::INNER, true));
                 runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/关闭窗口.png"));
-                clicker = clicker->click(startUntil, clickUntil, runUntil, positionSelector("xCenter", "min"));
+                clicker = clicker->click(startUntil, clickUntil, runUntil, positionSelector("yCenter", "max"));
 
                 clearUntil(startUntil, clickUntil, runUntil);
                 runUntil.emplace_back(std::make_unique<UntilImage>("/国家战争/关闭窗口.png", Previous::INNER, true));

@@ -978,17 +978,15 @@ void otherActivity() {
         if (clicker->founded()) {
             clearUntil(startUntil, clickUntil, runUntil);
             runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/论军功兑好礼标题.png"));
-            runUntil.emplace_back(std::make_unique<UntilIfImage>(
-                    "/其它活动/兑换.png", Previous::NONE, false, Mode::RGB, 0, 0.95
-            ));
-            clicker = clicker->click(startUntil, clickUntil, runUntil);
+            clicker->click(startUntil, clickUntil, runUntil);
 
-            if (clicker->founded()) {
+            while (!state.stopFlag.load()) {
+                clicker = std::make_unique<ImageClicker>("/其它活动/兑换.png", 0, 0.95, 60, Mode::RGB);
+
+                if (!clicker->founded()) break;
+
                 clearUntil(startUntil, clickUntil, runUntil);
-                clickUntil.emplace_back(std::make_unique<UntilImage>(
-                        "/其它活动/兑换.png", Previous::NONE, true, Mode::RGB, 0, 0.95
-                ));
-                clicker->click(startUntil, clickUntil, runUntil);
+                clicker->click(startUntil, clickUntil, runUntil, similaritySelector, 0, 3);
             }
 
             clicker = std::make_unique<ImageClicker>("/其它活动/关闭窗口.png");
