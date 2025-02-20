@@ -56,7 +56,7 @@ public slots:
 
     void clearText() const;
 
-    QVBoxLayout *createCommandLayout(int colWidth = 100);
+    QVBoxLayout *createCommandLayout(int colWidth = 100, bool hideOnSelected = true);
 
     void runCommand(const QString &command);
 

@@ -8,33 +8,31 @@ AutoWarBrowser::AutoWarBrowser(QWidget *parent) : PanelWidget(parent) {
 
     auto *mainLayout = new QHBoxLayout(this);
 
-    auto *panelLayout = new QVBoxLayout(this);
-
-    auto *controlLayout = new QHBoxLayout();
-
-    auto *refreshButton = new QPushButton("刷新游戏");
-    connect(refreshButton, &QPushButton::clicked, this, &AutoWarBrowser::refresh);
-
-    controlLayout->addWidget(refreshButton);
-    controlLayout->addWidget(stopButton);
-    controlLayout->addWidget(clearButton);
-
-    panelLayout->addLayout(createCommandLayout(60));
-    panelLayout->addWidget(outputText);
-    panelLayout->addLayout(controlLayout);
-
     browser = new QWebEngineView(this);
-
     QWebEngineProfile *engineProfile = browser->page()->profile();
     engineProfile->setCachePath("cache");
     engineProfile->setPersistentCookiesPolicy(QWebEngineProfile::ForcePersistentCookies);
     engineProfile->setHttpCacheType(QWebEngineProfile::MemoryHttpCache);
-
     browser->settings()->setAttribute(QWebEngineSettings::PluginsEnabled, true);
     browser->load(QUrl("https://qqgame.qq.com/webappframe/?appid=10407"));
     browser->setFixedWidth(985);
     browser->setMinimumHeight(700);
     browser->setMaximumHeight(935);
+
+    mainLayout->addWidget(browser);
+
+    auto *panelLayout = new QVBoxLayout(this);
+    panelLayout->addLayout(createCommandLayout(60, false));
+    panelLayout->addWidget(outputText);
+    auto *controlLayout = new QHBoxLayout();
+    auto *refreshButton = new QPushButton("刷新游戏");
+    connect(refreshButton, &QPushButton::clicked, this, &AutoWarBrowser::refresh);
+    controlLayout->addWidget(refreshButton);
+    controlLayout->addWidget(stopButton);
+    controlLayout->addWidget(clearButton);
+    panelLayout->addLayout(controlLayout);
+
+    mainLayout->addLayout(panelLayout);
 
     state.hwnd = reinterpret_cast<HWND>(browser->winId());
     wchar_t buffer[256] = {0};
@@ -47,9 +45,6 @@ AutoWarBrowser::AutoWarBrowser(QWidget *parent) : PanelWidget(parent) {
 
     log("运行命令时由于在频繁点击浏览器，按钮可能需要连续快速点击才能触发!");
     log("按快捷键Ctrl Q也可以停止命令", "blue");
-
-    mainLayout->addWidget(browser);
-    mainLayout->addLayout(panelLayout);
 
     auto *quitAction = new QAction(tr("Quit"), this);
     quitAction->setShortcut(QKeySequence("Ctrl+Q"));

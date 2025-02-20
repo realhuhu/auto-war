@@ -5,7 +5,6 @@ auto configFile = "/config.json";
 PanelWidget::PanelWidget(QWidget *parent) : QWidget(parent) {
     connect(stopButton, &QPushButton::clicked, this, &PanelWidget::stopCommand);
     connect(clearButton, &QPushButton::clicked, this, &PanelWidget::clearText);
-
     outputText->setReadOnly(true);
 
     tasks["军备合成"] = armsCompound;
@@ -84,7 +83,7 @@ void PanelWidget::onLogMessage(const QString &text, const QString &color) {
 
 void PanelWidget::clearText() const { outputText->clear(); }
 
-QVBoxLayout *PanelWidget::createCommandLayout(int colWidth) {
+QVBoxLayout *PanelWidget::createCommandLayout(int colWidth, bool hideOnSelected) {
     auto *layout = new QVBoxLayout();
 
     auto style = R"(
@@ -146,8 +145,8 @@ QVBoxLayout *PanelWidget::createCommandLayout(int colWidth) {
         customBtn->getTextButton()->setAutoDefault(false);
         customBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-        connect(customBtn->getTextButton(), &QPushButton::clicked, [this, command, &layout]() {
-            if (autoHide) qobject_cast<QDialog *>(layout->parentWidget())->accept();
+        connect(customBtn->getTextButton(), &QPushButton::clicked, [this, command, layout, hideOnSelected]() {
+            if (hideOnSelected) qobject_cast<QDialog *>(layout->parentWidget())->accept();
             runCommand(command);
         });
         if (customBtn->getSettingButton()) {
@@ -171,8 +170,8 @@ QVBoxLayout *PanelWidget::createCommandLayout(int colWidth) {
         customBtn->getTextButton()->setAutoDefault(false);
         customBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-        connect(customBtn->getTextButton(), &QPushButton::clicked, [this, command, &layout]() {
-            if (autoHide) qobject_cast<QDialog *>(layout->parentWidget())->accept();
+        connect(customBtn->getTextButton(), &QPushButton::clicked, [this, command, layout, hideOnSelected]() {
+            if (hideOnSelected) qobject_cast<QDialog *>(layout->parentWidget())->accept();
             runCommand(command);
         });
 
@@ -198,8 +197,8 @@ QVBoxLayout *PanelWidget::createCommandLayout(int colWidth) {
         customBtn->getTextButton()->setAutoDefault(false);
         customBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-        connect(customBtn->getTextButton(), &QToolButton::clicked, [this, command, &layout]() {
-            if (autoHide) qobject_cast<QDialog *>(layout->parentWidget())->accept();
+        connect(customBtn->getTextButton(), &QToolButton::clicked, [this, command, layout, hideOnSelected]() {
+            if (hideOnSelected) qobject_cast<QDialog *>(layout->parentWidget())->accept();
             batchRunCommand(command);
         });
 
@@ -224,8 +223,8 @@ QVBoxLayout *PanelWidget::createCommandLayout(int colWidth) {
         customBtn->getTextButton()->setAutoDefault(false);
         customBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-        connect(customBtn->getTextButton(), &QPushButton::clicked, [this, command, &layout]() {
-            if (autoHide) qobject_cast<QDialog *>(layout->parentWidget())->accept();
+        connect(customBtn->getTextButton(), &QPushButton::clicked, [this, command, layout, hideOnSelected]() {
+            if (hideOnSelected) qobject_cast<QDialog *>(layout->parentWidget())->accept();
             runCommand(command);
         });
 
@@ -262,49 +261,49 @@ QVBoxLayout *PanelWidget::createCommandLayout(int colWidth) {
     clickerBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     activityBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-    connect(viewBtn->getTextButton(), &QToolButton::clicked, [this, &layout]() {
+    connect(viewBtn->getTextButton(), &QToolButton::clicked, [this, layout, hideOnSelected]() {
         if (!state.hwnd) {
             log("请先获取游戏窗口!");
-            if (autoHide) qobject_cast<QDialog *>(layout->parentWidget())->accept();
+            if (hideOnSelected) qobject_cast<QDialog *>(layout->parentWidget())->accept();
             return;
         }
         auto *dialog = new ImageDialog(this);
         dialog->exec();
     });
 
-    connect(folderBtn->getTextButton(), &QToolButton::clicked, [this, &layout]() {
+    connect(folderBtn->getTextButton(), &QToolButton::clicked, [this, layout, hideOnSelected]() {
         QString dirPath = QCoreApplication::applicationDirPath();
         if (!QDesktopServices::openUrl(QUrl::fromLocalFile(dirPath))) {
             log("无法打开程序所在目录：" + dirPath + ", 请手动打开");
         } else {
             log("已打开程序所在目录：" + dirPath);
         }
-        if (autoHide) qobject_cast<QDialog *>(layout->parentWidget())->accept();
+        if (hideOnSelected) qobject_cast<QDialog *>(layout->parentWidget())->accept();
     });
 
-    connect(replaceBtn->getTextButton(), &QToolButton::clicked, [this, &layout]() {
+    connect(replaceBtn->getTextButton(), &QToolButton::clicked, [this, layout, hideOnSelected]() {
         if (!state.hwnd) {
             log("请先获取游戏窗口!");
-            if (autoHide) qobject_cast<QDialog *>(layout->parentWidget())->accept();
+            if (hideOnSelected) qobject_cast<QDialog *>(layout->parentWidget())->accept();
             return;
         }
 
         auto *dialog = new ReplaceDialog(this);
-        if (autoHide) qobject_cast<QDialog *>(layout->parentWidget())->accept();
+        if (hideOnSelected) qobject_cast<QDialog *>(layout->parentWidget())->accept();
         if (autoHide) this->showMinimized();
         dialog->show();
     });
 
-    connect(clickerBtn->getTextButton(), &QToolButton::clicked, [this, &layout]() {
+    connect(clickerBtn->getTextButton(), &QToolButton::clicked, [this, layout, hideOnSelected]() {
 
         if (!state.hwnd) {
             log("请先获取游戏窗口!");
-            if (autoHide) qobject_cast<QDialog *>(layout->parentWidget())->accept();
+            if (hideOnSelected) qobject_cast<QDialog *>(layout->parentWidget())->accept();
             return;
         }
 
         auto *dialog = new ClickerDialog(this);
-        if (autoHide) qobject_cast<QDialog *>(layout->parentWidget())->accept();
+        if (hideOnSelected) qobject_cast<QDialog *>(layout->parentWidget())->accept();
         if (autoHide) this->showMinimized();
         dialog->show();
     });
@@ -368,7 +367,7 @@ void PanelWidget::runCommand(const QString &command) {
     }, Qt::DirectConnection);
 
     connect(state.currentThread, &QThread::finished, state.currentThread, &QThread::deleteLater);
-    connect(state.currentThread, &QThread::destroyed, this, [this]() {
+    connect(state.currentThread, &QThread::destroyed, this, []() {
         QMutexLocker locker(&state.threadMutex);
         state.currentThread = nullptr;
     });
@@ -455,7 +454,7 @@ void PanelWidget::batchRunCommand(const QString &command) {
     }, Qt::DirectConnection);
 
     connect(state.currentThread, &QThread::finished, state.currentThread, &QThread::deleteLater);
-    connect(state.currentThread, &QThread::destroyed, this, [this]() {
+    connect(state.currentThread, &QThread::destroyed, this, []() {
         QMutexLocker locker(&state.threadMutex);
         state.currentThread = nullptr;
     });
