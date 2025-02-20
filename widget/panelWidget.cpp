@@ -3,7 +3,6 @@
 auto configFile = "/config.json";
 
 PanelWidget::PanelWidget(QWidget *parent) : QWidget(parent) {
-    connect(executeButton, &QPushButton::clicked, this, &PanelWidget::selectCommand);
     connect(stopButton, &QPushButton::clicked, this, &PanelWidget::stopCommand);
     connect(clearButton, &QPushButton::clicked, this, &PanelWidget::clearText);
 
@@ -85,12 +84,8 @@ void PanelWidget::onLogMessage(const QString &text, const QString &color) {
 
 void PanelWidget::clearText() const { outputText->clear(); }
 
-void PanelWidget::selectCommand() {
-    QDialog selectDialog(this);
-    selectDialog.setWindowTitle("选择命令");
-    selectDialog.setWindowFlags(selectDialog.windowFlags() & ~Qt::WindowContextHelpButtonHint);
-
-    auto *layout = new QVBoxLayout(&selectDialog);
+QVBoxLayout *PanelWidget::createCommandLayout(int colWidth) {
+    auto *layout = new QVBoxLayout();
 
     auto style = R"(
         QGroupBox {
@@ -105,11 +100,11 @@ void PanelWidget::selectCommand() {
         }
     )";
 
-    auto *battleGroupBox = new QGroupBox("自动战斗", &selectDialog);
-    auto *dailyGroupBox = new QGroupBox("日常任务", &selectDialog);
-    auto *autoRunGroupBox = new QGroupBox("一键执行", &selectDialog);
-    auto *specialGroupBox = new QGroupBox("特殊功能", &selectDialog);
-    auto *otherFunctionGroupBox = new QGroupBox("其它", &selectDialog);
+    auto *battleGroupBox = new QGroupBox("自动战斗", layout->parentWidget());
+    auto *dailyGroupBox = new QGroupBox("日常任务", layout->parentWidget());
+    auto *autoRunGroupBox = new QGroupBox("一键执行", layout->parentWidget());
+    auto *specialGroupBox = new QGroupBox("特殊功能", layout->parentWidget());
+    auto *otherFunctionGroupBox = new QGroupBox("其它", layout->parentWidget());
 
     battleGroupBox->setStyleSheet(style);
     dailyGroupBox->setStyleSheet(style);
@@ -130,11 +125,11 @@ void PanelWidget::selectCommand() {
     otherFunctionLayout->setSpacing(5);
 
     for (int i = 0; i < 4; ++i) {
-        battleLayout->setColumnMinimumWidth(i, 100);
-        dailyLayout->setColumnMinimumWidth(i, 100);
-        autoRunLayout->setColumnMinimumWidth(i, 100);
-        specialLayout->setColumnMinimumWidth(i, 100);
-        otherFunctionLayout->setColumnMinimumWidth(i, 100);
+        battleLayout->setColumnMinimumWidth(i, colWidth);
+        dailyLayout->setColumnMinimumWidth(i, colWidth);
+        autoRunLayout->setColumnMinimumWidth(i, colWidth);
+        specialLayout->setColumnMinimumWidth(i, colWidth);
+        otherFunctionLayout->setColumnMinimumWidth(i, colWidth);
 
         battleLayout->setColumnStretch(i, 1);
         dailyLayout->setColumnStretch(i, 1);
@@ -151,8 +146,8 @@ void PanelWidget::selectCommand() {
         customBtn->getTextButton()->setAutoDefault(false);
         customBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-        connect(customBtn->getTextButton(), &QPushButton::clicked, [this, command, &selectDialog]() {
-            selectDialog.accept();
+        connect(customBtn->getTextButton(), &QPushButton::clicked, [this, command, &layout]() {
+            if (autoHide) qobject_cast<QDialog *>(layout->parentWidget())->accept();
             runCommand(command);
         });
         if (customBtn->getSettingButton()) {
@@ -176,8 +171,8 @@ void PanelWidget::selectCommand() {
         customBtn->getTextButton()->setAutoDefault(false);
         customBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-        connect(customBtn->getTextButton(), &QPushButton::clicked, [this, command, &selectDialog]() {
-            selectDialog.accept();
+        connect(customBtn->getTextButton(), &QPushButton::clicked, [this, command, &layout]() {
+            if (autoHide) qobject_cast<QDialog *>(layout->parentWidget())->accept();
             runCommand(command);
         });
 
@@ -203,8 +198,8 @@ void PanelWidget::selectCommand() {
         customBtn->getTextButton()->setAutoDefault(false);
         customBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-        connect(customBtn->getTextButton(), &QToolButton::clicked, [this, command, &selectDialog]() {
-            selectDialog.accept();
+        connect(customBtn->getTextButton(), &QToolButton::clicked, [this, command, &layout]() {
+            if (autoHide) qobject_cast<QDialog *>(layout->parentWidget())->accept();
             batchRunCommand(command);
         });
 
@@ -229,8 +224,8 @@ void PanelWidget::selectCommand() {
         customBtn->getTextButton()->setAutoDefault(false);
         customBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-        connect(customBtn->getTextButton(), &QPushButton::clicked, [this, command, &selectDialog]() {
-            selectDialog.accept();
+        connect(customBtn->getTextButton(), &QPushButton::clicked, [this, command, &layout]() {
+            if (autoHide) qobject_cast<QDialog *>(layout->parentWidget())->accept();
             runCommand(command);
         });
 
@@ -267,49 +262,49 @@ void PanelWidget::selectCommand() {
     clickerBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     activityBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-    connect(viewBtn->getTextButton(), &QToolButton::clicked, [this, &selectDialog]() {
+    connect(viewBtn->getTextButton(), &QToolButton::clicked, [this, &layout]() {
         if (!state.hwnd) {
             log("请先获取游戏窗口!");
-            selectDialog.accept();
+            if (autoHide) qobject_cast<QDialog *>(layout->parentWidget())->accept();
             return;
         }
         auto *dialog = new ImageDialog(this);
         dialog->exec();
     });
 
-    connect(folderBtn->getTextButton(), &QToolButton::clicked, [this, &selectDialog]() {
+    connect(folderBtn->getTextButton(), &QToolButton::clicked, [this, &layout]() {
         QString dirPath = QCoreApplication::applicationDirPath();
-
         if (!QDesktopServices::openUrl(QUrl::fromLocalFile(dirPath))) {
             log("无法打开程序所在目录：" + dirPath + ", 请手动打开");
         } else {
             log("已打开程序所在目录：" + dirPath);
         }
-        selectDialog.accept();
+        if (autoHide) qobject_cast<QDialog *>(layout->parentWidget())->accept();
     });
 
-    connect(replaceBtn->getTextButton(), &QToolButton::clicked, [this, &selectDialog]() {
+    connect(replaceBtn->getTextButton(), &QToolButton::clicked, [this, &layout]() {
         if (!state.hwnd) {
             log("请先获取游戏窗口!");
-            selectDialog.accept();
+            if (autoHide) qobject_cast<QDialog *>(layout->parentWidget())->accept();
             return;
         }
 
         auto *dialog = new ReplaceDialog(this);
-        selectDialog.accept();
+        if (autoHide) qobject_cast<QDialog *>(layout->parentWidget())->accept();
         if (autoHide) this->showMinimized();
         dialog->show();
     });
 
-    connect(clickerBtn->getTextButton(), &QToolButton::clicked, [this, &selectDialog]() {
+    connect(clickerBtn->getTextButton(), &QToolButton::clicked, [this, &layout]() {
+
         if (!state.hwnd) {
             log("请先获取游戏窗口!");
-            selectDialog.accept();
+            if (autoHide) qobject_cast<QDialog *>(layout->parentWidget())->accept();
             return;
         }
 
         auto *dialog = new ClickerDialog(this);
-        selectDialog.accept();
+        if (autoHide) qobject_cast<QDialog *>(layout->parentWidget())->accept();
         if (autoHide) this->showMinimized();
         dialog->show();
     });
@@ -332,7 +327,7 @@ void PanelWidget::selectCommand() {
     layout->addWidget(specialGroupBox);
     layout->addWidget(otherFunctionGroupBox);
 
-    selectDialog.exec();
+    return layout;
 }
 
 void PanelWidget::runCommand(const QString &command) {
@@ -370,11 +365,9 @@ void PanelWidget::runCommand(const QString &command) {
                 emit logMessage("运行完成", "red");
             }
         }
-    }, Qt::DirectConnection); // 确保在新线程中执行
+    }, Qt::DirectConnection);
 
-    // 线程结束时自动清理
     connect(state.currentThread, &QThread::finished, state.currentThread, &QThread::deleteLater);
-    // 只在销毁当前线程时置空指针
     connect(state.currentThread, &QThread::destroyed, this, [this]() {
         QMutexLocker locker(&state.threadMutex);
         state.currentThread = nullptr;
@@ -461,9 +454,7 @@ void PanelWidget::batchRunCommand(const QString &command) {
         }
     }, Qt::DirectConnection);
 
-    // 线程结束时自动清理
     connect(state.currentThread, &QThread::finished, state.currentThread, &QThread::deleteLater);
-    // 只在销毁当前线程时置空指针
     connect(state.currentThread, &QThread::destroyed, this, [this]() {
         QMutexLocker locker(&state.threadMutex);
         state.currentThread = nullptr;

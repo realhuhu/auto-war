@@ -11,6 +11,7 @@ ButtonWithSetting::ButtonWithSetting(
 
     textButton = new QPushButton(text);
     textButton->setFixedHeight(25);
+    textButton->setMinimumWidth(60);
     textButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     layout->addWidget(textButton);
 

@@ -30,6 +30,9 @@ AutoWarSimple::AutoWarSimple(QWidget *parent) : PanelWidget(parent) {
     auto *captureButton = new QPushButton("获取窗口");
     connect(captureButton, &QPushButton::clicked, this, &AutoWarSimple::startCapture);
 
+    auto *executeButton = new QPushButton("执行命令");
+    connect(executeButton, &QPushButton::clicked, this, &AutoWarSimple::selectCommand);
+
     controlLayout->addWidget(captureButton);
     controlLayout->addWidget(executeButton);
     controlLayout->addWidget(stopButton);
@@ -50,6 +53,15 @@ void AutoWarSimple::startCapture() {
     hook = SetWindowsHookEx(WH_MOUSE_LL, MouseHookProc, nullptr, 0);
 
     if (hook == nullptr) log("Failed to set hook");
+}
+
+
+void AutoWarSimple::selectCommand() {
+    QDialog selectDialog(this);
+    selectDialog.setWindowTitle("选择命令");
+    selectDialog.setWindowFlags(selectDialog.windowFlags() & ~Qt::WindowContextHelpButtonHint);
+    selectDialog.setLayout(createCommandLayout());
+    selectDialog.exec();
 }
 
 [[maybe_unused]] void AutoWarSimple::getHwnd(int x, int y) {

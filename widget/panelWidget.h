@@ -38,8 +38,6 @@ class PanelWidget : public QWidget {
 Q_OBJECT
 public:
     bool autoHide = true;
-
-    QPushButton *executeButton = new QPushButton("执行命令");
     QPushButton *stopButton = new QPushButton("停止命令");
     QPushButton *clearButton = new QPushButton("清空输出");
     QTextEdit *outputText = new QTextEdit();
@@ -58,7 +56,7 @@ public slots:
 
     void clearText() const;
 
-    void selectCommand();
+    QVBoxLayout *createCommandLayout(int colWidth = 100);
 
     void runCommand(const QString &command);
 
@@ -77,6 +75,7 @@ private:
     QMap<QString, std::function<void()>> tasks;
 
     QString previousLog;
+
 };
 
 #endif // MAINWINDOW_H

@@ -12,6 +12,8 @@ private slots:
 
     void startCapture();
 
+    void selectCommand();
+
     [[maybe_unused]] [[maybe_unused]] void getHwnd(int x, int y);
 
 private:

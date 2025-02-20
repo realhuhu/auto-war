@@ -127,12 +127,10 @@ QVector<ResultEntry> ActivityResultDialog::getActivity() {
 
 QDateTime ActivityResultDialog::getTime(const QString &timeStr) {
     QDateTime dateTime;
-    // 尝试按照 "yyyy:MM:dd:hh:mm:ss" 格式解析
     dateTime = QDateTime::fromString(timeStr, "yyyy:M:d:h:m:s");
     if (dateTime.isValid()) {
         return dateTime;
     }
-    // 尝试按照 "yyyy/MM/dd/hh:mm:ss" 格式解析
     dateTime = QDateTime::fromString(timeStr, "yyyy:M:d:h:m");
     return dateTime;
 }

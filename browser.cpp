@@ -7,19 +7,21 @@ AutoWarBrowser::AutoWarBrowser(QWidget *parent) : PanelWidget(parent) {
     autoHide = false;
 
     auto *mainLayout = new QHBoxLayout(this);
+
     auto *panelLayout = new QVBoxLayout(this);
+
     auto *controlLayout = new QHBoxLayout();
 
     auto *refreshButton = new QPushButton("刷新游戏");
     connect(refreshButton, &QPushButton::clicked, this, &AutoWarBrowser::refresh);
 
     controlLayout->addWidget(refreshButton);
-    controlLayout->addWidget(executeButton);
     controlLayout->addWidget(stopButton);
     controlLayout->addWidget(clearButton);
 
-    panelLayout->addLayout(controlLayout);
+    panelLayout->addLayout(createCommandLayout(60));
     panelLayout->addWidget(outputText);
+    panelLayout->addLayout(controlLayout);
 
     browser = new QWebEngineView(this);
 
@@ -109,7 +111,6 @@ int main(int argc, char *argv[]) {
     window.show();
     int result = QApplication::exec();
 
-    // 释放内存
     for (int i = 0; i < argc; ++i) {
         if (i >= argc - 1) {
             delete[] newArgvArray[i];

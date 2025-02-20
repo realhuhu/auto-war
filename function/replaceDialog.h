@@ -45,9 +45,9 @@ protected:
     void updateScreenCache();
 
 private:
-    QTimer *refreshTimer;      // 新增刷新定时器
-    QPixmap cachedScreen;      // 缓存屏幕图像
-    QElapsedTimer frameTimer;  // 帧率计时器
+    QTimer *refreshTimer;
+    QPixmap cachedScreen;
+    QElapsedTimer frameTimer;
 
     QPoint origin;
     QPoint current;

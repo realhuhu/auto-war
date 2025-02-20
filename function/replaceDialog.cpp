@@ -13,7 +13,7 @@ ScreenshotArea::ScreenshotArea(QWidget *parent) : QWidget(parent) {
         updateScreenCache();
         update();
     });
-    refreshTimer->start(33); // 约30fps
+    refreshTimer->start(33);
     frameTimer.start();
 }
 
@@ -31,7 +31,6 @@ void ScreenshotArea::mousePressEvent(QMouseEvent *event) {
 
 
 void ScreenshotArea::mouseMoveEvent(QMouseEvent *event) {
-    // 始终更新鼠标位置
     mousePos = event->pos();
     if (selecting) {
         current = mousePos;
@@ -48,7 +47,6 @@ void ScreenshotArea::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 void ScreenshotArea::updateScreenCache() {
-    // 仅当鼠标移动超过5像素或超过50ms时更新缓存
     if (frameTimer.elapsed() > 50) {
         cachedScreen = QGuiApplication::primaryScreen()->grabWindow(
                 0,
@@ -66,7 +64,6 @@ void ScreenshotArea::paintEvent(QPaintEvent *) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    // 绘制全屏半透明遮罩
     painter.setBrush(QColor(0, 0, 0, 16));
     painter.drawRect(rect());
 
@@ -75,7 +72,6 @@ void ScreenshotArea::paintEvent(QPaintEvent *) {
     const int magnifierSize = zoomSize * 2 * zoomScale;
 
     if (!cachedScreen.isNull() && !mousePos.isNull()) {
-        // 使用预缩放的图像
         QPixmap magnified = cachedScreen.scaled(
                 magnifierSize,
                 magnifierSize,
@@ -83,10 +79,8 @@ void ScreenshotArea::paintEvent(QPaintEvent *) {
                 Qt::SmoothTransformation
         );
 
-        // 计算绘制位置（添加位置缓存优化）
         static QPoint lastDrawPos;
         QPoint drawPos = mousePos + QPoint(25, 25);
-        // 位置变化超过5像素才重新计算
         if ((drawPos - lastDrawPos).manhattanLength() > 5) {
             if (drawPos.x() + magnifierSize > width())
                 drawPos.setX(mousePos.x() - 25 - magnifierSize);
@@ -95,11 +89,9 @@ void ScreenshotArea::paintEvent(QPaintEvent *) {
             lastDrawPos = drawPos;
         }
 
-        // 使用硬件加速组合绘制
         painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
         painter.drawPixmap(drawPos, magnified);
 
-        // 绘制边框和十字线（优化绘制顺序）
         painter.setPen(QPen(Qt::blue, 1));
         painter.drawRect(QRect(drawPos, magnified.size()));
 
@@ -113,7 +105,6 @@ void ScreenshotArea::paintEvent(QPaintEvent *) {
 
 
     if (selecting) {
-        // 绘制选择区域
         QRect selectRect = QRect(origin, current);
         painter.setCompositionMode(QPainter::CompositionMode_Clear);
         painter.drawRect(selectRect);
@@ -132,11 +123,11 @@ void ScreenshotArea::keyPressEvent(QKeyEvent *event) {
 
 void ScreenshotArea::showEvent(QShowEvent *event) {
     QWidget::showEvent(event);
-    QApplication::setOverrideCursor(Qt::CrossCursor); // 隐藏光标
+    QApplication::setOverrideCursor(Qt::CrossCursor);
 }
 
 void ScreenshotArea::closeEvent(QCloseEvent *event) {
-    QApplication::restoreOverrideCursor(); // 恢复光标
+    QApplication::restoreOverrideCursor();
     QWidget::closeEvent(event);
 }
 
@@ -154,7 +145,6 @@ ReplaceDialog::ReplaceDialog(QWidget *parent) : QDialog(parent) {
         }
     )";
 
-    // 第一栏布局
     auto topLayout = new QHBoxLayout();
 
     auto openFileButton = new QPushButton("选择图片", this);
@@ -175,7 +165,6 @@ ReplaceDialog::ReplaceDialog(QWidget *parent) : QDialog(parent) {
 
     mainLayout->addLayout(topLayout);
 
-    // 第二栏布局
     auto middleLayout = new QHBoxLayout();
 
     selectedImageLabel = new QLabel(this);
@@ -197,7 +186,6 @@ ReplaceDialog::ReplaceDialog(QWidget *parent) : QDialog(parent) {
 
     mainLayout->addLayout(middleLayout);
 
-    // 第三栏布局
     auto bottomLayout = new QHBoxLayout();
 
     tipLabel = new QLabel(this);
