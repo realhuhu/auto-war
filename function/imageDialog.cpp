@@ -1,8 +1,8 @@
 ﻿#include "imageDialog.h"
 
 ImageDialog::ImageDialog(QWidget *parent) : QDialog(parent), imageLabel(new QLabel(this)) {
-    this->setWindowTitle("查看截屏");
-    this->setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint);
+    setWindowTitle("查看截屏");
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
     auto screenshot = CV::getScreen(Mode::RGB);
     cv::cvtColor(screenshot, screenshot, cv::COLOR_BGR2RGB);

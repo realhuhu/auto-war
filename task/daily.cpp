@@ -954,7 +954,7 @@ void otherActivity() {
             for (const auto &i: targetList) {
                 clicker = std::make_unique<ImageClicker>("/其它活动/免费领取.png", i);
                 runUntil.emplace_back(std::make_unique<UntilAnyImage>(list{
-                        "/其它活动/领取成功.png", "/其它活动/时间已到.png", "/其它活动/时间未到.png"
+                        "/其它活动/领取成功.png", "/其它活动/已领取过.png", "/其它活动/时间已到.png", "/其它活动/时间未到.png"
                 }));
                 runUntil.emplace_back(std::make_unique<UntilImage>("/其它活动/关闭窗口.png"));
                 clicker = clicker->click(startUntil, clickUntil, runUntil);
