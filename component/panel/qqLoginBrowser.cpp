@@ -11,11 +11,13 @@ void LinkInterceptor::interceptRequest(QWebEngineUrlRequestInfo &info) {
 QQLoginBrowser::QQLoginBrowser(QWidget *parent, QString remark) : QDialog(parent) {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(QString("登录账号：%1").arg(remark));
-    resize(985, 965);
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+    resize(970, 640);
 
     remark = remark.trimmed().replace("/", "_").replace("\\", "_");
 
     auto *mainLayout = new QHBoxLayout(this);
+    mainLayout->setMargin(0);
 
     QWebEngineProfile *profile = nullptr;
     LinkInterceptor *interceptor = nullptr;
@@ -24,7 +26,7 @@ QQLoginBrowser::QQLoginBrowser(QWidget *parent, QString remark) : QDialog(parent
         profile = profileMap.value(remark);
         interceptor = interceptorMap.value(remark);
     } else {
-        QString storagePath = QCoreApplication::applicationDirPath() + "/web_profile/" + remark;
+        QString storagePath = QCoreApplication::applicationDirPath() + "/web_profile/login/" + remark;
         QDir dir(storagePath);
         if (!dir.exists()) dir.mkpath(".");
 

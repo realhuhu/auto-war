@@ -101,21 +101,46 @@ void AutoWar::loadConfig() const {
 }
 
 void AutoWar::openBrowser() {
-    auto browser = new AutoWarBrowser(panelTabWidget);
-    auto wid = browser->winId();
+    const auto accounts = state.config["account"].toArray();
+    for (const auto &accountVal: accounts) {
+        const auto account = accountVal.toObject();
+        const auto qqRemark = account["remark"].toString();  // QQ账号备注
+        const auto link = account["link"].toString();  // QQ账号备注
 
-    browsers.insert(wid, browser);
-    browser->show();
+        // 提取红警子账号配置
+        const auto redAccounts = account["red"].toArray();
+        for (const auto &redVal: redAccounts) {
+            const auto red = redVal.toObject();
 
-    panelTabWidget->addTabWithWId(browser->panel, WIdToQSting(wid), browser->winId());
+            // 创建表格行数据
+            const auto redRemark = red["remark"].toString();
+            const auto region = red["region"].toInt();
 
-    connect(browser, &AutoWarBrowser::closed, [this](WId closedWid) {
-        panelTabWidget->removeTabByWId(closedWid);
-        browsers.remove(closedWid);
-        log(QString("已关闭游戏窗口(%1)").arg(WIdToQSting(closedWid)));
-    });
 
-    log(QString("已打开游戏窗口(%1)").arg(WIdToQSting(wid)));
+            auto browser = new RedBrowser(
+                    panelTabWidget,
+                    qqRemark,
+                    redRemark,
+                    link,
+                    region
+            );
+
+            auto wid = browser->winId();
+
+            browsers.insert(wid, browser);
+            browser->show();
+
+            panelTabWidget->addTabWithWId(browser->panel, WIdToQSting(wid), browser->winId());
+
+            connect(browser, &RedBrowser::closed, [this](WId closedWid) {
+                panelTabWidget->removeTabByWId(closedWid);
+                browsers.remove(closedWid);
+                log(QString("已关闭游戏窗口(%1)").arg(WIdToQSting(closedWid)));
+            });
+
+            log(QString("已打开游戏窗口(%1)").arg(WIdToQSting(wid)));
+        }
+    }
 }
 
 void AutoWar::openQQManager() {
@@ -152,7 +177,7 @@ void AutoWar::clearLog() const { logTextEdit->clear(); }
 
 void AutoWar::closeEvent(QCloseEvent *event) {
     for (auto it = browsers.begin(); it != browsers.end(); ++it) {
-        AutoWarBrowser *browser = it.value();
+        RedBrowser *browser = it.value();
         if (browser) {
             browser->close();
         }

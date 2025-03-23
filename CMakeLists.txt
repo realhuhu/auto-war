@@ -17,6 +17,7 @@ find_package(OpenCV REQUIRED)
 qt5_add_resources(qrc_FILES resource/resource.qrc)
 
 add_executable(Red
+        WIN32
         ${qrc_FILES}
 
         util/tool.h
@@ -31,8 +32,8 @@ add_executable(Red
 
         component/panel/controller.h
         component/panel/controller.cpp
-        component/panel/browser.h
-        component/panel/browser.cpp
+        component/panel/redBrowser.h
+        component/panel/redBrowser.cpp
         component/panel/qqManger.h
         component/panel/qqManger.cpp
         component/panel/qqLoginBrowser.h

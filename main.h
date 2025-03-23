@@ -12,7 +12,7 @@
 
 #include "util/tool.h"
 #include "util/state.h"
-#include "component/panel/browser.h"
+#include "component/panel/redBrowser.h"
 #include "component/panel/qqManger.h"
 #include "component/panel/redManager.h"
 #include "component/panel/controller.h"
@@ -23,7 +23,7 @@ class AutoWar : public QWidget {
 Q_OBJECT
 
 public:
-    QMap<WId, AutoWarBrowser *> browsers;
+    QMap<WId, RedBrowser *> browsers;
     QTextEdit *logTextEdit = new QTextEdit(this);
     WIdTabWidget *panelTabWidget = new WIdTabWidget(this);
 
