@@ -17,7 +17,6 @@ Q_OBJECT
 public:
     explicit LinkInterceptor(QObject *parent = nullptr);
 
-    // 拦截请求的核心函数
     void interceptRequest(QWebEngineUrlRequestInfo &info) override;
 
 signals:
@@ -31,7 +30,7 @@ Q_OBJECT
 public:
     QWebEngineView *browser;
     static QMap<QString, QWebEngineProfile *> profileMap;
-    static QMap<QString, LinkInterceptor*> interceptorMap;
+    static QMap<QString, LinkInterceptor *> interceptorMap;
 
     explicit QQLoginBrowser(QWidget *parent, QString remark);
 

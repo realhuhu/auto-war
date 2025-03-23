@@ -50,7 +50,7 @@ QQLoginBrowser::QQLoginBrowser(QWidget *parent, QString remark) : QDialog(parent
 
 
 void QQLoginBrowser::onLinkDetected(QUrl url) {
-    emit linkDetected(url);
+    emit linkDetected(std::move(url));
     close();
 }
 

@@ -10,8 +10,8 @@
 #include <QHBoxLayout>
 #include <QMessageBox>
 #include <QTableWidget>
-#include <QRandomGenerator>
 #include <QInputDialog>
+#include <QRandomGenerator>
 
 #include "qqLoginBrowser.h"
 #include "../unit/placeholderDelegate.h"
@@ -23,19 +23,21 @@ Q_OBJECT
 public:
     explicit QQManger(QWidget *parent = nullptr);
 
-private slots:
+    int getIndexThroughButton(QObject* button);
 
-    void addNew();
+private slots:
 
     void handleTest(int row);
 
     void handleLogin(int row);
 
+    void handleDelete(int row);
+
+    void addNew();
+
     void testAll();
 
     void loginAll();
-
-    void handleDelete(int row);
 
 private:
     QTableWidget *tableWidget;

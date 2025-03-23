@@ -24,11 +24,11 @@ QQManger::QQManger(QWidget *parent) : QDialog(parent) {
         }
     )");
 
-    QWidget *buttonContainer = new QWidget();
-    QHBoxLayout *buttonLayout = new QHBoxLayout(buttonContainer);
-    QPushButton *addButton = new QPushButton("添加账号");
-    QPushButton *testAllButton = new QPushButton("全部测试");
-    QPushButton *loginAllButton = new QPushButton("全部登录");
+    auto buttonContainer = new QWidget();
+    auto buttonLayout = new QHBoxLayout(buttonContainer);
+    auto addButton = new QPushButton("添加账号");
+    auto testAllButton = new QPushButton("全部测试");
+    auto loginAllButton = new QPushButton("全部登录");
     connect(addButton, &QPushButton::clicked, this, &QQManger::addNew);
     connect(testAllButton, &QPushButton::clicked, this, &QQManger::testAll);
     connect(loginAllButton, &QPushButton::clicked, this, &QQManger::loginAll);
@@ -37,9 +37,21 @@ QQManger::QQManger(QWidget *parent) : QDialog(parent) {
     buttonLayout->addWidget(loginAllButton);
     buttonLayout->addStretch();
 
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    auto mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(tableWidget);
     mainLayout->addWidget(buttonContainer);
+}
+
+int QQManger::getIndexThroughButton(QObject *button) {
+    QWidget *buttonWidget = qobject_cast<QWidget *>(button);
+
+    if (!buttonWidget) return -1;
+
+    for (int i = 0; i < tableWidget->rowCount(); ++i) {
+        if (tableWidget->cellWidget(i, ActionCol) == buttonWidget) return i;
+    }
+
+    return -1;
 }
 
 void QQManger::handleDelete(int row) {
@@ -62,9 +74,6 @@ void QQManger::handleDelete(int row) {
 }
 
 void QQManger::handleTest(int row) {
-    QString qq = tableWidget->item(row, QQNumberCol)->text();
-    QString pwd = tableWidget->item(row, PasswordCol)->text();
-
     bool success = QRandomGenerator::global()->bounded(2);
 
     QTableWidgetItem *statusItem = tableWidget->item(row, StatusCol);
@@ -78,7 +87,7 @@ void QQManger::handleLogin(int row) {
     QString remark = remarkItem ? remarkItem->text() : "未知账号";
 
     auto browser = new QQLoginBrowser(this, remark);
-    connect(browser, &QQLoginBrowser::linkDetected, [this, &row](QUrl url) {
+    connect(browser, &QQLoginBrowser::linkDetected, [this, &row](const QUrl& url) {
         QTableWidgetItem *linkItem = tableWidget->item(row, LinkCol);
         linkItem->setText(url.toString());
 
@@ -122,28 +131,28 @@ void QQManger::addNew() {
     int row = tableWidget->rowCount();
     tableWidget->insertRow(row);
 
-    QTableWidgetItem *remarkItem = new QTableWidgetItem(remark);
+    auto remarkItem = new QTableWidgetItem(remark);
     remarkItem->setFlags(remarkItem->flags() & ~Qt::ItemIsEditable);
     remarkItem->setBackground(QColor(240, 240, 240));
     tableWidget->setItem(row, RemarkCol, remarkItem);
 
     for (int col = QQNumberCol; col <= LinkCol; ++col) {
-        QTableWidgetItem *item = new QTableWidgetItem();
+        auto item = new QTableWidgetItem();
         tableWidget->setItem(row, col, item);
     }
 
-    QTableWidgetItem *statusItem = new QTableWidgetItem("待测试");
+    auto statusItem = new QTableWidgetItem("待测试");
     statusItem->setFlags(statusItem->flags() & ~Qt::ItemIsEditable);
     statusItem->setForeground(Qt::darkGray);
     statusItem->setBackground(QColor(240, 240, 240));
     tableWidget->setItem(row, StatusCol, statusItem);
 
-    QWidget *buttonWidget = new QWidget();
-    QHBoxLayout *btnLayout = new QHBoxLayout(buttonWidget);
+    auto buttonWidget = new QWidget();
+    auto btnLayout = new QHBoxLayout(buttonWidget);
     btnLayout->setContentsMargins(0, 0, 0, 0);
-    QPushButton *testBtn = new QPushButton("测试");
-    QPushButton *loginBtn = new QPushButton("登录");
-    QPushButton *deleteBtn = new QPushButton("删除");
+    auto testBtn = new QPushButton("测试");
+    auto loginBtn = new QPushButton("登录");
+    auto deleteBtn = new QPushButton("删除");
     deleteBtn->setStyleSheet("background-color: #ff4444; color: white;");
     btnLayout->addWidget(testBtn);
     btnLayout->addWidget(loginBtn);
@@ -151,11 +160,23 @@ void QQManger::addNew() {
 
     tableWidget->setCellWidget(row, ActionCol, buttonWidget);
 
-    connect(testBtn, &QPushButton::clicked, this, [this, row]() { handleTest(row); });
-    connect(loginBtn, &QPushButton::clicked, this, [this, row]() { handleLogin(row); });
-    connect(deleteBtn, &QPushButton::clicked, this, [this, row]() { handleDelete(row); });
+    connect(deleteBtn, &QPushButton::clicked, this, [this]() {
+        int index = getIndexThroughButton(sender()->parent());
+        if (index != -1) handleDelete(index);
+    });
+
+    connect(testBtn, &QPushButton::clicked, this, [this]() {
+        int index = getIndexThroughButton(sender()->parent());
+        if (index != -1) handleTest(index);
+    });
+
+    connect(loginBtn, &QPushButton::clicked, this, [this]() {
+        int index = getIndexThroughButton(sender()->parent());
+        if (index != -1) handleLogin(index);
+    });
 }
 
 void QQManger::testAll() { for (int row = 0; row < tableWidget->rowCount(); ++row) handleTest(row); }
 
 void QQManger::loginAll() { for (int row = 0; row < tableWidget->rowCount(); ++row) handleLogin(row); }
+
