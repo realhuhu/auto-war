@@ -1,5 +1,7 @@
 ﻿#include "main.h"
 
+auto configFile = "/config.json";
+
 AutoWar::AutoWar(QWidget *parent) : QWidget(parent) {
     setWindowTitle("红警多开");
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
@@ -34,6 +36,8 @@ AutoWar::AutoWar(QWidget *parent) : QWidget(parent) {
     connect(openWindowButton, &QPushButton::clicked, this, &AutoWar::openBrowser);
     connect(qqLoginButton, &QPushButton::clicked, this, &AutoWar::openQQManager);
     connect(clearLogButton, &QPushButton::clicked, this, &AutoWar::clearLog);
+
+    loadConfig();
 }
 
 void AutoWar::log(const QString &text, const QString &color) const {
@@ -51,6 +55,49 @@ void AutoWar::log(const QString &text, const QString &color) const {
     ).arg(timeString, color, text));
 }
 
+void AutoWar::loadConfig() const {
+    QString configPath = QCoreApplication::applicationDirPath() + configFile;
+    QFileInfo fileInfo(configPath);
+
+    if (!fileInfo.exists()) {
+        QFile newFile(configPath);
+        if (!newFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            log(QString("无法创建配置文件: %1").arg(configPath));
+            return;
+        }
+        QTextStream stream(&newFile);
+        stream << "{\"account\": []}";
+        newFile.close();
+        log("已创建默认配置文件");
+    }
+
+    QFile file(configPath);
+
+    if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) {
+        log(QString("配置文件存在但无法打开: %1").arg(file.errorString()));
+        return;
+    }
+
+    QByteArray jsonData = file.readAll();
+    QJsonParseError parseError{};
+    QJsonDocument doc = QJsonDocument::fromJson(jsonData, &parseError);
+
+    if (parseError.error != QJsonParseError::NoError) {
+        log(QString("配置文件解析错误: %1").arg(parseError.errorString()));
+
+        if (jsonData.trimmed().isEmpty()) {
+            log("检测到空文件，重新初始化配置");
+            file.resize(0); // 清空文件内容
+            QTextStream stream(&file);
+            stream << "{\"account\": []}";
+        }
+        file.close();
+        return;
+    }
+
+    state.config = doc.object();
+    file.close();
+}
 
 void AutoWar::openBrowser() {
     auto browser = new AutoWarBrowser(panelTabWidget);
@@ -70,14 +117,27 @@ void AutoWar::openBrowser() {
     log(QString("已打开游戏窗口(%1)").arg(WIdToQSting(wid)));
 }
 
-
 void AutoWar::openQQManager() {
     auto dialog = new QQManger(this);
+    connect(dialog, &QQManger::configChanged, this, &AutoWar::saveConfig);
     dialog->exec();
 }
 
-void AutoWar::clearLog() const { logTextEdit->clear(); }
 
+void AutoWar::saveConfig() const {
+    QString configPath = QCoreApplication::applicationDirPath() + configFile;
+
+    QFile file(configPath);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QJsonDocument doc(state.config);
+        file.write(doc.toJson(QJsonDocument::Indented));
+        file.close();
+    }
+
+    log("配置已保存");
+}
+
+void AutoWar::clearLog() const { logTextEdit->clear(); }
 
 void AutoWar::closeEvent(QCloseEvent *event) {
     for (auto it = browsers.begin(); it != browsers.end(); ++it) {

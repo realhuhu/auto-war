@@ -3,3 +3,4 @@ cmake-build-*
 
 debug.log
 web_profile
+config.json

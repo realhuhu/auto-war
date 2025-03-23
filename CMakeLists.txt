@@ -21,6 +21,8 @@ add_executable(Red
 
         util/tool.h
         util/tool.cpp
+        util/state.h
+        util/state.cpp
 
         component/unit/widTabWidget.h
         component/unit/widTabWidget.cpp

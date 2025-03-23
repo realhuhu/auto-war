@@ -32,17 +32,19 @@ QQManger::QQManger(QWidget *parent) : QDialog(parent) {
     connect(addButton, &QPushButton::clicked, this, &QQManger::addNew);
     connect(testAllButton, &QPushButton::clicked, this, &QQManger::testAll);
     connect(loginAllButton, &QPushButton::clicked, this, &QQManger::loginAll);
+    buttonLayout->addStretch();
     buttonLayout->addWidget(addButton);
     buttonLayout->addWidget(testAllButton);
     buttonLayout->addWidget(loginAllButton);
-    buttonLayout->addStretch();
 
     auto mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(tableWidget);
     mainLayout->addWidget(buttonContainer);
+
+    loadConfig();
 }
 
-int QQManger::getIndexThroughButton(QObject *button) {
+int QQManger::getIndex(QObject *button) const {
     QWidget *buttonWidget = qobject_cast<QWidget *>(button);
 
     if (!buttonWidget) return -1;
@@ -52,6 +54,139 @@ int QQManger::getIndexThroughButton(QObject *button) {
     }
 
     return -1;
+}
+
+void QQManger::insertRow(const QString &remark, const QString &qq, const QString &password, const QString &link) {
+    int row = tableWidget->rowCount();
+    tableWidget->insertRow(row);
+
+    auto remarkItem = new QTableWidgetItem(remark);
+    remarkItem->setFlags(remarkItem->flags() & ~Qt::ItemIsEditable);
+    remarkItem->setBackground(QColor(240, 240, 240));
+    tableWidget->setItem(row, RemarkCol, remarkItem);
+
+    auto qqItem = new QTableWidgetItem(qq);
+    tableWidget->setItem(row, QQNumberCol, qqItem);
+
+    auto pwdItem = new QTableWidgetItem(password);
+    tableWidget->setItem(row, PasswordCol, pwdItem);
+
+    auto linkItem = new QTableWidgetItem(link);
+    tableWidget->setItem(row, LinkCol, linkItem);
+
+    auto statusItem = new QTableWidgetItem("待测试");
+    statusItem->setFlags(statusItem->flags() & ~Qt::ItemIsEditable);
+    statusItem->setForeground(Qt::darkGray);
+    statusItem->setBackground(QColor(240, 240, 240));
+    tableWidget->setItem(row, StatusCol, statusItem);
+
+    auto buttonWidget = new QWidget();
+    auto btnLayout = new QHBoxLayout(buttonWidget);
+    btnLayout->setContentsMargins(0, 0, 0, 0);
+    auto testBtn = new QPushButton("测试");
+    auto loginBtn = new QPushButton("登录");
+    auto deleteBtn = new QPushButton("删除");
+    deleteBtn->setStyleSheet("background-color: #ff4444; color: white;");
+    btnLayout->addWidget(testBtn);
+    btnLayout->addWidget(loginBtn);
+    btnLayout->addWidget(deleteBtn);
+
+    tableWidget->setCellWidget(row, ActionCol, buttonWidget);
+
+    connect(deleteBtn, &QPushButton::clicked, this, [this]() {
+        int index = getIndex(sender()->parent());
+        if (index != -1) handleDelete(index);
+    });
+
+    connect(testBtn, &QPushButton::clicked, this, [this]() {
+        int index = getIndex(sender()->parent());
+        if (index != -1) handleTest(index);
+    });
+
+    connect(loginBtn, &QPushButton::clicked, this, [this]() {
+        int index = getIndex(sender()->parent());
+        if (index != -1) handleLogin(index);
+    });
+}
+
+void QQManger::loadConfig() {
+    tableWidget->blockSignals(true);
+    tableWidget->setRowCount(0);
+
+    if (!state.config.contains("account") || !state.config["account"].isArray()) {
+        tableWidget->blockSignals(false);
+        return;
+    }
+
+    QJsonArray accounts = state.config["account"].toArray();
+    std::vector<QJsonObject> accountObjects;
+
+    for (auto val: accounts) if (val.isObject()) accountObjects.push_back(val.toObject());
+
+    std::sort(accountObjects.begin(), accountObjects.end(), [](const QJsonObject &a, const QJsonObject &b) {
+        return a["order"].toInt(0) < b["order"].toInt(0);
+    });
+
+    QJsonArray sortedAccounts;
+    for (const auto &obj: accountObjects) sortedAccounts.append(obj);
+
+    for (auto accountVal: accounts) {
+        QJsonObject account = accountVal.toObject();
+
+        insertRow(
+                account["remark"].toString(),
+                account["qq"].toString(),
+                account["password"].toString(),
+                account["link"].toString()
+        );
+    }
+
+    tableWidget->blockSignals(false);
+}
+
+void QQManger::saveConfig() {
+    QJsonArray accounts;
+    QHash<QString, QJsonArray> existingReds;
+
+    // 从现有配置中提取 red 数据
+    if (state.config.contains("account") && state.config["account"].isArray()) {
+        for (const auto val: state.config["account"].toArray()) {
+            QJsonObject obj = val.toObject();
+            QString remark = obj["remark"].toString();
+            existingReds.insert(remark, obj["red"].toArray());
+        }
+    }
+
+    // 遍历表格生成新配置
+    for (int row = 0; row < tableWidget->rowCount(); ++row) {
+        QJsonObject account;
+
+        // 获取单元格数据
+        QTableWidgetItem *remarkItem = tableWidget->item(row, RemarkCol);
+        QTableWidgetItem *qqItem = tableWidget->item(row, QQNumberCol);
+        QTableWidgetItem *pwdItem = tableWidget->item(row, PasswordCol);
+        QTableWidgetItem *linkItem = tableWidget->item(row, LinkCol);
+
+        // 构建账号对象
+        account["order"] = row + 1;  // 行号从1开始
+        account["remark"] = remarkItem ? remarkItem->text() : "";
+        account["qq"] = qqItem ? qqItem->text() : "";
+        account["password"] = pwdItem ? pwdItem->text() : "";
+        account["link"] = linkItem ? linkItem->text() : "";
+
+        // 保留已有的 red 数据
+        if (existingReds.contains(account["remark"].toString())) {
+            account["red"] = existingReds[account["remark"].toString()];
+        } else {
+            account["red"] = QJsonArray();
+        }
+
+        accounts.append(account);
+    }
+
+    state.config["account"] = accounts;
+
+    emit configChanged();
 }
 
 void QQManger::handleDelete(int row) {
@@ -67,13 +202,11 @@ void QQManger::handleDelete(int row) {
                 QMessageBox::Yes | QMessageBox::No
         );
 
-        if (reply == QMessageBox::Yes) {
-            tableWidget->removeRow(row);
-        }
+        if (reply == QMessageBox::Yes) tableWidget->removeRow(row);
     }
 }
 
-void QQManger::handleTest(int row) {
+void QQManger::handleTest(int row) const {
     bool success = QRandomGenerator::global()->bounded(2);
 
     QTableWidgetItem *statusItem = tableWidget->item(row, StatusCol);
@@ -87,7 +220,7 @@ void QQManger::handleLogin(int row) {
     QString remark = remarkItem ? remarkItem->text() : "未知账号";
 
     auto browser = new QQLoginBrowser(this, remark);
-    connect(browser, &QQLoginBrowser::linkDetected, [this, &row](const QUrl& url) {
+    connect(browser, &QQLoginBrowser::linkDetected, [this, &row](const QUrl &url) {
         QTableWidgetItem *linkItem = tableWidget->item(row, LinkCol);
         linkItem->setText(url.toString());
 
@@ -128,55 +261,17 @@ void QQManger::addNew() {
         break;
     }
 
-    int row = tableWidget->rowCount();
-    tableWidget->insertRow(row);
-
-    auto remarkItem = new QTableWidgetItem(remark);
-    remarkItem->setFlags(remarkItem->flags() & ~Qt::ItemIsEditable);
-    remarkItem->setBackground(QColor(240, 240, 240));
-    tableWidget->setItem(row, RemarkCol, remarkItem);
-
-    for (int col = QQNumberCol; col <= LinkCol; ++col) {
-        auto item = new QTableWidgetItem();
-        tableWidget->setItem(row, col, item);
-    }
-
-    auto statusItem = new QTableWidgetItem("待测试");
-    statusItem->setFlags(statusItem->flags() & ~Qt::ItemIsEditable);
-    statusItem->setForeground(Qt::darkGray);
-    statusItem->setBackground(QColor(240, 240, 240));
-    tableWidget->setItem(row, StatusCol, statusItem);
-
-    auto buttonWidget = new QWidget();
-    auto btnLayout = new QHBoxLayout(buttonWidget);
-    btnLayout->setContentsMargins(0, 0, 0, 0);
-    auto testBtn = new QPushButton("测试");
-    auto loginBtn = new QPushButton("登录");
-    auto deleteBtn = new QPushButton("删除");
-    deleteBtn->setStyleSheet("background-color: #ff4444; color: white;");
-    btnLayout->addWidget(testBtn);
-    btnLayout->addWidget(loginBtn);
-    btnLayout->addWidget(deleteBtn);
-
-    tableWidget->setCellWidget(row, ActionCol, buttonWidget);
-
-    connect(deleteBtn, &QPushButton::clicked, this, [this]() {
-        int index = getIndexThroughButton(sender()->parent());
-        if (index != -1) handleDelete(index);
-    });
-
-    connect(testBtn, &QPushButton::clicked, this, [this]() {
-        int index = getIndexThroughButton(sender()->parent());
-        if (index != -1) handleTest(index);
-    });
-
-    connect(loginBtn, &QPushButton::clicked, this, [this]() {
-        int index = getIndexThroughButton(sender()->parent());
-        if (index != -1) handleLogin(index);
-    });
+    insertRow(remark);
 }
 
 void QQManger::testAll() { for (int row = 0; row < tableWidget->rowCount(); ++row) handleTest(row); }
 
 void QQManger::loginAll() { for (int row = 0; row < tableWidget->rowCount(); ++row) handleLogin(row); }
+
+void QQManger::closeEvent(QCloseEvent *event) {
+    saveConfig();
+    QDialog::closeEvent(event);
+}
+
+
 
