@@ -11,15 +11,15 @@ AutoWar::AutoWar(QWidget *parent) : QWidget(parent) {
 
     auto *topLayout = new QHBoxLayout();
 
-    auto *openWindowButton = new QPushButton("全部打开", this);
-    auto *qqLoginButton = new QPushButton("QQ账号", this);
-    auto *setConfigButton = new QPushButton("红警账号", this);
+    auto *openAllButton = new QPushButton("全部打开", this);
+    auto *qqConfigButton = new QPushButton("QQ账号", this);
+    auto *redConfigButton = new QPushButton("红警账号", this);
     auto *batchRunButton = new QPushButton("全部执行", this);
     auto *batchStopButton = new QPushButton("全部停止", this);
     auto *clearLogButton = new QPushButton("清空日志", this);
-    topLayout->addWidget(openWindowButton);
-    topLayout->addWidget(qqLoginButton);
-    topLayout->addWidget(setConfigButton);
+    topLayout->addWidget(openAllButton);
+    topLayout->addWidget(qqConfigButton);
+    topLayout->addWidget(redConfigButton);
     topLayout->addWidget(batchRunButton);
     topLayout->addWidget(batchStopButton);
     topLayout->addWidget(clearLogButton);
@@ -33,8 +33,9 @@ AutoWar::AutoWar(QWidget *parent) : QWidget(parent) {
 
     mainLayout->addLayout(bodyLayout);
 
-    connect(openWindowButton, &QPushButton::clicked, this, &AutoWar::openBrowser);
-    connect(qqLoginButton, &QPushButton::clicked, this, &AutoWar::openQQManager);
+    connect(openAllButton, &QPushButton::clicked, this, &AutoWar::openBrowser);
+    connect(qqConfigButton, &QPushButton::clicked, this, &AutoWar::openQQManager);
+    connect(redConfigButton, &QPushButton::clicked, this, &AutoWar::openRedManager);
     connect(clearLogButton, &QPushButton::clicked, this, &AutoWar::clearLog);
 
     loadConfig();
@@ -123,6 +124,16 @@ void AutoWar::openQQManager() {
     dialog->exec();
 }
 
+void AutoWar::openRedManager() {
+    if (state.config["account"].toArray().isEmpty()) {
+        log("请先配置QQ账号", "red");
+        return;
+    }
+
+    auto dialog = new RedManger(this);
+    connect(dialog, &RedManger::configChanged, this, &AutoWar::saveConfig);
+    dialog->exec();
+}
 
 void AutoWar::saveConfig() const {
     QString configPath = QCoreApplication::applicationDirPath() + configFile;

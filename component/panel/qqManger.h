@@ -65,7 +65,6 @@ public:
 
     void closeEvent(QCloseEvent *event) override;
 
-
 public slots:
 
     void handleTest(int row);

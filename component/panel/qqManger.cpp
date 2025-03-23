@@ -5,6 +5,8 @@ QQManger::QQManger(QWidget *parent) : QDialog(parent), networkManager(new QNetwo
     resize(800, 600);
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
+    auto mainLayout = new QVBoxLayout(this);
+
     QStringList headers;
     headers << "备注" << "QQ号" << "密码" << "链接" << "状态" << "操作";
     tableWidget = new QTableWidget(0, 6);
@@ -18,15 +20,15 @@ QQManger::QQManger(QWidget *parent) : QDialog(parent), networkManager(new QNetwo
     tableWidget->horizontalHeader()->setStyleSheet(R"(
         QHeaderView::section {
             background-color: #87CEFA;
-            padding: 4px;
             border: 1px solid #E0E0E0;
-            font-weight: bold;
         }
     )");
 
+    mainLayout->addWidget(tableWidget);
+
     auto buttonContainer = new QWidget();
     auto buttonLayout = new QHBoxLayout(buttonContainer);
-    auto addButton = new QPushButton("添加账号");
+    auto addButton = new QPushButton("添加QQ账号");
     auto testAllButton = new QPushButton("全部测试");
     auto loginAllButton = new QPushButton("全部登录");
     connect(addButton, &QPushButton::clicked, this, &QQManger::addNew);
@@ -37,8 +39,6 @@ QQManger::QQManger(QWidget *parent) : QDialog(parent), networkManager(new QNetwo
     buttonLayout->addWidget(testAllButton);
     buttonLayout->addWidget(loginAllButton);
 
-    auto mainLayout = new QVBoxLayout(this);
-    mainLayout->addWidget(tableWidget);
     mainLayout->addWidget(buttonContainer);
 
     loadConfig();
@@ -82,7 +82,7 @@ void QQManger::insertRow(const QString &remark, const QString &qq, const QString
 
     auto buttonWidget = new QWidget();
     auto btnLayout = new QHBoxLayout(buttonWidget);
-    btnLayout->setContentsMargins(0, 0, 0, 0);
+    btnLayout->setContentsMargins(2, 0, 2, 0);
     auto testBtn = new QPushButton("测试");
     auto loginBtn = new QPushButton("登录");
     auto deleteBtn = new QPushButton("删除");
@@ -93,10 +93,6 @@ void QQManger::insertRow(const QString &remark, const QString &qq, const QString
 
     tableWidget->setCellWidget(row, ActionCol, buttonWidget);
 
-    connect(deleteBtn, &QPushButton::clicked, this, [this]() {
-        int index = getIndex(sender()->parent());
-        if (index != -1) handleDelete(index);
-    });
 
     connect(testBtn, &QPushButton::clicked, this, [this]() {
         int index = getIndex(sender()->parent());
@@ -106,6 +102,11 @@ void QQManger::insertRow(const QString &remark, const QString &qq, const QString
     connect(loginBtn, &QPushButton::clicked, this, [this]() {
         int index = getIndex(sender()->parent());
         if (index != -1) handleLogin(index);
+    });
+
+    connect(deleteBtn, &QPushButton::clicked, this, [this]() {
+        int index = getIndex(sender()->parent());
+        if (index != -1) handleDelete(index);
     });
 }
 
@@ -150,13 +151,7 @@ void QQManger::setStatus(int row, Status status) {
 }
 
 void QQManger::loadConfig() {
-    tableWidget->blockSignals(true);
     tableWidget->setRowCount(0);
-
-    if (!state.config.contains("account") || !state.config["account"].isArray()) {
-        tableWidget->blockSignals(false);
-        return;
-    }
 
     QJsonArray accounts = state.config["account"].toArray();
     std::vector<QJsonObject> accountObjects;
@@ -180,8 +175,6 @@ void QQManger::loadConfig() {
                 account["link"].toString()
         );
     }
-
-    tableWidget->blockSignals(false);
 }
 
 void QQManger::saveConfig() {
@@ -319,7 +312,7 @@ void QQManger::addNew() {
         if (!ok) return;
 
         if (remark.length() == 0 || remark.length() > 10) {
-            QMessageBox::warning(this, "错误", "备注应当为1-10字符");
+            QMessageBox::warning(this, "输入错误", "备注应当为1-10字符");
             continue;
         }
 
@@ -332,7 +325,7 @@ void QQManger::addNew() {
         }
 
         if (exists) {
-            QMessageBox::warning(this, "错误", "备注名称已存在，请重新输入！");
+            QMessageBox::warning(this, "输入错误", "备注名称已存在，请重新输入！");
             continue;
         }
 

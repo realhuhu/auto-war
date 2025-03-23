@@ -12,8 +12,9 @@
 
 #include "util/tool.h"
 #include "util/state.h"
-#include "component/panel/qqManger.h"
 #include "component/panel/browser.h"
+#include "component/panel/qqManger.h"
+#include "component/panel/redManager.h"
 #include "component/panel/controller.h"
 #include "component/unit/widTabWidget.h"
 
@@ -39,6 +40,8 @@ public slots:
     void openBrowser();
 
     void openQQManager();
+
+    void openRedManager();
 
     void saveConfig() const;
 

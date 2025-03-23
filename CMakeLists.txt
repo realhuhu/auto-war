@@ -40,6 +40,8 @@ add_executable(Red
 
         main.h
         main.cpp
+        component/panel/redManager.cpp
+        component/panel/redManager.h
 )
 target_link_libraries(Red ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network Qt5::WebEngineWidgets)
 set_target_properties(Red PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
