@@ -9,12 +9,14 @@ AutoWar::AutoWar(QWidget *parent) : QWidget(parent) {
 
     auto *topLayout = new QHBoxLayout();
 
-    auto *openWindowButton = new QPushButton("打开游戏", this);
-    auto *setConfigButton = new QPushButton("账号设置", this);
+    auto *openWindowButton = new QPushButton("全部打开", this);
+    auto *qqLoginButton = new QPushButton("QQ账号", this);
+    auto *setConfigButton = new QPushButton("红警账号", this);
     auto *batchRunButton = new QPushButton("全部执行", this);
     auto *batchStopButton = new QPushButton("全部停止", this);
     auto *clearLogButton = new QPushButton("清空日志", this);
     topLayout->addWidget(openWindowButton);
+    topLayout->addWidget(qqLoginButton);
     topLayout->addWidget(setConfigButton);
     topLayout->addWidget(batchRunButton);
     topLayout->addWidget(batchStopButton);
@@ -30,6 +32,7 @@ AutoWar::AutoWar(QWidget *parent) : QWidget(parent) {
     mainLayout->addLayout(bodyLayout);
 
     connect(openWindowButton, &QPushButton::clicked, this, &AutoWar::openBrowser);
+    connect(qqLoginButton, &QPushButton::clicked, this, &AutoWar::openQQManager);
     connect(clearLogButton, &QPushButton::clicked, this, &AutoWar::clearLog);
 }
 
@@ -67,6 +70,11 @@ void AutoWar::openBrowser() {
     log(QString("已打开游戏窗口(%1)").arg(WIdToQSting(wid)));
 }
 
+
+void AutoWar::openQQManager() {
+    auto dialog = new QQManger(this);
+    dialog->exec();
+}
 
 void AutoWar::clearLog() const { logTextEdit->clear(); }
 

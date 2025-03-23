@@ -10,6 +10,7 @@
 #include <QPlainTextEdit>
 
 #include "util/tool.h"
+#include "component/panel/qqManger.h"
 #include "component/panel/browser.h"
 #include "component/panel/controller.h"
 #include "component/unit/widTabWidget.h"
@@ -32,6 +33,8 @@ public:
 public slots:
 
     void openBrowser();
+
+    void openQQManager();
 
     void clearLog() const;
 };

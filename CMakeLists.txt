@@ -29,6 +29,10 @@ add_executable(Red
         util/tool.cpp
         util/tool.cpp
         util/tool.h
+        component/panel/qqManger.cpp
+        component/panel/qqManger.h
+        component/unit/placeholderDelegate.cpp
+        component/unit/placeholderDelegate.h
 )
 target_link_libraries(Red ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network Qt5::WebEngineWidgets)
 set_target_properties(Red PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
