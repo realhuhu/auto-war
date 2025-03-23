@@ -1,6 +1,6 @@
 ﻿#include "qqManger.h"
 
-QQManger::QQManger(QWidget *parent) : QDialog(parent) {
+QQManger::QQManger(QWidget *parent) : QDialog(parent), networkManager(new QNetworkAccessManager(this)) {
     setWindowTitle("QQ账号配置");
     resize(800, 600);
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
@@ -109,6 +109,46 @@ void QQManger::insertRow(const QString &remark, const QString &qq, const QString
     });
 }
 
+void QQManger::setStatus(int row, Status status) {
+    auto statusItem = tableWidget->item(row, StatusCol);
+    QString text;
+    QColor color;
+
+    switch (status) {
+        case Waiting:
+            text = "待测试";
+            color = Qt::darkGray;
+            break;
+        case Empty:
+            text = "空链接";
+            color = Qt::yellow;
+            break;
+        case Testing:
+            text = "测试中...";
+            color = Qt::lightGray;
+            break;
+        case Timeout:
+            text = "超时";
+            color = Qt::red;
+            break;
+        case NetError:
+            text = "网络错误";
+            color = Qt::red;
+            break;
+        case Valid:
+            text = "有效";
+            color = Qt::green;
+            break;
+        case Invalid:
+            text = "已过期";
+            color = Qt::red;
+            break;
+    }
+
+    statusItem->setText(text);
+    statusItem->setForeground(color);
+}
+
 void QQManger::loadConfig() {
     tableWidget->blockSignals(true);
     tableWidget->setRowCount(0);
@@ -162,10 +202,10 @@ void QQManger::saveConfig() {
         QJsonObject account;
 
         // 获取单元格数据
-        QTableWidgetItem *remarkItem = tableWidget->item(row, RemarkCol);
-        QTableWidgetItem *qqItem = tableWidget->item(row, QQNumberCol);
-        QTableWidgetItem *pwdItem = tableWidget->item(row, PasswordCol);
-        QTableWidgetItem *linkItem = tableWidget->item(row, LinkCol);
+        auto remarkItem = tableWidget->item(row, RemarkCol);
+        auto qqItem = tableWidget->item(row, QQNumberCol);
+        auto pwdItem = tableWidget->item(row, PasswordCol);
+        auto linkItem = tableWidget->item(row, LinkCol);
 
         // 构建账号对象
         account["order"] = row + 1;  // 行号从1开始
@@ -191,7 +231,7 @@ void QQManger::saveConfig() {
 
 void QQManger::handleDelete(int row) {
     if (row >= 0 && row < tableWidget->rowCount()) {
-        QTableWidgetItem *remarkItem = tableWidget->item(row, RemarkCol);
+        auto remarkItem = tableWidget->item(row, RemarkCol);
         QString remark = remarkItem ? remarkItem->text() : "未知账号";
 
         QMessageBox::StandardButton reply;
@@ -202,31 +242,69 @@ void QQManger::handleDelete(int row) {
                 QMessageBox::Yes | QMessageBox::No
         );
 
-        if (reply == QMessageBox::Yes) tableWidget->removeRow(row);
+        if (reply == QMessageBox::Yes) {
+            tableWidget->removeRow(row);
+
+            remark = remark.trimmed().replace("/", "_").replace("\\", "_");
+            auto storagePath = QCoreApplication::applicationDirPath() + "/web_profile/" + remark;
+            QDir(storagePath).removeRecursively();
+        }
     }
 }
 
-void QQManger::handleTest(int row) const {
-    bool success = QRandomGenerator::global()->bounded(2);
+void QQManger::handleTest(int row) {
+    auto remarkItem = tableWidget->item(row, RemarkCol);
+    auto linkItem = tableWidget->item(row, LinkCol);
+    auto url = linkItem->text();
+    auto remark = remarkItem->text();
 
-    QTableWidgetItem *statusItem = tableWidget->item(row, StatusCol);
-    statusItem->setText(success ? "有效" : "已过期");
-    statusItem->setForeground(success ? Qt::darkGreen : Qt::red);
-    statusItem->setBackground(QColor(240, 240, 240));
+    if (url.isEmpty()) {
+        setStatus(row, Empty);
+        return;
+    }
+
+    setStatus(row, Testing);
+
+    auto reply = networkManager->get(QNetworkRequest(url));
+    auto timeoutTimer = new QTimer(reply);
+    timeoutTimer->setSingleShot(true);
+
+    connect(timeoutTimer, &QTimer::timeout, [reply]() { if (reply->isRunning()) reply->abort(); });
+
+    connect(reply, &QNetworkReply::finished, [this, reply, remark, timeoutTimer]() {
+        timeoutTimer->stop();
+        Status status;
+
+        if (reply->error() == QNetworkReply::NoError) {
+            status = QString::fromUtf8(reply->readAll()).contains("\">ID:") ? Valid : Invalid;
+        } else {
+            status = reply->error() == QNetworkReply::OperationCanceledError ? Timeout : NetError;
+        }
+
+        for (int i = 0; i < tableWidget->rowCount(); ++i) {
+            if (tableWidget->item(i, RemarkCol)->text() == remark) {
+                setStatus(i, status);
+                break;
+            }
+        }
+
+        reply->deleteLater();
+        timeoutTimer->deleteLater();
+    });
+
+    timeoutTimer->start(30000);
 }
 
 void QQManger::handleLogin(int row) {
-    QTableWidgetItem *remarkItem = tableWidget->item(row, RemarkCol);
+    auto remarkItem = tableWidget->item(row, RemarkCol);
     QString remark = remarkItem ? remarkItem->text() : "未知账号";
 
     auto browser = new QQLoginBrowser(this, remark);
     connect(browser, &QQLoginBrowser::linkDetected, [this, &row](const QUrl &url) {
-        QTableWidgetItem *linkItem = tableWidget->item(row, LinkCol);
+        auto linkItem = tableWidget->item(row, LinkCol);
         linkItem->setText(url.toString());
 
-        QTableWidgetItem *statusItem = tableWidget->item(row, StatusCol);
-        statusItem->setText("有效");
-        statusItem->setForeground(Qt::darkGreen);
+        setStatus(row, Valid);
     });
     browser->exec();
 }
@@ -272,6 +350,4 @@ void QQManger::closeEvent(QCloseEvent *event) {
     saveConfig();
     QDialog::closeEvent(event);
 }
-
-
 

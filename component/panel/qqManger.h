@@ -13,7 +13,9 @@
 #include <QMessageBox>
 #include <QTableWidget>
 #include <QInputDialog>
-#include <QRandomGenerator>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QNetworkAccessManager>
 
 #include "qqLoginBrowser.h"
 #include "../unit/placeholderDelegate.h"
@@ -25,7 +27,7 @@ Q_OBJECT
 
 public:
     QTableWidget *tableWidget;
-    enum StatusColumn {
+    enum Column {
         RemarkCol = 0,
         QQNumberCol = 1,
         PasswordCol = 2,
@@ -33,6 +35,16 @@ public:
         StatusCol = 4,
         ActionCol = 5
     };
+    enum Status {
+        Waiting = 0,
+        Empty = 1,
+        Testing = 2,
+        Timeout = 3,
+        NetError = 4,
+        Valid = 5,
+        Invalid = 6
+    };
+    QNetworkAccessManager *networkManager;
 
     explicit QQManger(QWidget *parent = nullptr);
 
@@ -45,15 +57,18 @@ public:
             const QString &link = ""
     );
 
+    void setStatus(int row, Status status);
+
     void loadConfig();
 
     void saveConfig();
 
     void closeEvent(QCloseEvent *event) override;
 
+
 public slots:
 
-    void handleTest(int row) const;
+    void handleTest(int row);
 
     void handleLogin(int row);
 
