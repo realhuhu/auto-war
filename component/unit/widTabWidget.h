@@ -1,5 +1,5 @@
-﻿#ifndef RED_WIDTABWIDGET_H
-#define RED_WIDTABWIDGET_H
+﻿#ifndef RED_WID_TAB_WIDGET_H
+#define RED_WID_TAB_WIDGET_H
 
 #include <QTabBar>
 #include <QPainter>
@@ -18,4 +18,4 @@ public:
     void paintEvent(QPaintEvent *event) override;
 };
 
-#endif //RED_WIDTABWIDGET_H
+#endif //RED_WID_TAB_WIDGET_H

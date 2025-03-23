@@ -18,21 +18,26 @@ qt5_add_resources(qrc_FILES resource/resource.qrc)
 
 add_executable(Red
         ${qrc_FILES}
-        main.cpp
-        main.h
+
+        util/tool.h
+        util/tool.cpp
+
+        component/unit/widTabWidget.h
+        component/unit/widTabWidget.cpp
+        component/unit/placeholderDelegate.h
+        component/unit/placeholderDelegate.cpp
+
         component/panel/controller.h
         component/panel/controller.cpp
-        component/panel/browser.cpp
         component/panel/browser.h
-        component/unit/widTabWidget.cpp
-        component/unit/widTabWidget.h
-        util/tool.cpp
-        util/tool.cpp
-        util/tool.h
-        component/panel/qqManger.cpp
+        component/panel/browser.cpp
         component/panel/qqManger.h
-        component/unit/placeholderDelegate.cpp
-        component/unit/placeholderDelegate.h
+        component/panel/qqManger.cpp
+        component/panel/qqLoginBrowser.h
+        component/panel/qqLoginBrowser.cpp
+
+        main.h
+        main.cpp
 )
 target_link_libraries(Red ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network Qt5::WebEngineWidgets)
 set_target_properties(Red PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})

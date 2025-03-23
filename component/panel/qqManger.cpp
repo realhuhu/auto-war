@@ -74,10 +74,19 @@ void QQManger::handleTest(int row) {
 }
 
 void QQManger::handleLogin(int row) {
-    QString qq = tableWidget->item(row, QQNumberCol)->text();
-    QTableWidgetItem *statusItem = tableWidget->item(row, StatusCol);
-    statusItem->setText("有效");
-    statusItem->setForeground(Qt::darkGreen);
+    QTableWidgetItem *remarkItem = tableWidget->item(row, RemarkCol);
+    QString remark = remarkItem ? remarkItem->text() : "未知账号";
+
+    auto browser = new QQLoginBrowser(this, remark);
+    connect(browser, &QQLoginBrowser::linkDetected, [this, &row](QUrl url) {
+        QTableWidgetItem *linkItem = tableWidget->item(row, LinkCol);
+        linkItem->setText(url.toString());
+
+        QTableWidgetItem *statusItem = tableWidget->item(row, StatusCol);
+        statusItem->setText("有效");
+        statusItem->setForeground(Qt::darkGreen);
+    });
+    browser->exec();
 }
 
 void QQManger::addNew() {

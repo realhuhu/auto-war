@@ -13,6 +13,7 @@
 #include <QRandomGenerator>
 #include <QInputDialog>
 
+#include "qqLoginBrowser.h"
 #include "../unit/placeholderDelegate.h"
 
 
