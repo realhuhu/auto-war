@@ -3,6 +3,7 @@
 
 #include <QLabel>
 #include <QWidget>
+#include <QDateTime>
 #include <QTextEdit>
 #include <QPushButton>
 #include <QVBoxLayout>
@@ -14,8 +15,13 @@ Q_OBJECT
 
 public:
     QString remark;
+    QTextEdit *logTextEdit = new QTextEdit(this);
 
     explicit RedController(QString redRemark, QWidget *parent = nullptr);
+
+public slots:
+
+    void log(const QString &text, const QString &color = "black") const;
 
 signals:
 

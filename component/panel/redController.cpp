@@ -3,8 +3,7 @@
 RedController::RedController(QString redRemark, QWidget *parent) : remark(std::move(redRemark)), QWidget(parent) {
     auto mainLayout = new QVBoxLayout(this);
 
-    auto textEdit = new QTextEdit(this);
-    mainLayout->addWidget(textEdit);
+    mainLayout->addWidget(logTextEdit);
 
     auto footLayout = new QHBoxLayout();
     auto *refreshButton = new QPushButton("刷新游戏", this);
@@ -29,4 +28,20 @@ RedController::RedController(QString redRemark, QWidget *parent) : remark(std::m
 
         if (reply == QMessageBox::Yes) emit refreshBrowser();
     });
+}
+
+void RedController::log(const QString &text, const QString &color) const {
+    QDateTime currentDateTime = QDateTime::currentDateTime();
+    QTime currentTime = currentDateTime.time();
+    QString timeString = currentTime.toString("hh:mm:ss");
+
+    logTextEdit->append(QString(
+            R"(
+                <div>
+                <span style="color:white;background-color:green;">&nbsp;%1&nbsp;</span>
+                <span style="color:%2;">%3</span>
+                <img src=":/ui/transparent.png" height='14' width='1'>
+                </div>
+                )"
+    ).arg(timeString, color, text));
 }

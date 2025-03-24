@@ -41,6 +41,9 @@ public slots:
 signals:
 
     void closed(QString remark);
+
+    void log(const QString &text, const QString &color = "black") const;
+
 };
 
 #endif //RED_RED_GAME_BROWSER_H

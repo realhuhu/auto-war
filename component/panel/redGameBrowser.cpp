@@ -45,7 +45,11 @@ RedGameBrowser::RedGameBrowser(
     mainLayout->addWidget(browser);
 
     panel = new RedController(redRemark, tabWidget);
+
     connect(panel, &RedController::refreshBrowser, this, &RedGameBrowser::refresh);
+    connect(this, &RedGameBrowser::log, panel, &RedController::log);
+
+    emit log(QString("%1 游戏已打开").arg(redRemark));
 }
 
 void RedGameBrowser::refresh() const { browser->load(url); }
