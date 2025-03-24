@@ -17,11 +17,12 @@ find_package(OpenCV REQUIRED)
 qt5_add_resources(qrc_FILES resource/resource.qrc)
 
 add_executable(Red
-        WIN32
+#        WIN32
         ${qrc_FILES}
 
         util/state.h
         util/state.cpp
+        util/emitter.h
 
         component/unit/labelTabWidget.h
         component/unit/labelTabWidget.cpp
@@ -38,6 +39,10 @@ add_executable(Red
         component/panel/redController.cpp
         component/panel/redGameBrowser.h
         component/panel/redGameBrowser.cpp
+
+
+        task/daily.cpp
+        task/daily.h
 
         main.h
         main.cpp

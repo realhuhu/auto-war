@@ -27,26 +27,28 @@ AutoWar::AutoWar(QWidget *parent) : QWidget(parent) {
     mainLayout->addLayout(topLayout);
 
     auto *bodyLayout = new QHBoxLayout();
-    logTextEdit->setReadOnly(true);
+    consoleTextEdit->setReadOnly(true);
     bodyLayout->addWidget(panelTabWidget, 3);
-    bodyLayout->addWidget(logTextEdit, 2);
+    bodyLayout->addWidget(consoleTextEdit, 2);
 
     mainLayout->addLayout(bodyLayout);
 
     connect(openAllButton, &QPushButton::clicked, this, &AutoWar::openBrowser);
     connect(qqConfigButton, &QPushButton::clicked, this, &AutoWar::openQQManager);
     connect(redConfigButton, &QPushButton::clicked, this, &AutoWar::openRedManager);
-    connect(clearLogButton, &QPushButton::clicked, this, &AutoWar::clearLog);
+    connect(clearLogButton, &QPushButton::clicked, this, &AutoWar::clearConsole);
 
     loadConfig();
+
+    connect(Emitter::instance(), &Emitter::log, this, &AutoWar::redirectLog);
 }
 
-void AutoWar::log(const QString &text, const QString &color) const {
+void AutoWar::consolePrint(const QString &text, const QString &color) const {
     QDateTime currentDateTime = QDateTime::currentDateTime();
     QTime currentTime = currentDateTime.time();
     QString timeString = currentTime.toString("hh:mm:ss");
 
-    logTextEdit->append(QString(
+    consoleTextEdit->append(QString(
             R"(
                 <div>
                 <span style="color:green;">[%1]</span>
@@ -63,19 +65,19 @@ void AutoWar::loadConfig() const {
     if (!fileInfo.exists()) {
         QFile newFile(configPath);
         if (!newFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            log(QString("无法创建配置文件: %1").arg(configPath));
+            consolePrint(QString("无法创建配置文件: %1").arg(configPath));
             return;
         }
         QTextStream stream(&newFile);
         stream << "{\"account\": []}";
         newFile.close();
-        log("已创建默认配置文件");
+        consolePrint("已创建默认配置文件");
     }
 
     QFile file(configPath);
 
     if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) {
-        log(QString("配置文件存在但无法打开: %1").arg(file.errorString()));
+        consolePrint(QString("配置文件存在但无法打开: %1").arg(file.errorString()));
         return;
     }
 
@@ -84,10 +86,10 @@ void AutoWar::loadConfig() const {
     QJsonDocument doc = QJsonDocument::fromJson(jsonData, &parseError);
 
     if (parseError.error != QJsonParseError::NoError) {
-        log(QString("配置文件解析错误: %1").arg(parseError.errorString()));
+        consolePrint(QString("配置文件解析错误: %1").arg(parseError.errorString()));
 
         if (jsonData.trimmed().isEmpty()) {
-            log("检测到空文件，重新初始化配置");
+            consolePrint("检测到空文件，重新初始化配置");
             file.resize(0);
             QTextStream stream(&file);
             stream << "{\"account\": []}";
@@ -123,7 +125,7 @@ void AutoWar::openBrowser() {
     }
 
     if (redAccountList.isEmpty()) {
-        log("请先配置QQ账号", "red");
+        consolePrint("请先配置QQ账号", "red");
         return;
     }
 
@@ -172,7 +174,8 @@ void AutoWar::openBrowser() {
         if (browsers.contains(redRemark)) continue;
 
         if (!QUrl(info["link"].toString()).isValid()) {
-            log(QString("链接无效，请点击[QQ账号]按钮，重新登录QQ号(%1)").arg(info["qqRemark"].toString()), "red");
+            consolePrint(QString("链接无效，请点击[QQ账号]按钮，重新登录QQ号(%1)").arg(info["qqRemark"].toString()),
+                         "red");
             continue;
         }
 
@@ -191,10 +194,10 @@ void AutoWar::openBrowser() {
         connect(browser, &RedGameBrowser::closed, [this](const QString &remark) {
             panelTabWidget->removeTabByLabel(remark);
             browsers.remove(remark);
-            log(QString("已关闭游戏窗口(%1)").arg(remark), "red");
+            consolePrint(QString("已关闭游戏窗口(%1)").arg(remark), "red");
         });
 
-        log(QString("已打开游戏窗口(%1)").arg(redRemark));
+        consolePrint(QString("已打开游戏窗口(%1)").arg(redRemark));
     }
 }
 
@@ -206,7 +209,7 @@ void AutoWar::openQQManager() {
 
 void AutoWar::openRedManager() {
     if (state.config["account"].toArray().isEmpty()) {
-        log("请先配置QQ账号", "red");
+        consolePrint("请先配置QQ账号", "red");
         return;
     }
 
@@ -223,22 +226,27 @@ void AutoWar::saveConfig() const {
         QJsonDocument doc(state.config);
         file.write(doc.toJson(QJsonDocument::Indented));
         file.close();
+        consolePrint("配置已保存");
+    } else {
+        consolePrint("配置保存失败", "red");
     }
-
-    log("配置已保存");
 }
 
-void AutoWar::clearLog() const { logTextEdit->clear(); }
+void AutoWar::clearConsole() const { consoleTextEdit->clear(); }
+
+void AutoWar::redirectLog(const QString &remark, const QString &message, const QString &color) const {
+    if (!browsers.contains(remark))return;
+
+    emit browsers[remark]->log(message, color);
+}
 
 void AutoWar::closeEvent(QCloseEvent *event) {
     for (auto it = browsers.begin(); it != browsers.end(); ++it) {
         RedGameBrowser *browser = it.value();
-        if (browser) {
-            browser->close();
-        }
+        if (browser) browser->close();
     }
-    browsers.clear();
 
+    browsers.clear();
     QWidget::closeEvent(event);
 }
 

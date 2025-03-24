@@ -3,6 +3,7 @@
 RedController::RedController(QString redRemark, QWidget *parent) : remark(std::move(redRemark)), QWidget(parent) {
     auto mainLayout = new QVBoxLayout(this);
 
+    logTextEdit->setReadOnly(true);
     mainLayout->addWidget(logTextEdit);
 
     auto footLayout = new QHBoxLayout();

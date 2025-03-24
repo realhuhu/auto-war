@@ -3,7 +3,9 @@
 
 #include <QDir>
 #include <QDialog>
+#include <QThread>
 #include <QTabWidget>
+#include <QBasicMutex>
 #include <QHBoxLayout>
 #include <QWebEngineView>
 #include <QCoreApplication>
@@ -11,6 +13,7 @@
 #include <QWebEngineSettings>
 
 #include "redController.h"
+#include "../../task/daily.h"
 
 class RedGameBrowser : public QDialog {
 Q_OBJECT
@@ -20,6 +23,9 @@ public:
     QString remark;
     RedController *panel;
     QWebEngineView *browser;
+    QBasicMutex workerMutex;
+    QThread *workerThread = nullptr;
+    QMap<QString, std::function<void()>> tasks;
     static QMap<QString, QWebEngineProfile *> profileMap;
 
     explicit RedGameBrowser(
@@ -37,6 +43,8 @@ public:
 public slots:
 
     void refresh() const;
+
+    void runCommand();
 
 signals:
 

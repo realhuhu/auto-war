@@ -13,6 +13,7 @@
 #include <QListWidgetItem>
 
 #include "util/state.h"
+#include "util/emitter.h"
 #include "component/panel/qqManger.h"
 #include "component/panel/redManager.h"
 #include "component/panel/redController.h"
@@ -25,12 +26,12 @@ Q_OBJECT
 
 public:
     QMap<QString, RedGameBrowser *> browsers;
-    QTextEdit *logTextEdit = new QTextEdit(this);
+    QTextEdit *consoleTextEdit = new QTextEdit(this);
     LabelTabWidget *panelTabWidget = new LabelTabWidget(this);
 
     explicit AutoWar(QWidget *parent = nullptr);
 
-    void log(const QString &text, const QString &color = "blue") const;
+    void consolePrint(const QString &text, const QString &color = "blue") const;
 
     void loadConfig() const;
 
@@ -46,7 +47,9 @@ public slots:
 
     void saveConfig() const;
 
-    void clearLog() const;
+    void clearConsole() const;
+
+    void redirectLog(const QString &remark, const QString &text, const QString &color) const;
 };
 
 #endif //RED_MAIN_H

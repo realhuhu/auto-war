@@ -50,6 +50,9 @@ RedGameBrowser::RedGameBrowser(
     connect(this, &RedGameBrowser::log, panel, &RedController::log);
 
     emit log(QString("%1 游戏已打开").arg(redRemark));
+
+    runCommand();
+    runCommand();
 }
 
 void RedGameBrowser::refresh() const {
@@ -57,7 +60,35 @@ void RedGameBrowser::refresh() const {
     browser->load(url);
 }
 
+
+void RedGameBrowser::runCommand() {
+    if (workerThread) {
+        workerThread->quit();
+        workerThread->wait();
+    }
+
+    workerThread = new QThread(this);
+    connect(workerThread, &QThread::started, this, [this]() {
+        test(remark);
+        workerThread->quit();
+        emit log("已结束");
+    });
+
+    connect(workerThread, &QThread::finished, workerThread, &QThread::deleteLater);
+    connect(workerThread, &QThread::destroyed, this, [this]() {
+        QMutexLocker locker(&workerMutex);
+        workerThread = nullptr;
+    });
+
+    workerThread->start();
+}
+
 void RedGameBrowser::closeEvent(QCloseEvent *event) {
+    if (workerThread) {
+        workerThread->quit();
+        workerThread->wait();
+    }
+
     if (!browser) return;
 
     browser->deleteLater();
