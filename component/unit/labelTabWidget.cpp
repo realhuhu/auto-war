@@ -1,21 +1,20 @@
-﻿#include "widTabWidget.h"
+﻿#include "labelTabWidget.h"
 
 
-WIdTabWidget::WIdTabWidget(QWidget *parent) : QTabWidget(parent) {}
+LabelTabWidget::LabelTabWidget(QWidget *parent) : QTabWidget(parent) {}
 
-int WIdTabWidget::addTabWithWId(QWidget *page, const QString &label, WId wid) {
+int LabelTabWidget::addTabWithLabel(QWidget *page, const QString &label) {
     int index = addTab(page, label);
-    tabBar()->setTabData(index, QVariant(static_cast<quint64>(wid)));
+    tabBar()->setTabData(index, QVariant(label));
     return index;
 }
 
-bool WIdTabWidget::removeTabByWId(WId wid) {
-    auto targetWId = static_cast<quint64>(wid);
+bool LabelTabWidget::removeTabByLabel(const QString &label) {
     for (int i = 0; i < count(); ++i) {
         QVariant data = tabBar()->tabData(i);
 
         if (!data.isValid()) continue;
-        if (data.toULongLong() != targetWId) continue;
+        if (data.toString() != label) continue;
 
         removeTab(i);
         return true;
@@ -23,7 +22,7 @@ bool WIdTabWidget::removeTabByWId(WId wid) {
     return false;
 }
 
-void WIdTabWidget::paintEvent(QPaintEvent *event) {
+void LabelTabWidget::paintEvent(QPaintEvent *event) {
     QTabWidget::paintEvent(event);
     if (count() != 0) return;
 

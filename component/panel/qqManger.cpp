@@ -181,7 +181,6 @@ void QQManger::saveConfig() {
     QJsonArray accounts;
     QHash<QString, QJsonArray> existingReds;
 
-    // 从现有配置中提取 red 数据
     if (state.config.contains("account") && state.config["account"].isArray()) {
         for (const auto val: state.config["account"].toArray()) {
             QJsonObject obj = val.toObject();
@@ -190,24 +189,20 @@ void QQManger::saveConfig() {
         }
     }
 
-    // 遍历表格生成新配置
     for (int row = 0; row < tableWidget->rowCount(); ++row) {
         QJsonObject account;
 
-        // 获取单元格数据
         auto remarkItem = tableWidget->item(row, RemarkCol);
         auto qqItem = tableWidget->item(row, QQNumberCol);
         auto pwdItem = tableWidget->item(row, PasswordCol);
         auto linkItem = tableWidget->item(row, LinkCol);
 
-        // 构建账号对象
-        account["order"] = row + 1;  // 行号从1开始
+        account["order"] = row + 1;
         account["remark"] = remarkItem ? remarkItem->text() : "";
         account["qq"] = qqItem ? qqItem->text() : "";
         account["password"] = pwdItem ? pwdItem->text() : "";
         account["link"] = linkItem ? linkItem->text() : "";
 
-        // 保留已有的 red 数据
         if (existingReds.contains(account["remark"].toString())) {
             account["red"] = existingReds[account["remark"].toString()];
         } else {

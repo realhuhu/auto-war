@@ -88,24 +88,20 @@ void RedManger::insertRow(const QString &remark, const QString &qq, const QStrin
 }
 
 void RedManger::loadConfig() {
-    tableWidget->setRowCount(0);  // 清空现有数据
+    tableWidget->setRowCount(0);
 
-    // 遍历所有QQ账号配置
     const auto accounts = state.config["account"].toArray();
     for (const auto &accountVal: accounts) {
         const auto account = accountVal.toObject();
-        const auto qqRemark = account["remark"].toString();  // QQ账号备注
+        const auto qqRemark = account["remark"].toString();
 
-        // 提取红警子账号配置
         const auto redAccounts = account["red"].toArray();
         for (const auto &redVal: redAccounts) {
             const auto red = redVal.toObject();
 
-            // 创建表格行数据
             const auto remark = red["remark"].toString();
             const auto region = QString::number(red["region"].toInt());
 
-            // 插入表格行
             insertRow(remark, qqRemark, region);
         }
     }
@@ -115,7 +111,7 @@ void RedManger::saveConfig() {
     auto accounts = state.config["account"].toArray();
     for (auto accountRef: accounts) {
         auto account = accountRef.toObject();
-        account["red"] = QJsonArray();  // 清空原有配置
+        account["red"] = QJsonArray();
         accountRef = account;
     }
 
@@ -127,10 +123,9 @@ void RedManger::saveConfig() {
         QJsonObject redConfig;
         redConfig["remark"] = remarkItem->text();
         redConfig["region"] = regionItem->text().toInt();
-        redConfig["order"] = row;  // 保持显示顺序
+        redConfig["order"] = row;
 
 
-        // 查找对应QQ账号配置
         const auto accountKey = qqItem->text();
         for (auto accountRef: accounts) {
             auto account = accountRef.toObject();
@@ -144,7 +139,6 @@ void RedManger::saveConfig() {
         }
     }
 
-    // 更新全局配置并触发信号
     state.config["account"] = accounts;
     emit configChanged();
 }
@@ -175,10 +169,8 @@ void RedManger::addNew() {
     dialog.setWindowTitle("添加红警账号");
     QFormLayout form(&dialog);
 
-    // 备注输入框
     auto remarkEdit = new QLineEdit(&dialog);
     form.addRow("备注:", remarkEdit);
-
 
     auto qqCombo = new QComboBox(&dialog);
     for (auto account: state.config["account"].toArray()) {
@@ -187,25 +179,21 @@ void RedManger::addNew() {
     }
     form.addRow("QQ:", qqCombo);
 
-    // 区服数字输入
     auto regionSpin = new QSpinBox(&dialog);
     regionSpin->setMinimum(1);
     regionSpin->setMaximum(9999);
     form.addRow("区服:", regionSpin);
 
-    // 确认按钮组
     QDialogButtonBox btnBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
     form.addRow(&btnBox);
     QObject::connect(&btnBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
     QObject::connect(&btnBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
 
-    // 处理输入结果
     if (dialog.exec() == QDialog::Accepted) {
         const auto remark = remarkEdit->text().trimmed();
         const auto qq = qqCombo->currentText();
         const auto region = QString::number(regionSpin->value());
 
-        // 验证输入有效性
         if (remark.isEmpty()) {
             QMessageBox::warning(this, "输入错误", "备注不能为空");
             return;

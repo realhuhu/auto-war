@@ -6,7 +6,7 @@ RedBrowser::RedBrowser(
         const QString &redRemark,
         const QString &link,
         int region
-) {
+) : remark(redRemark) {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(QString("(%1)%2-%3-%4区").arg(WIdToQSting(winId()), qqRemark, redRemark, QString::number(region)));
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
@@ -16,25 +16,25 @@ RedBrowser::RedBrowser(
     resize(970, 890);
 
     url = QString("%1&region=%2").arg(link, QString::number(region - 1));
-    auto remark = redRemark.trimmed().replace("/", "_").replace("\\", "_");
+    auto modifiedRemark = redRemark.trimmed().replace("/", "_").replace("\\", "_");
 
     auto *mainLayout = new QHBoxLayout(this);
     mainLayout->setMargin(0);
 
     QWebEngineProfile *profile = nullptr;
 
-    if (profileMap.contains(remark)) {
-        profile = profileMap.value(remark);
+    if (profileMap.contains(modifiedRemark)) {
+        profile = profileMap.value(modifiedRemark);
     } else {
-        QString storagePath = QCoreApplication::applicationDirPath() + "/web_profile/game/" + remark;
+        QString storagePath = QCoreApplication::applicationDirPath() + "/web_profile/game/" + modifiedRemark;
         QDir dir(storagePath);
         if (!dir.exists()) dir.mkpath(".");
 
-        profile = new QWebEngineProfile(remark, QCoreApplication::instance());
+        profile = new QWebEngineProfile(modifiedRemark, QCoreApplication::instance());
         profile->setPersistentStoragePath(storagePath);
         profile->setCachePath(storagePath + "/cache");
         profile->setPersistentCookiesPolicy(QWebEngineProfile::ForcePersistentCookies);
-        profileMap.insert(remark, profile);
+        profileMap.insert(modifiedRemark, profile);
     }
 
     browser = new QWebEngineView(this);
@@ -56,7 +56,7 @@ void RedBrowser::closeEvent(QCloseEvent *event) {
     browser->deleteLater();
     browser = nullptr;
 
-    emit RedBrowser::closed(winId());
+    emit RedBrowser::closed(remark);
 
     QDialog::closeEvent(event);
 }

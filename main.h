@@ -16,16 +16,16 @@
 #include "component/panel/qqManger.h"
 #include "component/panel/redManager.h"
 #include "component/panel/controller.h"
-#include "component/unit/widTabWidget.h"
+#include "component/unit/labelTabWidget.h"
 
 
 class AutoWar : public QWidget {
 Q_OBJECT
 
 public:
-    QMap<WId, RedBrowser *> browsers;
+    QMap<QString, RedBrowser *> browsers;
     QTextEdit *logTextEdit = new QTextEdit(this);
-    WIdTabWidget *panelTabWidget = new WIdTabWidget(this);
+    LabelTabWidget *panelTabWidget = new LabelTabWidget(this);
 
     explicit AutoWar(QWidget *parent = nullptr);
 

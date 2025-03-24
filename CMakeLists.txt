@@ -25,8 +25,8 @@ add_executable(Red
         util/state.h
         util/state.cpp
 
-        component/unit/widTabWidget.h
-        component/unit/widTabWidget.cpp
+        component/unit/labelTabWidget.h
+        component/unit/labelTabWidget.cpp
         component/unit/placeholderDelegate.h
         component/unit/placeholderDelegate.cpp
 

@@ -19,6 +19,7 @@ Q_OBJECT
 
 public:
     QString url;
+    QString remark;
     ControlPanel *panel;
     QWebEngineView *browser;
     static QMap<QString, QWebEngineProfile *> profileMap;
@@ -41,7 +42,7 @@ public slots:
 
 signals:
 
-    void closed(WId wid);
+    void closed(QString remark);
 };
 
 #endif //RED_REDBROWSER_H

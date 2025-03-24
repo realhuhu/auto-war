@@ -6,14 +6,14 @@
 #include <QVariant>
 #include <QTabWidget>
 
-class WIdTabWidget : public QTabWidget {
+class LabelTabWidget : public QTabWidget {
 Q_OBJECT
 public:
-    explicit WIdTabWidget(QWidget *parent = nullptr);
+    explicit LabelTabWidget(QWidget *parent = nullptr);
 
-    int addTabWithWId(QWidget *page, const QString &label, WId wid);
+    int addTabWithLabel(QWidget *page, const QString &label);
 
-    bool removeTabByWId(WId wid);
+    bool removeTabByLabel(const QString &label);
 
     void paintEvent(QPaintEvent *event) override;
 };

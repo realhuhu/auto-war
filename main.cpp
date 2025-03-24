@@ -88,7 +88,7 @@ void AutoWar::loadConfig() const {
 
         if (jsonData.trimmed().isEmpty()) {
             log("检测到空文件，重新初始化配置");
-            file.resize(0); // 清空文件内容
+            file.resize(0);
             QTextStream stream(&file);
             stream << "{\"account\": []}";
         }
@@ -104,18 +104,15 @@ void AutoWar::openBrowser() {
     const auto accounts = state.config["account"].toArray();
     for (const auto &accountVal: accounts) {
         const auto account = accountVal.toObject();
-        const auto qqRemark = account["remark"].toString();  // QQ账号备注
-        const auto link = account["link"].toString();  // QQ账号备注
+        const auto qqRemark = account["remark"].toString();
+        const auto link = account["link"].toString();
 
-        // 提取红警子账号配置
         const auto redAccounts = account["red"].toArray();
         for (const auto &redVal: redAccounts) {
             const auto red = redVal.toObject();
 
-            // 创建表格行数据
             const auto redRemark = red["remark"].toString();
             const auto region = red["region"].toInt();
-
 
             auto browser = new RedBrowser(
                     panelTabWidget,
@@ -125,20 +122,18 @@ void AutoWar::openBrowser() {
                     region
             );
 
-            auto wid = browser->winId();
-
-            browsers.insert(wid, browser);
+            browsers.insert(redRemark, browser);
             browser->show();
 
-            panelTabWidget->addTabWithWId(browser->panel, WIdToQSting(wid), browser->winId());
+            panelTabWidget->addTabWithLabel(browser->panel, redRemark);
 
-            connect(browser, &RedBrowser::closed, [this](WId closedWid) {
-                panelTabWidget->removeTabByWId(closedWid);
-                browsers.remove(closedWid);
-                log(QString("已关闭游戏窗口(%1)").arg(WIdToQSting(closedWid)));
+            connect(browser, &RedBrowser::closed, [this](const QString &remark) {
+                panelTabWidget->removeTabByLabel(remark);
+                browsers.remove(remark);
+                log(QString("已关闭游戏窗口(%1)").arg(remark), "red");
             });
 
-            log(QString("已打开游戏窗口(%1)").arg(WIdToQSting(wid)));
+            log(QString("已打开游戏窗口(%1)").arg(redRemark));
         }
     }
 }
