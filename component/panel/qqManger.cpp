@@ -96,12 +96,12 @@ void QQManger::insertRow(const QString &remark, const QString &qq, const QString
         if (index != -1) handleTest(index);
     });
 
-    connect(loginBtn, &QPushButton::clicked, this,[this]() {
+    connect(loginBtn, &QPushButton::clicked, this, [this]() {
         int index = getIndex(sender()->parent());
         if (index != -1) handleLogin(index);
     });
 
-    connect(deleteBtn, &QPushButton::clicked,this, [this]() {
+    connect(deleteBtn, &QPushButton::clicked, this, [this]() {
         int index = getIndex(sender()->parent());
         if (index != -1) handleDelete(index);
     });
@@ -118,8 +118,8 @@ void QQManger::setStatus(int row, Status status) const {
             color = Qt::darkGray;
             break;
         case Empty:
-            text = "空链接";
-            color = Qt::yellow;
+            text = "无效链接";
+            color = Qt::darkRed;
             break;
         case Testing:
             text = "测试中...";
@@ -239,10 +239,10 @@ void QQManger::handleDelete(int row) {
 void QQManger::handleTest(int row) {
     auto remarkItem = tableWidget->item(row, RemarkCol);
     auto linkItem = tableWidget->item(row, LinkCol);
-    auto url = linkItem->text();
+    auto url = QUrl(linkItem->text());
     auto remark = remarkItem->text();
 
-    if (url.isEmpty()) {
+    if (!url.isValid()) {
         setStatus(row, Empty);
         return;
     }

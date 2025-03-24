@@ -122,7 +122,7 @@ void AutoWar::openBrowser() {
         }
     }
 
-    if(redAccountList.isEmpty()){
+    if (redAccountList.isEmpty()) {
         log("请先配置QQ账号", "red");
         return;
     }
@@ -170,6 +170,11 @@ void AutoWar::openBrowser() {
         const QString redRemark = info["redRemark"].toString();
 
         if (browsers.contains(redRemark)) continue;
+
+        if (!QUrl(info["link"].toString()).isValid()) {
+            log(QString("链接无效，请点击[QQ账号]按钮，重新登录QQ号(%1)").arg(info["qqRemark"].toString()), "red");
+            continue;
+        }
 
         auto browser = new RedGameBrowser(
                 panelTabWidget,
