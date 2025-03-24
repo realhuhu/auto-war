@@ -262,6 +262,7 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < argc; ++i) newArgvArray[i] = newArgv[i];
 
     QApplication app(argc, newArgvArray);
+    QApplication::setStyle(QStyleFactory::create("Fusion"));
 
     AutoWar autoWar;
     autoWar.show();

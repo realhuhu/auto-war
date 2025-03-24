@@ -44,4 +44,4 @@ add_executable(Red
 )
 target_link_libraries(Red ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network Qt5::WebEngineWidgets)
 set_target_properties(Red PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
-set_target_properties(Red PROPERTIES OUTPUT_NAME 启动浏览器)
+set_target_properties(Red PROPERTIES OUTPUT_NAME 启动多开器)

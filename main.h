@@ -7,6 +7,7 @@
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QApplication>
+#include <QStyleFactory>
 #include <QJsonDocument>
 #include <QPlainTextEdit>
 #include <QListWidgetItem>
