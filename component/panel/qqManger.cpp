@@ -234,7 +234,7 @@ void QQManger::handleDelete(int row) {
             tableWidget->removeRow(row);
 
             remark = remark.trimmed().replace("/", "_").replace("\\", "_");
-            auto storagePath = QCoreApplication::applicationDirPath() + "/web_profile/" + remark;
+            auto storagePath = QCoreApplication::applicationDirPath() + "/web_profile/login/" + remark;
             QDir(storagePath).removeRecursively();
         }
     }
