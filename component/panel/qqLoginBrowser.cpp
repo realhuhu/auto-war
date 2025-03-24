@@ -7,7 +7,6 @@ void LinkInterceptor::interceptRequest(QWebEngineUrlRequestInfo &info) {
     if (url.host() == "qqgame.app100616028.twsapp.com") emit linkDetected(url);
 }
 
-
 QQLoginBrowser::QQLoginBrowser(QWidget *parent, QString remark) : QDialog(parent) {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(QString("登录账号：%1").arg(remark));

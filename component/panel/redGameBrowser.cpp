@@ -1,6 +1,6 @@
-﻿#include "redBrowser.h"
+﻿#include "redGameBrowser.h"
 
-RedBrowser::RedBrowser(
+RedGameBrowser::RedGameBrowser(
         QTabWidget *tabWidget,
         const QString &qqRemark,
         const QString &redRemark,
@@ -8,7 +8,7 @@ RedBrowser::RedBrowser(
         int region
 ) : remark(redRemark) {
     setAttribute(Qt::WA_DeleteOnClose);
-    setWindowTitle(QString("(%1)%2-%3-%4区").arg(WIdToQSting(winId()), qqRemark, redRemark, QString::number(region)));
+    setWindowTitle(QString("%1 %2 %3区").arg(qqRemark, redRemark, QString::number(region)));
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     setFixedWidth(970);
     setMinimumHeight(640);
@@ -44,28 +44,28 @@ RedBrowser::RedBrowser(
 
     mainLayout->addWidget(browser);
 
-    panel = new ControlPanel(winId(), tabWidget);
-    connect(panel, &ControlPanel::refreshBrowser, this, &RedBrowser::refresh);
+    panel = new RedController(redRemark, tabWidget);
+    connect(panel, &RedController::refreshBrowser, this, &RedGameBrowser::refresh);
 }
 
-void RedBrowser::refresh() const { browser->load(url); }
+void RedGameBrowser::refresh() const { browser->load(url); }
 
-void RedBrowser::closeEvent(QCloseEvent *event) {
+void RedGameBrowser::closeEvent(QCloseEvent *event) {
     if (!browser) return;
 
     browser->deleteLater();
     browser = nullptr;
 
-    emit RedBrowser::closed(remark);
+    emit RedGameBrowser::closed(remark);
 
     QDialog::closeEvent(event);
 }
 
-RedBrowser::~RedBrowser() {
+RedGameBrowser::~RedGameBrowser() {
     if (!browser) return;
 
     browser->page()->deleteLater();
     browser->close();
 }
 
-QMap<QString, QWebEngineProfile *> RedBrowser::profileMap;
+QMap<QString, QWebEngineProfile *> RedGameBrowser::profileMap;

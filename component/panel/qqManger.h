@@ -57,7 +57,7 @@ public:
             const QString &link = ""
     );
 
-    void setStatus(int row, Status status);
+    void setStatus(int row, Status status) const;
 
     void loadConfig();
 

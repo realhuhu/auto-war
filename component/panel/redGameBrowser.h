@@ -1,5 +1,5 @@
-﻿#ifndef RED_REDBROWSER_H
-#define RED_REDBROWSER_H
+﻿#ifndef RED_RED_GAME_BROWSER_H
+#define RED_RED_GAME_BROWSER_H
 
 #include <QDir>
 #include <QDialog>
@@ -10,21 +10,19 @@
 #include <QWebEngineProfile>
 #include <QWebEngineSettings>
 
-#include "controller.h"
-#include "../../util/tool.h"
+#include "redController.h"
 
-
-class RedBrowser : public QDialog {
+class RedGameBrowser : public QDialog {
 Q_OBJECT
 
 public:
     QString url;
     QString remark;
-    ControlPanel *panel;
+    RedController *panel;
     QWebEngineView *browser;
     static QMap<QString, QWebEngineProfile *> profileMap;
 
-    explicit RedBrowser(
+    explicit RedGameBrowser(
             QTabWidget *tabWidget,
             const QString &qqRemark,
             const QString &redRemark,
@@ -34,7 +32,7 @@ public:
 
     void closeEvent(QCloseEvent *event) override;
 
-    ~RedBrowser() override;
+    ~RedGameBrowser() override;
 
 public slots:
 
@@ -45,4 +43,4 @@ signals:
     void closed(QString remark);
 };
 
-#endif //RED_REDBROWSER_H
+#endif //RED_RED_GAME_BROWSER_H

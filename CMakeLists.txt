@@ -20,8 +20,6 @@ add_executable(Red
         WIN32
         ${qrc_FILES}
 
-        util/tool.h
-        util/tool.cpp
         util/state.h
         util/state.cpp
 
@@ -30,19 +28,19 @@ add_executable(Red
         component/unit/placeholderDelegate.h
         component/unit/placeholderDelegate.cpp
 
-        component/panel/controller.h
-        component/panel/controller.cpp
-        component/panel/redBrowser.h
-        component/panel/redBrowser.cpp
         component/panel/qqManger.h
         component/panel/qqManger.cpp
         component/panel/qqLoginBrowser.h
         component/panel/qqLoginBrowser.cpp
+        component/panel/redManager.h
+        component/panel/redManager.cpp
+        component/panel/redController.h
+        component/panel/redController.cpp
+        component/panel/redGameBrowser.h
+        component/panel/redGameBrowser.cpp
 
         main.h
         main.cpp
-        component/panel/redManager.cpp
-        component/panel/redManager.h
 )
 target_link_libraries(Red ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network Qt5::WebEngineWidgets)
 set_target_properties(Red PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})

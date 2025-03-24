@@ -11,20 +11,19 @@
 #include <QPlainTextEdit>
 #include <QListWidgetItem>
 
-#include "util/tool.h"
 #include "util/state.h"
-#include "component/panel/redBrowser.h"
 #include "component/panel/qqManger.h"
 #include "component/panel/redManager.h"
-#include "component/panel/controller.h"
+#include "component/panel/redController.h"
 #include "component/unit/labelTabWidget.h"
+#include "component/panel/redGameBrowser.h"
 
 
 class AutoWar : public QWidget {
 Q_OBJECT
 
 public:
-    QMap<QString, RedBrowser *> browsers;
+    QMap<QString, RedGameBrowser *> browsers;
     QTextEdit *logTextEdit = new QTextEdit(this);
     LabelTabWidget *panelTabWidget = new LabelTabWidget(this);
 

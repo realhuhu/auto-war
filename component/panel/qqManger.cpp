@@ -63,22 +63,15 @@ void QQManger::insertRow(const QString &remark, const QString &qq, const QString
     auto remarkItem = new QTableWidgetItem(remark);
     remarkItem->setFlags(remarkItem->flags() & ~Qt::ItemIsEditable);
     remarkItem->setBackground(QColor(240, 240, 240));
-    tableWidget->setItem(row, RemarkCol, remarkItem);
 
     auto qqItem = new QTableWidgetItem(qq);
-    tableWidget->setItem(row, QQNumberCol, qqItem);
-
     auto pwdItem = new QTableWidgetItem(password);
-    tableWidget->setItem(row, PasswordCol, pwdItem);
-
     auto linkItem = new QTableWidgetItem(link);
-    tableWidget->setItem(row, LinkCol, linkItem);
 
     auto statusItem = new QTableWidgetItem("待测试");
     statusItem->setFlags(statusItem->flags() & ~Qt::ItemIsEditable);
     statusItem->setForeground(Qt::darkGray);
     statusItem->setBackground(QColor(240, 240, 240));
-    tableWidget->setItem(row, StatusCol, statusItem);
 
     auto buttonWidget = new QWidget();
     auto btnLayout = new QHBoxLayout(buttonWidget);
@@ -91,26 +84,30 @@ void QQManger::insertRow(const QString &remark, const QString &qq, const QString
     btnLayout->addWidget(loginBtn);
     btnLayout->addWidget(deleteBtn);
 
+    tableWidget->setItem(row, RemarkCol, remarkItem);
+    tableWidget->setItem(row, QQNumberCol, qqItem);
+    tableWidget->setItem(row, PasswordCol, pwdItem);
+    tableWidget->setItem(row, LinkCol, linkItem);
+    tableWidget->setItem(row, StatusCol, statusItem);
     tableWidget->setCellWidget(row, ActionCol, buttonWidget);
 
-
-    connect(testBtn, &QPushButton::clicked, this, [this]() {
+    connect(testBtn, &QPushButton::clicked, [this]() {
         int index = getIndex(sender()->parent());
         if (index != -1) handleTest(index);
     });
 
-    connect(loginBtn, &QPushButton::clicked, this, [this]() {
+    connect(loginBtn, &QPushButton::clicked, [this]() {
         int index = getIndex(sender()->parent());
         if (index != -1) handleLogin(index);
     });
 
-    connect(deleteBtn, &QPushButton::clicked, this, [this]() {
+    connect(deleteBtn, &QPushButton::clicked, [this]() {
         int index = getIndex(sender()->parent());
         if (index != -1) handleDelete(index);
     });
 }
 
-void QQManger::setStatus(int row, Status status) {
+void QQManger::setStatus(int row, Status status) const {
     auto statusItem = tableWidget->item(row, StatusCol);
     QString text;
     QColor color;
@@ -218,26 +215,25 @@ void QQManger::saveConfig() {
 }
 
 void QQManger::handleDelete(int row) {
-    if (row >= 0 && row < tableWidget->rowCount()) {
-        auto remarkItem = tableWidget->item(row, RemarkCol);
-        QString remark = remarkItem ? remarkItem->text() : "未知账号";
+    if (row <= 0 || row >= tableWidget->rowCount()) return;
 
-        QMessageBox::StandardButton reply;
-        reply = QMessageBox::question(
-                this,
-                "确认删除",
-                QString("确定要删除账号[%1]吗？").arg(remark),
-                QMessageBox::Yes | QMessageBox::No
-        );
+    auto remarkItem = tableWidget->item(row, RemarkCol);
+    QString remark = remarkItem ? remarkItem->text() : "未知账号";
 
-        if (reply == QMessageBox::Yes) {
-            tableWidget->removeRow(row);
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(
+            this,
+            "确认删除",
+            QString("确定要删除账号[%1]吗？").arg(remark),
+            QMessageBox::Yes | QMessageBox::No
+    );
 
-            remark = remark.trimmed().replace("/", "_").replace("\\", "_");
-            auto storagePath = QCoreApplication::applicationDirPath() + "/web_profile/login/" + remark;
-            QDir(storagePath).removeRecursively();
-        }
-    }
+    if (reply != QMessageBox::Yes) return;
+
+    tableWidget->removeRow(row);
+    remark = remark.trimmed().replace("/", "_").replace("\\", "_");
+    auto storagePath = QCoreApplication::applicationDirPath() + "/web_profile/login/" + remark;
+    QDir(storagePath).removeRecursively();
 }
 
 void QQManger::handleTest(int row) {

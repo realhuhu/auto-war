@@ -52,16 +52,11 @@ void RedManger::insertRow(const QString &remark, const QString &qq, const QStrin
     tableWidget->insertRow(row);
 
     auto remarkItem = new QTableWidgetItem(remark);
-    remarkItem->setFlags(remarkItem->flags() & ~Qt::ItemIsEditable);
-    tableWidget->setItem(row, RemarkCol, remarkItem);
-
     auto qqItem = new QTableWidgetItem(qq);
-    qqItem->setFlags(remarkItem->flags() & ~Qt::ItemIsEditable);
-    tableWidget->setItem(row, QQCol, qqItem);
-
     auto regionItem = new QTableWidgetItem(region);
+    remarkItem->setFlags(remarkItem->flags() & ~Qt::ItemIsEditable);
+    qqItem->setFlags(remarkItem->flags() & ~Qt::ItemIsEditable);
     regionItem->setFlags(remarkItem->flags() & ~Qt::ItemIsEditable);
-    tableWidget->setItem(row, RegionCol, regionItem);
 
     auto buttonWidget = new QWidget();
     auto btnLayout = new QHBoxLayout(buttonWidget);
@@ -72,15 +67,17 @@ void RedManger::insertRow(const QString &remark, const QString &qq, const QStrin
     btnLayout->addWidget(configBtn);
     btnLayout->addWidget(deleteBtn);
 
+    tableWidget->setItem(row, RemarkCol, remarkItem);
+    tableWidget->setItem(row, QQCol, qqItem);
+    tableWidget->setItem(row, RegionCol, regionItem);
     tableWidget->setCellWidget(row, ActionCol, buttonWidget);
 
-
-    connect(configBtn, &QPushButton::clicked, this, [this]() {
+    connect(configBtn, &QPushButton::clicked, [this]() {
         int index = getIndex(sender()->parent());
         if (index != -1) handleConfig(index);
     });
 
-    connect(deleteBtn, &QPushButton::clicked, this, [this]() {
+    connect(deleteBtn, &QPushButton::clicked, [this]() {
         int index = getIndex(sender()->parent());
         if (index != -1) handleDelete(index);
     });
@@ -148,20 +145,20 @@ void RedManger::handleConfig(int row) {
 }
 
 void RedManger::handleDelete(int row) {
-    if (row >= 0 && row < tableWidget->rowCount()) {
-        auto remarkItem = tableWidget->item(row, RemarkCol);
-        QString remark = remarkItem ? remarkItem->text() : "未知账号";
+    if (row < 0 || row >= tableWidget->rowCount())return;
 
-        QMessageBox::StandardButton reply;
-        reply = QMessageBox::question(
-                this,
-                "确认删除",
-                QString("确定要删除账号[%1]吗？").arg(remark),
-                QMessageBox::Yes | QMessageBox::No
-        );
+    auto remarkItem = tableWidget->item(row, RemarkCol);
+    QString remark = remarkItem ? remarkItem->text() : "未知账号";
 
-        if (reply == QMessageBox::Yes) tableWidget->removeRow(row);
-    }
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(
+            this,
+            "确认删除",
+            QString("确定要删除账号[%1]吗？").arg(remark),
+            QMessageBox::Yes | QMessageBox::No
+    );
+
+    if (reply == QMessageBox::Yes) tableWidget->removeRow(row);
 }
 
 void RedManger::addNew() {
@@ -189,36 +186,36 @@ void RedManger::addNew() {
     QObject::connect(&btnBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
     QObject::connect(&btnBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
 
-    if (dialog.exec() == QDialog::Accepted) {
-        const auto remark = remarkEdit->text().trimmed();
-        const auto qq = qqCombo->currentText();
-        const auto region = QString::number(regionSpin->value());
+    if (dialog.exec() != QDialog::Accepted) return;
 
-        if (remark.isEmpty()) {
-            QMessageBox::warning(this, "输入错误", "备注不能为空");
-            return;
-        }
+    const auto remark = remarkEdit->text().trimmed();
+    const auto qq = qqCombo->currentText();
+    const auto region = QString::number(regionSpin->value());
 
-        if (remark.length() == 0 || remark.length() > 10) {
-            QMessageBox::warning(this, "输入错误", "备注应当为1-10字符");
-            return;
-        }
-
-        bool exists = false;
-        for (int i = 0; i < tableWidget->rowCount(); ++i) {
-            if (tableWidget->item(i, RemarkCol)->text() == remark) {
-                exists = true;
-                break;
-            }
-        }
-
-        if (exists) {
-            QMessageBox::warning(this, "输入错误", "备注名称已存在，请重新输入！");
-            return;
-        }
-
-        insertRow(remark, qq, region);
+    if (remark.isEmpty()) {
+        QMessageBox::warning(this, "输入错误", "备注不能为空");
+        return;
     }
+
+    if (remark.length() == 0 || remark.length() > 10) {
+        QMessageBox::warning(this, "输入错误", "备注应当为1-10字符");
+        return;
+    }
+
+    bool exists = false;
+    for (int i = 0; i < tableWidget->rowCount(); ++i) {
+        if (tableWidget->item(i, RemarkCol)->text() == remark) {
+            exists = true;
+            break;
+        }
+    }
+
+    if (exists) {
+        QMessageBox::warning(this, "输入错误", "备注名称已存在，请重新输入！");
+        return;
+    }
+
+    insertRow(remark, qq, region);
 }
 
 void RedManger::closeEvent(QCloseEvent *event) {

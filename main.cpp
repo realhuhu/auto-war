@@ -140,7 +140,7 @@ void AutoWar::openBrowser() {
         const QString redRemark = info["redRemark"].toString();
         const int region = info["region"].toInt();
 
-        QString itemText = QString("%1-%2-%3区").arg(qqRemark, redRemark, QString::number(region));
+        QString itemText = QString("%1 %2 %3区").arg(qqRemark, redRemark, QString::number(region));
 
         auto item = new QListWidgetItem(itemText);
         const bool isExisting = browsers.contains(redRemark);
@@ -171,7 +171,7 @@ void AutoWar::openBrowser() {
 
         if (browsers.contains(redRemark)) continue;
 
-        auto browser = new RedBrowser(
+        auto browser = new RedGameBrowser(
                 panelTabWidget,
                 info["qqRemark"].toString(),
                 redRemark,
@@ -183,7 +183,7 @@ void AutoWar::openBrowser() {
         browser->show();
         panelTabWidget->addTabWithLabel(browser->panel, redRemark);
 
-        connect(browser, &RedBrowser::closed, [this](const QString &remark) {
+        connect(browser, &RedGameBrowser::closed, [this](const QString &remark) {
             panelTabWidget->removeTabByLabel(remark);
             browsers.remove(remark);
             log(QString("已关闭游戏窗口(%1)").arg(remark), "red");
@@ -227,7 +227,7 @@ void AutoWar::clearLog() const { logTextEdit->clear(); }
 
 void AutoWar::closeEvent(QCloseEvent *event) {
     for (auto it = browsers.begin(); it != browsers.end(); ++it) {
-        RedBrowser *browser = it.value();
+        RedGameBrowser *browser = it.value();
         if (browser) {
             browser->close();
         }
