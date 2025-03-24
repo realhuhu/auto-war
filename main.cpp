@@ -11,7 +11,7 @@ AutoWar::AutoWar(QWidget *parent) : QWidget(parent) {
 
     auto *topLayout = new QHBoxLayout();
 
-    auto *openAllButton = new QPushButton("全部打开", this);
+    auto *openAllButton = new QPushButton("打开游戏", this);
     auto *qqConfigButton = new QPushButton("QQ账号", this);
     auto *redConfigButton = new QPushButton("红警账号", this);
     auto *batchRunButton = new QPushButton("全部执行", this);
@@ -102,6 +102,8 @@ void AutoWar::loadConfig() const {
 
 void AutoWar::openBrowser() {
     const auto accounts = state.config["account"].toArray();
+
+    QList<QVariantMap> redAccountList;
     for (const auto &accountVal: accounts) {
         const auto account = accountVal.toObject();
         const auto qqRemark = account["remark"].toString();
@@ -111,30 +113,83 @@ void AutoWar::openBrowser() {
         for (const auto &redVal: redAccounts) {
             const auto red = redVal.toObject();
 
-            const auto redRemark = red["remark"].toString();
-            const auto region = red["region"].toInt();
-
-            auto browser = new RedBrowser(
-                    panelTabWidget,
-                    qqRemark,
-                    redRemark,
-                    link,
-                    region
-            );
-
-            browsers.insert(redRemark, browser);
-            browser->show();
-
-            panelTabWidget->addTabWithLabel(browser->panel, redRemark);
-
-            connect(browser, &RedBrowser::closed, [this](const QString &remark) {
-                panelTabWidget->removeTabByLabel(remark);
-                browsers.remove(remark);
-                log(QString("已关闭游戏窗口(%1)").arg(remark), "red");
-            });
-
-            log(QString("已打开游戏窗口(%1)").arg(redRemark));
+            QVariantMap info;
+            info["qqRemark"] = qqRemark;
+            info["redRemark"] = red["remark"].toString();
+            info["link"] = link;
+            info["region"] = red["region"].toInt();
+            redAccountList.append(info);
         }
+    }
+
+    if(redAccountList.isEmpty()){
+        log("请先配置QQ账号", "red");
+        return;
+    }
+
+    QDialog dialog(this);
+    dialog.setWindowTitle("选择要打开的账号");
+    dialog.setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+    QVBoxLayout mainLayout(&dialog);
+
+    QListWidget listWidget;
+    mainLayout.addWidget(&listWidget);
+
+    for (const auto &info: redAccountList) {
+        const QString qqRemark = info["qqRemark"].toString();
+        const QString redRemark = info["redRemark"].toString();
+        const int region = info["region"].toInt();
+
+        QString itemText = QString("%1-%2-%3区").arg(qqRemark, redRemark, QString::number(region));
+
+        auto item = new QListWidgetItem(itemText);
+        const bool isExisting = browsers.contains(redRemark);
+
+        item->setCheckState(isExisting ? Qt::Checked : Qt::Unchecked);
+        item->setFlags(isExisting ? (item->flags() & ~Qt::ItemIsEnabled) : (item->flags() | Qt::ItemIsUserCheckable));
+        item->setData(Qt::UserRole, info);
+        listWidget.addItem(item);
+    }
+
+    QPushButton btnOk("确定"), btnCancel("取消");
+    QHBoxLayout btnLayout;
+    btnLayout.addWidget(&btnOk);
+    btnLayout.addWidget(&btnCancel);
+    mainLayout.addLayout(&btnLayout);
+
+    QObject::connect(&btnOk, &QPushButton::clicked, &dialog, &QDialog::accept);
+    QObject::connect(&btnCancel, &QPushButton::clicked, &dialog, &QDialog::reject);
+
+    if (dialog.exec() != QDialog::Accepted) return;
+
+    for (int i = 0; i < listWidget.count(); ++i) {
+        QListWidgetItem *item = listWidget.item(i);
+        if (item->checkState() != Qt::Checked) continue;
+
+        const QVariantMap info = item->data(Qt::UserRole).toMap();
+        const QString redRemark = info["redRemark"].toString();
+
+        if (browsers.contains(redRemark)) continue;
+
+        auto browser = new RedBrowser(
+                panelTabWidget,
+                info["qqRemark"].toString(),
+                redRemark,
+                info["link"].toString(),
+                info["region"].toInt()
+        );
+
+        browsers.insert(redRemark, browser);
+        browser->show();
+        panelTabWidget->addTabWithLabel(browser->panel, redRemark);
+
+        connect(browser, &RedBrowser::closed, [this](const QString &remark) {
+            panelTabWidget->removeTabByLabel(remark);
+            browsers.remove(remark);
+            log(QString("已关闭游戏窗口(%1)").arg(remark), "red");
+        });
+
+        log(QString("已打开游戏窗口(%1)").arg(redRemark));
     }
 }
 

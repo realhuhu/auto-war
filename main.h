@@ -6,9 +6,10 @@
 #include <QTabWidget>
 #include <QPushButton>
 #include <QHBoxLayout>
-#include <QJsonDocument>
 #include <QApplication>
+#include <QJsonDocument>
 #include <QPlainTextEdit>
+#include <QListWidgetItem>
 
 #include "util/tool.h"
 #include "util/state.h"
