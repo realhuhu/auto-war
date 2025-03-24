@@ -91,17 +91,17 @@ void QQManger::insertRow(const QString &remark, const QString &qq, const QString
     tableWidget->setItem(row, StatusCol, statusItem);
     tableWidget->setCellWidget(row, ActionCol, buttonWidget);
 
-    connect(testBtn, &QPushButton::clicked, [this]() {
+    connect(testBtn, &QPushButton::clicked, this, [this]() {
         int index = getIndex(sender()->parent());
         if (index != -1) handleTest(index);
     });
 
-    connect(loginBtn, &QPushButton::clicked, [this]() {
+    connect(loginBtn, &QPushButton::clicked, this,[this]() {
         int index = getIndex(sender()->parent());
         if (index != -1) handleLogin(index);
     });
 
-    connect(deleteBtn, &QPushButton::clicked, [this]() {
+    connect(deleteBtn, &QPushButton::clicked,this, [this]() {
         int index = getIndex(sender()->parent());
         if (index != -1) handleDelete(index);
     });
@@ -215,7 +215,7 @@ void QQManger::saveConfig() {
 }
 
 void QQManger::handleDelete(int row) {
-    if (row <= 0 || row >= tableWidget->rowCount()) return;
+    if (row < 0 || row >= tableWidget->rowCount()) return;
 
     auto remarkItem = tableWidget->item(row, RemarkCol);
     QString remark = remarkItem ? remarkItem->text() : "未知账号";

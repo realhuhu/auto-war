@@ -72,12 +72,12 @@ void RedManger::insertRow(const QString &remark, const QString &qq, const QStrin
     tableWidget->setItem(row, RegionCol, regionItem);
     tableWidget->setCellWidget(row, ActionCol, buttonWidget);
 
-    connect(configBtn, &QPushButton::clicked, [this]() {
+    connect(configBtn, &QPushButton::clicked, this, [this]() {
         int index = getIndex(sender()->parent());
         if (index != -1) handleConfig(index);
     });
 
-    connect(deleteBtn, &QPushButton::clicked, [this]() {
+    connect(deleteBtn, &QPushButton::clicked, this, [this]() {
         int index = getIndex(sender()->parent());
         if (index != -1) handleDelete(index);
     });

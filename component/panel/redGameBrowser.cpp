@@ -52,7 +52,10 @@ RedGameBrowser::RedGameBrowser(
     emit log(QString("%1 游戏已打开").arg(redRemark));
 }
 
-void RedGameBrowser::refresh() const { browser->load(url); }
+void RedGameBrowser::refresh() const {
+    emit log(QString("刷新中..."));
+    browser->load(url);
+}
 
 void RedGameBrowser::closeEvent(QCloseEvent *event) {
     if (!browser) return;
