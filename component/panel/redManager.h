@@ -16,6 +16,7 @@
 #include <QDialogButtonBox>
 
 #include "../../../util/state.h"
+#include "../panel/redConfigurer.h"
 
 class RedManger : public QDialog {
 Q_OBJECT

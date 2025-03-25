@@ -1,5 +1,5 @@
-﻿#ifndef RED_QQ_LOGIN_BROWSER_H
-#define RED_QQ_LOGIN_BROWSER_H
+﻿#ifndef RED_QQ_BROWSER_H
+#define RED_QQ_BROWSER_H
 
 #include <QDir>
 #include <QDialog>
@@ -45,4 +45,4 @@ signals:
     void linkDetected(QUrl url);
 };
 
-#endif //RED_QQ_LOGIN_BROWSER_H
+#endif //RED_QQ_BROWSER_H

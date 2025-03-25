@@ -8,7 +8,7 @@ class Emitter : public QObject {
 Q_OBJECT
 public:
     static Emitter *instance() {
-        static auto *emitter = new Emitter();
+        static auto emitter = new Emitter();
         return emitter;
     }
 

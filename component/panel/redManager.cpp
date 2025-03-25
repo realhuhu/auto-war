@@ -139,7 +139,13 @@ void RedManger::saveConfig() {
 }
 
 void RedManger::handleConfig(int row) {
+    if (row < 0 || row >= tableWidget->rowCount()) return;
 
+    auto qqItem = tableWidget->item(row, QQCol);
+    auto remarkItem = tableWidget->item(row, RemarkCol);
+
+    auto dialog = new RedConfigurer(qqItem->text(), remarkItem->text(), this);
+    dialog->exec();
 }
 
 void RedManger::handleDelete(int row) {

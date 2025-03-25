@@ -8,10 +8,10 @@ RedController::RedController(QString redRemark, QWidget *parent) : remark(std::m
     mainLayout->addWidget(logTextEdit);
 
     auto footLayout = new QHBoxLayout();
-    auto *refreshButton = new QPushButton("刷新游戏", this);
-    auto *runButton = new QPushButton("执行命令", this);
-    auto *stopButton = new QPushButton("停止命令", this);
-    auto *clearButton = new QPushButton("清空输出", this);
+    auto refreshButton = new QPushButton("刷新游戏", this);
+    auto runButton = new QPushButton("执行命令", this);
+    auto stopButton = new QPushButton("停止命令", this);
+    auto clearButton = new QPushButton("清空输出", this);
     footLayout->addWidget(refreshButton);
     footLayout->addWidget(runButton);
     footLayout->addWidget(stopButton);

@@ -35,7 +35,7 @@ QQBrowser::QQBrowser(QWidget *parent, const QString &remark) : QDialog(parent) {
     }
     connect(interceptor, &LinkInterceptor::linkDetected, this, &QQBrowser::onLinkDetected);
 
-    auto *mainLayout = new QHBoxLayout(this);
+    auto mainLayout = new QHBoxLayout(this);
     mainLayout->setMargin(0);
     browser = new QWebEngineView(this);
     browser->setPage(new QWebEnginePage(profile, browser));

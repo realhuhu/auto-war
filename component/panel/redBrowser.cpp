@@ -32,7 +32,7 @@ RedBrowser::RedBrowser(
 
     url = QString("%1&region=%2").arg(link, QString::number(region - 1));
 
-    auto *mainLayout = new QHBoxLayout(this);
+    auto mainLayout = new QHBoxLayout(this);
     mainLayout->setMargin(0);
     browser = new QWebEngineView(this);
     browser->setPage(new QWebEnginePage(profile, browser));

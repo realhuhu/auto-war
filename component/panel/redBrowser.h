@@ -1,5 +1,5 @@
-﻿#ifndef RED_RED_GAME_BROWSER_H
-#define RED_RED_GAME_BROWSER_H
+﻿#ifndef RED_RED_BROWSER_H
+#define RED_RED_BROWSER_H
 
 #include <QDir>
 #include <QDialog>

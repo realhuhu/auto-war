@@ -1,22 +1,23 @@
 ﻿#include "main.h"
 
-auto configFile = "/config.json";
+auto configName = "/config.json";
+auto configDefaultName = "/config-default.json";
 
 AutoWar::AutoWar(QWidget *parent) : QWidget(parent) {
     setWindowTitle("红警多开");
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     resize(640, 480);
 
-    auto *mainLayout = new QVBoxLayout(this);
+    auto mainLayout = new QVBoxLayout(this);
 
-    auto *topLayout = new QHBoxLayout();
+    auto topLayout = new QHBoxLayout();
 
-    auto *openAllButton = new QPushButton("打开游戏", this);
-    auto *qqConfigButton = new QPushButton("QQ账号", this);
-    auto *redConfigButton = new QPushButton("红警账号", this);
-    auto *batchRunButton = new QPushButton("全部执行", this);
-    auto *batchStopButton = new QPushButton("全部停止", this);
-    auto *clearLogButton = new QPushButton("清空日志", this);
+    auto openAllButton = new QPushButton("打开游戏", this);
+    auto qqConfigButton = new QPushButton("QQ账号", this);
+    auto redConfigButton = new QPushButton("红警账号", this);
+    auto batchRunButton = new QPushButton("全部执行", this);
+    auto batchStopButton = new QPushButton("全部停止", this);
+    auto clearLogButton = new QPushButton("清空日志", this);
     topLayout->addWidget(openAllButton);
     topLayout->addWidget(qqConfigButton);
     topLayout->addWidget(redConfigButton);
@@ -26,7 +27,7 @@ AutoWar::AutoWar(QWidget *parent) : QWidget(parent) {
 
     mainLayout->addLayout(topLayout);
 
-    auto *bodyLayout = new QHBoxLayout();
+    auto bodyLayout = new QHBoxLayout();
     consoleTextEdit = new QTextEdit(this);
     consoleTextEdit->setReadOnly(true);
     panelTabWidget = new LabelTabWidget(this);
@@ -60,7 +61,7 @@ void AutoWar::consolePrint(const QString &text, const QString &color) const {
 }
 
 void AutoWar::loadConfig() const {
-    QString configPath = QCoreApplication::applicationDirPath() + configFile;
+    auto configPath = QCoreApplication::applicationDirPath() + configName;
     QFileInfo fileInfo(configPath);
 
     if (!fileInfo.exists()) {
@@ -75,32 +76,43 @@ void AutoWar::loadConfig() const {
         consolePrint("已创建默认配置文件");
     }
 
-    QFile file(configPath);
-
-    if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) {
-        consolePrint(QString("配置文件存在但无法打开: %1").arg(file.errorString()));
+    QFile configFile(configPath);
+    if (!configFile.open(QIODevice::ReadWrite | QIODevice::Text)) {
+        consolePrint(QString("配置文件存在但无法打开: %1").arg(configFile.errorString()));
         return;
     }
 
-    QByteArray jsonData = file.readAll();
     QJsonParseError parseError{};
-    QJsonDocument doc = QJsonDocument::fromJson(jsonData, &parseError);
+    auto configJson = configFile.readAll();
+    auto configDoc = QJsonDocument::fromJson(configJson, &parseError);
 
     if (parseError.error != QJsonParseError::NoError) {
         consolePrint(QString("配置文件解析错误: %1").arg(parseError.errorString()));
 
-        if (jsonData.trimmed().isEmpty()) {
+        if (configJson.trimmed().isEmpty()) {
             consolePrint("检测到空文件，重新初始化配置");
-            file.resize(0);
-            QTextStream stream(&file);
+            configFile.resize(0);
+            QTextStream stream(&configFile);
             stream << "{\"account\": []}";
         }
-        file.close();
+        configFile.close();
         return;
     }
 
-    state.config = doc.object();
-    file.close();
+    state.config = configDoc.object();
+    configFile.close();
+
+    auto configDefaultPath = QCoreApplication::applicationDirPath() + configDefaultName;
+    QFile configDefaultFile(configDefaultPath);
+    if (!configDefaultFile.open(QIODevice::ReadWrite | QIODevice::Text)) {
+        consolePrint(QString("默认配置文件存在但无法打开: %1").arg(configDefaultFile.errorString()));
+        return;
+    }
+
+    auto configDefaultJson = configDefaultFile.readAll();
+    auto configDefaultDoc = QJsonDocument::fromJson(configDefaultJson);
+    state.configDefault = configDefaultDoc.object();
+    configDefaultFile.close();
 }
 
 void AutoWar::openBrowser() {
@@ -201,7 +213,7 @@ void AutoWar::openBrowser() {
     }
 }
 
-void AutoWar::closeBrowser(const QString& remark) {
+void AutoWar::closeBrowser(const QString &remark) {
     panelTabWidget->removeTabByLabel(remark);
     browsers.remove(remark);
     consolePrint(QString("已关闭游戏窗口(%1)").arg(remark), "red");
@@ -225,7 +237,7 @@ void AutoWar::openRedManager() {
 }
 
 void AutoWar::saveConfig() const {
-    QString configPath = QCoreApplication::applicationDirPath() + configFile;
+    QString configPath = QCoreApplication::applicationDirPath() + configName;
 
     QFile file(configPath);
     if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {

@@ -24,6 +24,12 @@ add_executable(Red
         util/state.cpp
         util/emitter.h
 
+        component/unit/buttonWithSetting.h
+        component/unit/buttonWithSetting.cpp
+        component/unit/labelComboBox.h
+        component/unit/labelComboBox.cpp
+        component/unit/labelSpinBox.h
+        component/unit/labelSpinBox.cpp
         component/unit/labelTabWidget.h
         component/unit/labelTabWidget.cpp
         component/unit/placeholderDelegate.h
@@ -39,7 +45,8 @@ add_executable(Red
         component/panel/redController.cpp
         component/panel/redBrowser.h
         component/panel/redBrowser.cpp
-
+        component/panel/redConfigurer.cpp
+        component/panel/redConfigurer.h
 
         task/daily.cpp
         task/daily.h

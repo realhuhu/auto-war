@@ -5,6 +5,7 @@
 
 struct State {
     QJsonObject config;
+    QJsonObject configDefault;
 };
 
 extern State state;
