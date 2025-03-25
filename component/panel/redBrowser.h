@@ -15,21 +15,19 @@
 #include "redController.h"
 #include "../../task/daily.h"
 
-class RedGameBrowser : public QDialog {
+class RedBrowser : public QDialog {
 Q_OBJECT
 
 public:
     QString url;
     QString remark;
-    RedController *panel;
     QWebEngineView *browser;
     QBasicMutex workerMutex;
-    QThread *workerThread = nullptr;
+    QThread *workerThread;
     QMap<QString, std::function<void()>> tasks;
     static QMap<QString, QWebEngineProfile *> profileMap;
 
-    explicit RedGameBrowser(
-            QTabWidget *tabWidget,
+    explicit RedBrowser(
             const QString &qqRemark,
             const QString &redRemark,
             const QString &link,
@@ -38,7 +36,7 @@ public:
 
     void closeEvent(QCloseEvent *event) override;
 
-    ~RedGameBrowser() override;
+    ~RedBrowser() override;
 
 public slots:
 

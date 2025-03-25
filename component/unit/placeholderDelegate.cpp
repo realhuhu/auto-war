@@ -1,5 +1,10 @@
 ﻿#include "placeholderDelegate.h"
 
+PlaceholderDelegate::PlaceholderDelegate(
+        QString placeholder,
+        QObject *parent
+) : QStyledItemDelegate(parent), placeholder(std::move(placeholder)) {}
+
 void PlaceholderDelegate::paint(
         QPainter *painter,
         const QStyleOptionViewItem &option,
@@ -21,7 +26,7 @@ QWidget *PlaceholderDelegate::createEditor(
         const QStyleOptionViewItem &option,
         const QModelIndex &index
 ) const {
-    QLineEdit *editor = new QLineEdit(parent);
+    auto editor = new QLineEdit(parent);
     editor->setPlaceholderText(placeholder);
     return editor;
 }

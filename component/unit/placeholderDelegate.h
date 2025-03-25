@@ -4,13 +4,14 @@
 #include <QPainter>
 #include <QLineEdit>
 #include <QStyledItemDelegate>
+#include <utility>
 
 class PlaceholderDelegate : public QStyledItemDelegate {
 public:
-    PlaceholderDelegate(
-            const QString &placeholder,
+    explicit PlaceholderDelegate(
+            QString placeholder,
             QObject *parent = nullptr
-    ) : QStyledItemDelegate(parent), placeholder(placeholder) {}
+    );
 
     QWidget *createEditor(
             QWidget *parent,

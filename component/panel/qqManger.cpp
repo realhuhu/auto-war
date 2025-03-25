@@ -23,7 +23,6 @@ QQManger::QQManger(QWidget *parent) : QDialog(parent), networkManager(new QNetwo
             border: 1px solid #E0E0E0;
         }
     )");
-
     mainLayout->addWidget(tableWidget);
 
     auto buttonContainer = new QWidget();
@@ -31,14 +30,13 @@ QQManger::QQManger(QWidget *parent) : QDialog(parent), networkManager(new QNetwo
     auto addButton = new QPushButton("添加QQ账号");
     auto testAllButton = new QPushButton("全部测试");
     auto loginAllButton = new QPushButton("全部登录");
-    connect(addButton, &QPushButton::clicked, this, &QQManger::addNew);
+    connect(addButton, &QPushButton::clicked, this, &QQManger::handleAdd);
     connect(testAllButton, &QPushButton::clicked, this, &QQManger::testAll);
     connect(loginAllButton, &QPushButton::clicked, this, &QQManger::loginAll);
     buttonLayout->addStretch();
     buttonLayout->addWidget(addButton);
     buttonLayout->addWidget(testAllButton);
     buttonLayout->addWidget(loginAllButton);
-
     mainLayout->addWidget(buttonContainer);
 
     loadConfig();
@@ -231,8 +229,8 @@ void QQManger::handleDelete(int row) {
     if (reply != QMessageBox::Yes) return;
 
     tableWidget->removeRow(row);
-    remark = remark.trimmed().replace("/", "_").replace("\\", "_");
-    auto storagePath = QCoreApplication::applicationDirPath() + "/web_profile/login/" + remark;
+    auto modifiedRemark = remark.trimmed().replace("/", "_").replace("\\", "_");
+    auto storagePath = QCoreApplication::applicationDirPath() + "/web_profile/login/" + modifiedRemark;
     QDir(storagePath).removeRecursively();
 }
 
@@ -283,8 +281,8 @@ void QQManger::handleLogin(int row) {
     auto remarkItem = tableWidget->item(row, RemarkCol);
     QString remark = remarkItem ? remarkItem->text() : "未知账号";
 
-    auto browser = new QQLoginBrowser(this, remark);
-    connect(browser, &QQLoginBrowser::linkDetected, [this, &row](const QUrl &url) {
+    auto browser = new QQBrowser(this, remark);
+    connect(browser, &QQBrowser::linkDetected, [this, &row](const QUrl &url) {
         auto linkItem = tableWidget->item(row, LinkCol);
         linkItem->setText(url.toString());
 
@@ -293,7 +291,7 @@ void QQManger::handleLogin(int row) {
     browser->exec();
 }
 
-void QQManger::addNew() {
+void QQManger::handleAdd() {
     bool ok;
     QString remark;
 

@@ -20,16 +20,14 @@ RedManger::RedManger(QWidget *parent) : QDialog(parent) {
             border: 1px solid #E0E0E0;
         }
     )");
-
     mainLayout->addWidget(tableWidget);
 
     auto buttonContainer = new QWidget();
     auto buttonLayout = new QHBoxLayout(buttonContainer);
     auto addButton = new QPushButton("添加红警账号");
-    connect(addButton, &QPushButton::clicked, this, &RedManger::addNew);
+    connect(addButton, &QPushButton::clicked, this, &RedManger::handleAdd);
     buttonLayout->addStretch();
     buttonLayout->addWidget(addButton);
-
     mainLayout->addWidget(buttonContainer);
 
     loadConfig();
@@ -145,7 +143,7 @@ void RedManger::handleConfig(int row) {
 }
 
 void RedManger::handleDelete(int row) {
-    if (row < 0 || row >= tableWidget->rowCount())return;
+    if (row < 0 || row >= tableWidget->rowCount()) return;
 
     auto remarkItem = tableWidget->item(row, RemarkCol);
     QString remark = remarkItem ? remarkItem->text() : "未知账号";
@@ -161,7 +159,7 @@ void RedManger::handleDelete(int row) {
     if (reply == QMessageBox::Yes) tableWidget->removeRow(row);
 }
 
-void RedManger::addNew() {
+void RedManger::handleAdd() {
     QDialog dialog(this);
     dialog.setWindowTitle("添加红警账号");
     QFormLayout form(&dialog);
@@ -183,6 +181,7 @@ void RedManger::addNew() {
 
     QDialogButtonBox btnBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
     form.addRow(&btnBox);
+
     QObject::connect(&btnBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
     QObject::connect(&btnBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
 

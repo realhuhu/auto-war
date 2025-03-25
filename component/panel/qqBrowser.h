@@ -24,7 +24,7 @@ signals:
     void linkDetected(QUrl url);
 };
 
-class QQLoginBrowser : public QDialog {
+class QQBrowser : public QDialog {
 Q_OBJECT
 
 public:
@@ -32,13 +32,13 @@ public:
     static QMap<QString, QWebEngineProfile *> profileMap;
     static QMap<QString, LinkInterceptor *> interceptorMap;
 
-    explicit QQLoginBrowser(QWidget *parent, QString remark);
+    explicit QQBrowser(QWidget *parent, const QString &remark);
 
     void onLinkDetected(QUrl url);
 
     void closeEvent(QCloseEvent *event) override;
 
-    ~QQLoginBrowser() override;
+    ~QQBrowser() override;
 
 signals:
 

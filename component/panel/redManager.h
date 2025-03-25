@@ -52,7 +52,7 @@ public slots:
 
     void handleDelete(int row);
 
-    void addNew();
+    void handleAdd();
 
 signals:
 

@@ -17,7 +17,7 @@
 #include <QNetworkRequest>
 #include <QNetworkAccessManager>
 
-#include "qqLoginBrowser.h"
+#include "qqBrowser.h"
 #include "../unit/placeholderDelegate.h"
 #include "../../../util/state.h"
 
@@ -26,7 +26,6 @@ class QQManger : public QDialog {
 Q_OBJECT
 
 public:
-    QTableWidget *tableWidget;
     enum Column {
         RemarkCol = 0,
         QQNumberCol = 1,
@@ -44,6 +43,7 @@ public:
         Valid = 5,
         Invalid = 6
     };
+    QTableWidget *tableWidget;
     QNetworkAccessManager *networkManager;
 
     explicit QQManger(QWidget *parent = nullptr);
@@ -73,7 +73,7 @@ public slots:
 
     void handleDelete(int row);
 
-    void addNew();
+    void handleAdd();
 
     void testAll();
 

@@ -15,13 +15,17 @@ Q_OBJECT
 
 public:
     QString remark;
-    QTextEdit *logTextEdit = new QTextEdit(this);
+    QTextEdit *logTextEdit;
 
     explicit RedController(QString redRemark, QWidget *parent = nullptr);
 
 public slots:
 
     void log(const QString &text, const QString &color = "black") const;
+
+    void clear() const;
+
+    void refresh();
 
 signals:
 

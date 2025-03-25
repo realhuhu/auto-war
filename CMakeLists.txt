@@ -31,14 +31,14 @@ add_executable(Red
 
         component/panel/qqManger.h
         component/panel/qqManger.cpp
-        component/panel/qqLoginBrowser.h
-        component/panel/qqLoginBrowser.cpp
+        component/panel/qqBrowser.h
+        component/panel/qqBrowser.cpp
         component/panel/redManager.h
         component/panel/redManager.cpp
         component/panel/redController.h
         component/panel/redController.cpp
-        component/panel/redGameBrowser.h
-        component/panel/redGameBrowser.cpp
+        component/panel/redBrowser.h
+        component/panel/redBrowser.cpp
 
 
         task/daily.cpp

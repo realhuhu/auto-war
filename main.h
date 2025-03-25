@@ -18,16 +18,16 @@
 #include "component/panel/redManager.h"
 #include "component/panel/redController.h"
 #include "component/unit/labelTabWidget.h"
-#include "component/panel/redGameBrowser.h"
+#include "component/panel/redBrowser.h"
 
 
 class AutoWar : public QWidget {
 Q_OBJECT
 
 public:
-    QMap<QString, RedGameBrowser *> browsers;
-    QTextEdit *consoleTextEdit = new QTextEdit(this);
-    LabelTabWidget *panelTabWidget = new LabelTabWidget(this);
+    QTextEdit *consoleTextEdit;
+    LabelTabWidget *panelTabWidget;
+    QMap<QString, RedBrowser *> browsers;
 
     explicit AutoWar(QWidget *parent = nullptr);
 
@@ -40,6 +40,8 @@ public:
 public slots:
 
     void openBrowser();
+
+    void closeBrowser(const QString& remark);
 
     void openQQManager();
 

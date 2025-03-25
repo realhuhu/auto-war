@@ -27,7 +27,9 @@ AutoWar::AutoWar(QWidget *parent) : QWidget(parent) {
     mainLayout->addLayout(topLayout);
 
     auto *bodyLayout = new QHBoxLayout();
+    consoleTextEdit = new QTextEdit(this);
     consoleTextEdit->setReadOnly(true);
+    panelTabWidget = new LabelTabWidget(this);
     bodyLayout->addWidget(panelTabWidget, 3);
     bodyLayout->addWidget(consoleTextEdit, 2);
 
@@ -37,10 +39,9 @@ AutoWar::AutoWar(QWidget *parent) : QWidget(parent) {
     connect(qqConfigButton, &QPushButton::clicked, this, &AutoWar::openQQManager);
     connect(redConfigButton, &QPushButton::clicked, this, &AutoWar::openRedManager);
     connect(clearLogButton, &QPushButton::clicked, this, &AutoWar::clearConsole);
+    connect(Emitter::instance(), &Emitter::log, this, &AutoWar::redirectLog);
 
     loadConfig();
-
-    connect(Emitter::instance(), &Emitter::log, this, &AutoWar::redirectLog);
 }
 
 void AutoWar::consolePrint(const QString &text, const QString &color) const {
@@ -179,8 +180,7 @@ void AutoWar::openBrowser() {
             continue;
         }
 
-        auto browser = new RedGameBrowser(
-                panelTabWidget,
+        auto browser = new RedBrowser(
                 info["qqRemark"].toString(),
                 redRemark,
                 info["link"].toString(),
@@ -189,16 +189,22 @@ void AutoWar::openBrowser() {
 
         browsers.insert(redRemark, browser);
         browser->show();
-        panelTabWidget->addTabWithLabel(browser->panel, redRemark);
 
-        connect(browser, &RedGameBrowser::closed, [this](const QString &remark) {
-            panelTabWidget->removeTabByLabel(remark);
-            browsers.remove(remark);
-            consolePrint(QString("已关闭游戏窗口(%1)").arg(remark), "red");
-        });
+        auto panel = new RedController(redRemark, panelTabWidget);
+        panelTabWidget->addTabWithLabel(panel, redRemark);
+
+        connect(panel, &RedController::refreshBrowser, browser, &RedBrowser::refresh);
+        connect(browser, &RedBrowser::log, panel, &RedController::log);
+        connect(browser, &RedBrowser::closed, this, &AutoWar::closeBrowser);
 
         consolePrint(QString("已打开游戏窗口(%1)").arg(redRemark));
     }
+}
+
+void AutoWar::closeBrowser(const QString& remark) {
+    panelTabWidget->removeTabByLabel(remark);
+    browsers.remove(remark);
+    consolePrint(QString("已关闭游戏窗口(%1)").arg(remark), "red");
 }
 
 void AutoWar::openQQManager() {
@@ -242,13 +248,14 @@ void AutoWar::redirectLog(const QString &remark, const QString &message, const Q
 
 void AutoWar::closeEvent(QCloseEvent *event) {
     for (auto it = browsers.begin(); it != browsers.end(); ++it) {
-        RedGameBrowser *browser = it.value();
+        RedBrowser *browser = it.value();
         if (browser) browser->close();
     }
 
     browsers.clear();
     QWidget::closeEvent(event);
 }
+
 
 int main(int argc, char *argv[]) {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);

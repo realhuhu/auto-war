@@ -3,6 +3,7 @@
 RedController::RedController(QString redRemark, QWidget *parent) : remark(std::move(redRemark)), QWidget(parent) {
     auto mainLayout = new QVBoxLayout(this);
 
+    logTextEdit = new QTextEdit(this);
     logTextEdit->setReadOnly(true);
     mainLayout->addWidget(logTextEdit);
 
@@ -15,20 +16,10 @@ RedController::RedController(QString redRemark, QWidget *parent) : remark(std::m
     footLayout->addWidget(runButton);
     footLayout->addWidget(stopButton);
     footLayout->addWidget(clearButton);
-
     mainLayout->addLayout(footLayout);
 
-    connect(refreshButton, &QPushButton::clicked, [this] {
-        QMessageBox::StandardButton reply;
-        reply = QMessageBox::question(
-                this,
-                "刷新游戏",
-                QString("确认刷新窗口%1？").arg(remark),
-                QMessageBox::Yes | QMessageBox::No
-        );
-
-        if (reply == QMessageBox::Yes) emit refreshBrowser();
-    });
+    connect(refreshButton, &QPushButton::clicked, this, &RedController::refresh);
+    connect(clearButton, &QPushButton::clicked, this, &RedController::clear);
 }
 
 void RedController::log(const QString &text, const QString &color) const {
@@ -45,4 +36,20 @@ void RedController::log(const QString &text, const QString &color) const {
                 </div>
                 )"
     ).arg(timeString, color, text));
+}
+
+void RedController::refresh() {
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(
+            this,
+            "刷新游戏",
+            QString("确认刷新窗口%1？").arg(remark),
+            QMessageBox::Yes | QMessageBox::No
+    );
+
+    if (reply == QMessageBox::Yes) emit refreshBrowser();
+}
+
+void RedController::clear() const {
+    logTextEdit->clear();
 }
