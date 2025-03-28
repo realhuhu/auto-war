@@ -313,6 +313,10 @@ int main(int argc, char *argv[]) {
 
     QApplication app(argc, newArgvArray);
     QApplication::setStyle(QStyleFactory::create("Fusion"));
+    QWebEngineUrlScheme scheme("proxy");
+    scheme.setSyntax(QWebEngineUrlScheme::Syntax::HostAndPort);
+    scheme.setFlags(QWebEngineUrlScheme::SecureScheme | QWebEngineUrlScheme::LocalAccessAllowed);
+    QWebEngineUrlScheme::registerScheme(scheme);
 
     AutoWar autoWar;
     autoWar.show();

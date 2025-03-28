@@ -27,6 +27,8 @@ RedBrowser::RedBrowser(
         profile->setPersistentStoragePath(storagePath);
         profile->setCachePath(storagePath + "/cache");
         profile->setPersistentCookiesPolicy(QWebEngineProfile::ForcePersistentCookies);
+//        profile->setUrlRequestInterceptor(new StorageInterceptor(this));
+//        profile->installUrlSchemeHandler("proxy", new StorageProxyHandler(this));
         profileMap.insert(modifiedRemark, profile);
     }
 
@@ -41,9 +43,6 @@ RedBrowser::RedBrowser(
     mainLayout->addWidget(browser);
 
     emit log(QString("%1 游戏已打开").arg(redRemark));
-
-    runCommand();
-    runCommand();
 }
 
 void RedBrowser::refresh() const {

@@ -14,6 +14,8 @@
 
 #include "redController.h"
 #include "../../task/daily.h"
+#include "../../interceptor/storage.h"
+
 
 class RedBrowser : public QDialog {
 Q_OBJECT
@@ -52,4 +54,4 @@ signals:
 
 };
 
-#endif //RED_RED_GAME_BROWSER_H
+#endif //RED_RED_BROWSER_H

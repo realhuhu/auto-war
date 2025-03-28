@@ -11,6 +11,7 @@
 #include <QJsonDocument>
 #include <QPlainTextEdit>
 #include <QListWidgetItem>
+#include <QWebEngineUrlScheme>
 
 #include "util/tool.h"
 #include "util/state.h"

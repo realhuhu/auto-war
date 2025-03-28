@@ -19,13 +19,15 @@ qt5_add_resources(qrc_FILES resource/resource.qrc)
 add_executable(Red
 #        WIN32
         ${qrc_FILES}
-
         util/tool.h
         util/tool.cpp
         util/state.h
         util/state.cpp
         util/emitter.h
-
+        interceptor/link.h
+        interceptor/link.cpp
+        interceptor/storage.h
+        interceptor/storage.cpp
         component/unit/buttonWithSetting.h
         component/unit/buttonWithSetting.cpp
         component/unit/labelComboBox.h
@@ -36,7 +38,6 @@ add_executable(Red
         component/unit/labelTabWidget.cpp
         component/unit/placeholderDelegate.h
         component/unit/placeholderDelegate.cpp
-
         component/panel/qqManger.h
         component/panel/qqManger.cpp
         component/panel/qqBrowser.h
@@ -49,10 +50,8 @@ add_executable(Red
         component/panel/redBrowser.cpp
         component/panel/redConfigurer.cpp
         component/panel/redConfigurer.h
-
         task/daily.cpp
         task/daily.h
-
         main.h
         main.cpp
 )
