@@ -8,6 +8,8 @@
 
 class PlaceholderDelegate : public QStyledItemDelegate {
 public:
+    QString placeholder;
+
     explicit PlaceholderDelegate(
             QString placeholder,
             QObject *parent = nullptr
@@ -24,9 +26,6 @@ public:
             const QStyleOptionViewItem &option,
             const QModelIndex &index
     ) const override;
-
-private:
-    QString placeholder;
 };
 
 #endif //RED_PLACEHOLDER_DELEGATE_H

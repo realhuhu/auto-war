@@ -10,18 +10,14 @@
 class ButtonWithSetting : public QWidget {
 Q_OBJECT
 public:
+    QPushButton *textButton;
+    QToolButton *settingButton;
+
     explicit ButtonWithSetting(
             const QString &text,
             bool showSettingButton = true,
             QWidget *parent = nullptr
     );
-
-    [[nodiscard]] QPushButton *getTextButton() const;
-    [[nodiscard]] QToolButton *getSettingButton() const;
-
-private:
-    QPushButton *textButton;
-    QToolButton *settingButton;
 };
 
 

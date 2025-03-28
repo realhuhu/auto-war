@@ -12,6 +12,7 @@
 #include <QPlainTextEdit>
 #include <QListWidgetItem>
 
+#include "util/tool.h"
 #include "util/state.h"
 #include "util/emitter.h"
 #include "component/panel/qqManger.h"

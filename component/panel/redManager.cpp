@@ -103,38 +103,40 @@ void RedManger::loadConfig() {
 }
 
 void RedManger::saveConfig() {
-    auto accounts = state.config["account"].toArray();
-    for (auto accountRef: accounts) {
-        auto account = accountRef.toObject();
-        account["red"] = QJsonArray();
-        accountRef = account;
+    auto accountArray = state.config["account"].toArray();
+    QHash<QString, QJsonObject> existingSettings = {};
+
+    for (int i = 0; i < accountArray.count(); ++i) {
+        auto accountObj = accountArray[i].toObject();
+        for (auto redRef: accountObj["red"].toArray()) {
+            QJsonObject redObj = redRef.toObject();
+            existingSettings[redObj["remark"].toString()] = redObj["setting"].toObject();
+        }
+        accountObj["red"] = QJsonArray();
+        accountArray[i] = accountObj;
     }
 
     for (int row = 0; row < tableWidget->rowCount(); ++row) {
-        auto qqItem = tableWidget->item(row, QQCol);
-        auto remarkItem = tableWidget->item(row, RemarkCol);
-        auto regionItem = tableWidget->item(row, RegionCol);
-
         QJsonObject redConfig;
-        redConfig["remark"] = remarkItem->text();
-        redConfig["region"] = regionItem->text().toInt();
+        auto remark = tableWidget->item(row, RemarkCol)->text();
+
+        redConfig["remark"] = remark;
+        redConfig["region"] = tableWidget->item(row, RegionCol)->text().toInt();
         redConfig["order"] = row;
+        redConfig["setting"] = existingSettings.contains(remark) ? existingSettings[remark] : state.configDefault;
 
+        for (int i = 0; i < accountArray.count(); ++i) {
+            auto accountObj = accountArray[i].toObject();
+            if (accountObj["remark"] != tableWidget->item(row, QQCol)->text()) continue;
 
-        const auto accountKey = qqItem->text();
-        for (auto accountRef: accounts) {
-            auto account = accountRef.toObject();
-            if (account["remark"] == accountKey) {
-                auto reds = account["red"].toArray();
-                reds.append(redConfig);
-                account["red"] = reds;
-                accountRef = account;
-                break;
-            }
+            auto redArray = accountObj["red"].toArray();
+            redArray.append(redConfig);
+            accountObj["red"] = redArray;
+            accountArray[i] = accountObj;
         }
     }
 
-    state.config["account"] = accounts;
+    state.config["account"] = accountArray;
     emit configChanged();
 }
 

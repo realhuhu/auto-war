@@ -10,13 +10,10 @@
 class LabelSpinBox : public QWidget {
 Q_OBJECT
 public:
-    explicit LabelSpinBox(const QString &text, int value, QWidget *parent = nullptr);
-
-    [[nodiscard]] QSpinBox *getSpinBox() const;
-
-private:
     QLabel *label;
     QSpinBox *spinBox;
+
+    explicit LabelSpinBox(const QString &text, int value, QWidget *parent = nullptr);
 };
 
 #endif //QT_LABELEDSPINBOX_H

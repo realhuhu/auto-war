@@ -24,5 +24,3 @@ LabelComboBox::LabelComboBox(
 
     setLayout(layout);
 }
-
-QComboBox *LabelComboBox::getComboBox() { return comboBox; }

@@ -8,7 +8,19 @@ RedConfigurer::RedConfigurer(
     setWindowTitle(QString("配置账号: %1 %2").arg(qqRemark, redRemark));
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
-    config = state.configDefault;
+    for (auto qqRef: state.config["account"].toArray()) {
+        auto qqObj = qqRef.toObject();
+        if (qqObj["remark"] != qqRemark) continue;
+
+        for (auto redRef: qqObj["red"].toArray()) {
+            auto redObj = redRef.toObject();
+            if (redObj["remark"] != redRemark) continue;
+
+            config = redObj["setting"].toObject();
+            break;
+        }
+        break;
+    }
 
     for (auto it = config.begin(); it != config.end(); ++it) {
         auto obj = it.value().toObject();
@@ -21,8 +33,8 @@ RedConfigurer::RedConfigurer(
         });
     }
 
-    QList<QString> keys = modules.keys();
-    std::sort(keys.begin(), keys.end(), [this](const QString &a, const QString &b) {
+    QList<QString> moduleNames = modules.keys();
+    std::sort(moduleNames.begin(), moduleNames.end(), [this](const QString &a, const QString &b) {
         return modules[a].order < modules[b].order;
     });
 
@@ -31,35 +43,41 @@ RedConfigurer::RedConfigurer(
 
     listWidget = new QListWidget(this);
     listWidget->setFixedWidth(100);
-    std::sort(keys.begin(), keys.end(), [this](const QString &a, const QString &b) {
+    std::sort(moduleNames.begin(), moduleNames.end(), [this](const QString &a, const QString &b) {
         return modules[a].order < modules[b].order;
     });
-    for (const auto &key: keys) { listWidget->addItem(key); }
+    for (const auto &moduleName: moduleNames) { listWidget->addItem(moduleName); }
     listWidget->setCurrentRow(0);
     mainLayout->addWidget(listWidget);
 
     stackedWidget = new QStackedWidget(this);
-    std::sort(keys.begin(), keys.end(), [this](const QString &a, const QString &b) {
+    std::sort(moduleNames.begin(), moduleNames.end(), [this](const QString &a, const QString &b) {
         return modules[a].order < modules[b].order;
     });
-    for (const auto &key: keys) { stackedWidget->addWidget(createModulePage(modules[key])); }
+    for (const auto &moduleName: moduleNames) { stackedWidget->addWidget(createModulePage(moduleName)); }
     mainLayout->addWidget(stackedWidget);
 
     connect(listWidget, &QListWidget::currentRowChanged, stackedWidget, &QStackedWidget::setCurrentIndex);
 }
 
-
-QWidget *RedConfigurer::createModulePage(const ModuleConfig &redCconfig) {
+QWidget *RedConfigurer::createModulePage(QString moduleName) {
     auto page = new QWidget;
     auto layout = new QVBoxLayout(page);
     layout->setContentsMargins(10, 10, 10, 10);
     layout->setSpacing(20);
 
-    if (!redCconfig.checkboxes.isEmpty()) { layout->addWidget(createCheckboxGroup(redCconfig.checkboxes)); }
-    if (!redCconfig.selects.isEmpty()) { layout->addWidget(createSelectGroup(redCconfig.selects)); }
-    if (!redCconfig.inputs.isEmpty()) { layout->addWidget(createInputGroup(redCconfig.inputs)); }
-    if (!redCconfig.tips.isEmpty()) {
-        auto tipsLabel = new QLabel(redCconfig.tips);
+    auto redConfig = modules[moduleName];
+    if (!redConfig.checkboxes.isEmpty()) {
+        layout->addWidget(createCheckboxGroup(moduleName, redConfig.checkboxes));
+    }
+    if (!redConfig.selects.isEmpty()) {
+        layout->addWidget(createSelectGroup(moduleName, redConfig.selects));
+    }
+    if (!redConfig.inputs.isEmpty()) {
+        layout->addWidget(createInputGroup(moduleName, redConfig.inputs));
+    }
+    if (!redConfig.tips.isEmpty()) {
+        auto tipsLabel = new QLabel(redConfig.tips);
         tipsLabel->setWordWrap(true);
         layout->addWidget(tipsLabel);
     }
@@ -68,64 +86,145 @@ QWidget *RedConfigurer::createModulePage(const ModuleConfig &redCconfig) {
     return page;
 }
 
-QWidget *RedConfigurer::createCheckboxGroup(const QJsonArray &checkboxes) {
+QWidget *RedConfigurer::createCheckboxGroup(QString moduleName, const QJsonArray &checkboxes) {
     auto group = new QWidget;
     auto grid = new QGridLayout(group);
     grid->setContentsMargins(0, 0, 0, 0);
 
     for (const auto &item: checkboxes) {
         auto obj = item.toObject();
-        int order = obj["order"].toInt();
-        int row = order / 3;
-        int col = order % 3;
+        auto order = obj["order"].toInt();
+        auto text = obj["text"].toString();
 
-        auto cb = new QCheckBox(obj["text"].toString());
-        cb->setChecked(obj["value"].toBool());
-        grid->addWidget(cb, row, col);
+        auto check = new QCheckBox();
+        check->setChecked(obj["value"].toBool());
+        check->setProperty("order", order);
+        check->setProperty("text", text);
+
+        grid->addWidget(check, order / 3, order % 3);
+        moduleCheckboxes[moduleName].append(check);
     }
 
     return group;
 }
 
-QWidget *RedConfigurer::createSelectGroup(const QJsonArray &selects) {
+QWidget *RedConfigurer::createSelectGroup(QString moduleName, const QJsonArray &selects) {
     auto group = new QWidget;
     auto grid = new QGridLayout(group);
     grid->setContentsMargins(0, 0, 0, 0);
 
     for (const auto &select: selects) {
         auto obj = select.toObject();
-        int order = obj["order"].toInt();
-        int row = order / 2;
-        int col = order % 2;
+        auto order = obj["order"].toInt();
+        auto text = obj["text"].toString();
+        auto options = obj["options"].toArray();
 
         auto combo = new LabelComboBox(
-                obj["text"].toString(),
-                obj["options"].toArray(),
+                text,
+                options,
                 obj["value"].toString()
         );
-        grid->addWidget(combo, row, col);
+        combo->setProperty("order", order);
+        combo->setProperty("text", text);
+        combo->setProperty("options", options);
+
+        grid->addWidget(combo, order / 2, order % 2);
+        moduleSelects[moduleName].append(combo);
     }
 
     return group;
 }
 
-QWidget *RedConfigurer::createInputGroup(const QJsonArray &inputs) {
+QWidget *RedConfigurer::createInputGroup(QString moduleName, const QJsonArray &inputs) {
     auto group = new QWidget;
     auto grid = new QGridLayout(group);
     grid->setContentsMargins(0, 0, 0, 0);
 
     for (const auto &input: inputs) {
         auto obj = input.toObject();
-        int order = obj["order"].toInt();
-        int row = order / 2;
-        int col = order % 2;
+        auto order = obj["order"].toInt();
+        auto text = obj["text"].toString();
 
         auto spin = new LabelSpinBox(
-                obj["text"].toString(),
+                text,
                 obj["value"].toInt()
         );
-        grid->addWidget(spin, row, col);
+        spin->setProperty("order", order);
+        spin->setProperty("text", text);
+
+
+        moduleInputs[moduleName].append(spin);
+        grid->addWidget(spin, order / 2, order % 2);
     }
 
     return group;
+}
+
+void RedConfigurer::closeEvent(QCloseEvent *event) {
+    QJsonObject newSetting;
+
+    for (const QString &moduleName: modules.keys()) {
+        QJsonObject moduleConfig;
+
+        // 处理复选框
+        QJsonArray checkboxArray;
+        for (QCheckBox *cb: moduleCheckboxes[moduleName]) {
+            checkboxArray.append(QJsonObject{
+                    {"order", cb->property("order").toInt()},
+                    {"text",  cb->property("text").toString()},
+                    {"value", cb->isChecked()}
+            });
+        }
+        moduleConfig["checkbox"] = checkboxArray;
+
+        // 处理输入框
+        QJsonArray inputArray;
+        for (LabelSpinBox *spin: moduleInputs[moduleName]) {
+            inputArray.append(QJsonObject{
+                    {"order", spin->property("order").toInt()},
+                    {"text",  spin->property("text").toString()},
+                    {"value", spin->spinBox->value()}
+            });
+        }
+        moduleConfig["input"] = inputArray;
+
+        // 处理下拉框
+        QJsonArray selectArray;
+        for (LabelComboBox *combo: moduleSelects[moduleName]) {
+            selectArray.append(QJsonObject{
+                    {"order",   combo->property("order").toInt()},
+                    {"text",    combo->property("text").toString()},
+                    {"value",   combo->comboBox->currentText()},
+                    {"options", combo->property("options").toJsonArray()}
+            });
+        }
+        moduleConfig["select"] = selectArray;
+
+        moduleConfig["tips"] = modules[moduleName].tips;
+        newSetting[moduleName] = moduleConfig;
+    }
+
+    auto configObj = state.config;
+    auto accountArray = configObj["account"].toArray();
+    for (int i = 0; i < accountArray.count(); ++i) {
+        auto accountObj = accountArray[i].toObject();
+        if (accountObj["remark"] != qqRemark) continue;
+
+        auto redArray = accountObj["red"].toArray();
+        for (int j = 0; j < redArray.count(); ++j) {
+            auto redObj = redArray[j].toObject();
+            if (redObj["remark"] != redRemark) continue;
+
+            redObj["setting"] = newSetting;
+            redArray[j] = redObj;
+            accountObj["red"] = redArray;
+            accountArray[i] = accountObj;
+            configObj["account"] = accountArray;
+            state.config = configObj;
+            break;
+        }
+        break;
+    }
+
+    QDialog::closeEvent(event);
 }

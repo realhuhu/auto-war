@@ -173,42 +173,38 @@ void QQManger::loadConfig() {
 }
 
 void QQManger::saveConfig() {
-    QJsonArray accounts;
+    QJsonArray accountArray;
     QHash<QString, QJsonArray> existingReds;
 
-    if (state.config.contains("account") && state.config["account"].isArray()) {
-        for (const auto val: state.config["account"].toArray()) {
-            QJsonObject obj = val.toObject();
-            QString remark = obj["remark"].toString();
-            existingReds.insert(remark, obj["red"].toArray());
-        }
+    for (const auto accountRef: state.config["account"].toArray()) {
+        QJsonObject accountObj = accountRef.toObject();
+        existingReds.insert(accountObj["remark"].toString(), accountObj["red"].toArray());
     }
 
     for (int row = 0; row < tableWidget->rowCount(); ++row) {
-        QJsonObject account;
+        QJsonObject accountObj;
 
         auto remarkItem = tableWidget->item(row, RemarkCol);
         auto qqItem = tableWidget->item(row, QQNumberCol);
         auto pwdItem = tableWidget->item(row, PasswordCol);
         auto linkItem = tableWidget->item(row, LinkCol);
 
-        account["order"] = row + 1;
-        account["remark"] = remarkItem ? remarkItem->text() : "";
-        account["qq"] = qqItem ? qqItem->text() : "";
-        account["password"] = pwdItem ? pwdItem->text() : "";
-        account["link"] = linkItem ? linkItem->text() : "";
+        accountObj["order"] = row;
+        accountObj["remark"] = remarkItem ? remarkItem->text() : "";
+        accountObj["qq"] = qqItem ? qqItem->text() : "";
+        accountObj["password"] = pwdItem ? pwdItem->text() : "";
+        accountObj["link"] = linkItem ? linkItem->text() : "";
 
-        if (existingReds.contains(account["remark"].toString())) {
-            account["red"] = existingReds[account["remark"].toString()];
+        if (existingReds.contains(accountObj["remark"].toString())) {
+            accountObj["red"] = existingReds[accountObj["remark"].toString()];
         } else {
-            account["red"] = QJsonArray();
+            accountObj["red"] = QJsonArray();
         }
 
-        accounts.append(account);
+        accountArray.append(accountObj);
     }
 
-    state.config["account"] = accounts;
-
+    state.config["account"] = accountArray;
     emit configChanged();
 }
 

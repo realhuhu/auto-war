@@ -22,5 +22,3 @@ LabelSpinBox::LabelSpinBox(
 
     setLayout(layout);
 }
-
-QSpinBox *LabelSpinBox::getSpinBox() const { return spinBox; }

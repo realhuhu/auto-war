@@ -28,7 +28,3 @@ ButtonWithSetting::ButtonWithSetting(
 
     setLayout(layout);
 }
-
-QPushButton *ButtonWithSetting::getTextButton() const { return textButton; }
-
-QToolButton *ButtonWithSetting::getSettingButton() const { return settingButton; }

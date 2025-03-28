@@ -20,6 +20,8 @@ add_executable(Red
 #        WIN32
         ${qrc_FILES}
 
+        util/tool.h
+        util/tool.cpp
         util/state.h
         util/state.cpp
         util/emitter.h

@@ -6,6 +6,7 @@
 #include <QCheckBox>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QJsonObject>
 #include <QListWidget>
 #include <QHBoxLayout>
 #include <QStackedWidget>
@@ -17,9 +18,6 @@
 class RedConfigurer : public QDialog {
 Q_OBJECT
 public:
-    explicit RedConfigurer(QString qqRemark, QString redRemark, QWidget *parent = nullptr);
-
-private:
     struct ModuleConfig {
         int order;
         QJsonArray checkboxes;
@@ -28,20 +26,28 @@ private:
         QString tips;
     };
 
-    static QWidget *createModulePage(const ModuleConfig &config);
-
-    static QWidget *createCheckboxGroup(const QJsonArray &checkboxes);
-
-    static QWidget *createSelectGroup(const QJsonArray &selects);
-
-    static QWidget *createInputGroup(const QJsonArray &inputs);
-
     QString qqRemark;
     QString redRemark;
     QJsonObject config;
     QListWidget *listWidget;
     QStackedWidget *stackedWidget;
     QMap<QString, ModuleConfig> modules;
+    QMap<QString, QList<QCheckBox *>> moduleCheckboxes;
+    QMap<QString, QList<LabelSpinBox *>> moduleInputs;
+    QMap<QString, QList<LabelComboBox *>> moduleSelects;
+
+    explicit RedConfigurer(QString qqRemark, QString redRemark, QWidget *parent = nullptr);
+
+    QWidget *createModulePage(QString moduleName);
+
+    QWidget *createCheckboxGroup(QString moduleName, const QJsonArray &checkboxes);
+
+    QWidget *createSelectGroup(QString moduleName, const QJsonArray &selects);
+
+    QWidget *createInputGroup(QString moduleName, const QJsonArray &inputs);
+
+    void closeEvent(QCloseEvent *event) override;
+
 };
 
 #endif //RED_RED_CONFIGURER_H

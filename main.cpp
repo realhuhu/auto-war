@@ -99,19 +99,37 @@ void AutoWar::loadConfig() const {
         return;
     }
 
-    state.config = configDoc.object();
-    configFile.close();
-
     auto configDefaultPath = QCoreApplication::applicationDirPath() + configDefaultName;
     QFile configDefaultFile(configDefaultPath);
     if (!configDefaultFile.open(QIODevice::ReadWrite | QIODevice::Text)) {
         consolePrint(QString("默认配置文件存在但无法打开: %1").arg(configDefaultFile.errorString()));
+        configDefaultFile.close();
         return;
     }
 
     auto configDefaultJson = configDefaultFile.readAll();
     auto configDefaultDoc = QJsonDocument::fromJson(configDefaultJson);
     state.configDefault = configDefaultDoc.object();
+
+    auto configObj = configDoc.object();
+    auto accountArray = configObj["account"].toArray();
+
+    for (int i = 0; i < accountArray.count(); ++i) {
+        auto accountObj = accountArray[i].toObject();
+        auto redArray = accountObj["red"].toArray();
+        for (int j = 0; j < redArray.count(); ++j) {
+            auto redObj = redArray[j].toObject();
+            redObj["setting"] = merge(state.configDefault, redObj["setting"].toObject());
+            redArray[j] = redObj;
+        }
+        accountObj["red"] = redArray;
+        accountArray[i] = accountObj;
+    }
+    configObj["account"] = accountArray;
+    state.config = configObj;
+    saveConfig();
+
+    configFile.close();
     configDefaultFile.close();
 }
 
@@ -268,10 +286,10 @@ void AutoWar::closeEvent(QCloseEvent *event) {
     QWidget::closeEvent(event);
 }
 
-
 int main(int argc, char *argv[]) {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
+    QLocale::setDefault(QLocale(QLocale::Chinese, QLocale::China));
 
     std::vector<char *> newArgv;
     newArgv.reserve(argc);

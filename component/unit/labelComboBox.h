@@ -11,13 +11,10 @@
 class LabelComboBox : public QWidget {
 Q_OBJECT
 public:
-    explicit LabelComboBox(const QString &text, const QJsonArray &options, const QString &initialValue = "");
-
-    QComboBox *getComboBox();
-
-private:
     QLabel *label;
     QComboBox *comboBox;
+
+    explicit LabelComboBox(const QString &text, const QJsonArray &options, const QString &initialValue = "");
 };
 
 #endif //QT_LABELEDCOMBOBOX_H
