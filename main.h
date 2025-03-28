@@ -53,7 +53,7 @@ public slots:
 
     void clearConsole() const;
 
-    void redirectLog(const QString &remark, const QString &text, const QString &color) const;
+    void redirectLog(const QString &remark, const QString &message, const QString &color) const;
 };
 
 #endif //RED_MAIN_H

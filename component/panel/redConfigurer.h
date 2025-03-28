@@ -38,13 +38,13 @@ public:
 
     explicit RedConfigurer(QString qqRemark, QString redRemark, QWidget *parent = nullptr);
 
-    QWidget *createModulePage(QString moduleName);
+    QWidget *createModulePage(const QString& moduleName);
 
-    QWidget *createCheckboxGroup(QString moduleName, const QJsonArray &checkboxes);
+    QWidget *createCheckboxGroup(const QString& moduleName, const QJsonArray &checkboxes);
 
-    QWidget *createSelectGroup(QString moduleName, const QJsonArray &selects);
+    QWidget *createSelectGroup(const QString& moduleName, const QJsonArray &selects);
 
-    QWidget *createInputGroup(QString moduleName, const QJsonArray &inputs);
+    QWidget *createInputGroup(const QString& moduleName, const QJsonArray &inputs);
 
     void closeEvent(QCloseEvent *event) override;
 

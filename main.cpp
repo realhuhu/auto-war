@@ -307,7 +307,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     newArgv.push_back(newParamCopy);
-    argc = newArgv.size();
+    argc = static_cast<int>(newArgv.size());
     char **newArgvArray = new char *[argc];
     for (int i = 0; i < argc; ++i) newArgvArray[i] = newArgv[i];
 

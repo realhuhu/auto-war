@@ -10,4 +10,4 @@ struct State {
 
 extern State state;
 
-#endif // RED_STATE_H
+#endif //RED_STATE_H

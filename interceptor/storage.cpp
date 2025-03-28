@@ -31,16 +31,14 @@ void StorageProxyHandler::requestStarted(QWebEngineUrlRequestJob *job) {
     connect(reply, &QNetworkReply::finished, [job, reply]() {
         if (reply->error() == QNetworkReply::NoError) {
             QByteArray data = reply->readAll();
-            // 创建数据缓冲区
-            QBuffer *buffer = new QBuffer(job);
+            auto buffer = new QBuffer(job);
             buffer->setData(data);
             buffer->open(QIODevice::ReadOnly);
 
-            // 调用三参数重载
             job->reply(
                     reply->header(QNetworkRequest::ContentTypeHeader).toByteArray(),
                     buffer
-            ); // Qt 5.14+
+            );
         } else {
             qDebug() << reply->error();
         }

@@ -29,7 +29,6 @@ void LabelTabWidget::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setPen(Qt::gray);
 
-    // 准备多行文本
     const QStringList lines = {
             "1. 点击[QQ账号]登录QQ",
             "2. 点击[红警账号]配置红警账号",

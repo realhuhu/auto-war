@@ -60,7 +60,7 @@ RedConfigurer::RedConfigurer(
     connect(listWidget, &QListWidget::currentRowChanged, stackedWidget, &QStackedWidget::setCurrentIndex);
 }
 
-QWidget *RedConfigurer::createModulePage(QString moduleName) {
+QWidget *RedConfigurer::createModulePage(const QString &moduleName) {
     auto page = new QWidget;
     auto layout = new QVBoxLayout(page);
     layout->setContentsMargins(10, 10, 10, 10);
@@ -86,7 +86,7 @@ QWidget *RedConfigurer::createModulePage(QString moduleName) {
     return page;
 }
 
-QWidget *RedConfigurer::createCheckboxGroup(QString moduleName, const QJsonArray &checkboxes) {
+QWidget *RedConfigurer::createCheckboxGroup(const QString &moduleName, const QJsonArray &checkboxes) {
     auto group = new QWidget;
     auto grid = new QGridLayout(group);
     grid->setContentsMargins(0, 0, 0, 0);
@@ -108,7 +108,7 @@ QWidget *RedConfigurer::createCheckboxGroup(QString moduleName, const QJsonArray
     return group;
 }
 
-QWidget *RedConfigurer::createSelectGroup(QString moduleName, const QJsonArray &selects) {
+QWidget *RedConfigurer::createSelectGroup(const QString &moduleName, const QJsonArray &selects) {
     auto group = new QWidget;
     auto grid = new QGridLayout(group);
     grid->setContentsMargins(0, 0, 0, 0);
@@ -135,7 +135,7 @@ QWidget *RedConfigurer::createSelectGroup(QString moduleName, const QJsonArray &
     return group;
 }
 
-QWidget *RedConfigurer::createInputGroup(QString moduleName, const QJsonArray &inputs) {
+QWidget *RedConfigurer::createInputGroup(const QString &moduleName, const QJsonArray &inputs) {
     auto group = new QWidget;
     auto grid = new QGridLayout(group);
     grid->setContentsMargins(0, 0, 0, 0);
@@ -163,10 +163,10 @@ QWidget *RedConfigurer::createInputGroup(QString moduleName, const QJsonArray &i
 void RedConfigurer::closeEvent(QCloseEvent *event) {
     QJsonObject newSetting;
 
-    for (const QString &moduleName: modules.keys()) {
+    for (auto it = modules.keyBegin(); it != modules.keyEnd(); ++it) {
+        const QString &moduleName = *it;
         QJsonObject moduleConfig;
 
-        // 处理复选框
         QJsonArray checkboxArray;
         for (QCheckBox *cb: moduleCheckboxes[moduleName]) {
             checkboxArray.append(QJsonObject{
@@ -177,7 +177,6 @@ void RedConfigurer::closeEvent(QCloseEvent *event) {
         }
         moduleConfig["checkbox"] = checkboxArray;
 
-        // 处理输入框
         QJsonArray inputArray;
         for (LabelSpinBox *spin: moduleInputs[moduleName]) {
             inputArray.append(QJsonObject{
@@ -188,7 +187,6 @@ void RedConfigurer::closeEvent(QCloseEvent *event) {
         }
         moduleConfig["input"] = inputArray;
 
-        // 处理下拉框
         QJsonArray selectArray;
         for (LabelComboBox *combo: moduleSelects[moduleName]) {
             selectArray.append(QJsonObject{
