@@ -9,7 +9,7 @@ RedManger::RedManger(QWidget *parent) : QDialog(parent) {
 
     QStringList headers;
     headers << "备注" << "QQ账号" << "区服" << "操作";
-    tableWidget = new QTableWidget(0, 4);
+    tableWidget = new QTableWidget(0, headers.size());
     tableWidget->setHorizontalHeaderLabels(headers);
     tableWidget->setEditTriggers(QAbstractItemView::AllEditTriggers);
     tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -123,7 +123,7 @@ void RedManger::saveConfig() {
         redConfig["remark"] = remark;
         redConfig["region"] = tableWidget->item(row, RegionCol)->text().toInt();
         redConfig["order"] = row;
-        redConfig["setting"] = existingSettings.contains(remark) ? existingSettings[remark] : state.configDefault;
+        redConfig["setting"] = existingSettings.contains(remark) ? existingSettings[remark] : state.settingDefault;
 
         for (int i = 0; i < accountArray.count(); ++i) {
             auto accountObj = accountArray[i].toObject();

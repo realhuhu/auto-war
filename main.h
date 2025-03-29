@@ -43,7 +43,7 @@ public slots:
 
     void openBrowser();
 
-    void closeBrowser(const QString& remark);
+    void closeBrowser(const QString &remark);
 
     void openQQManager();
 
@@ -52,8 +52,6 @@ public slots:
     void saveConfig() const;
 
     void clearConsole() const;
-
-    void redirectLog(const QString &remark, const QString &message, const QString &color) const;
 };
 
 #endif //RED_MAIN_H

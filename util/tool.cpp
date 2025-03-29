@@ -65,14 +65,14 @@ QJsonArray mergeSelect(QJsonArray defaultSelectArray, QJsonArray rawSelectArray)
     return defaultSelectArray;
 }
 
-QJsonObject merge(QJsonObject defaultConfig, const QJsonObject &rawConfig) {
-    if (rawConfig.isEmpty()) return defaultConfig;
+QJsonObject mergeSetting(QJsonObject defaultSetting, const QJsonObject &rawSetting) {
+    if (rawSetting.isEmpty()) return defaultSetting;
 
     QJsonObject mergedSetting;
-    for (auto it = defaultConfig.begin(); it != defaultConfig.end(); ++it) {
+    for (auto it = defaultSetting.begin(); it != defaultSetting.end(); ++it) {
         auto key = it.key();
         auto defaultItemObj = it.value().toObject();
-        auto rawItemObj = rawConfig.value(key).toObject();
+        auto rawItemObj = rawSetting.value(key).toObject();
 
         if (rawItemObj.isEmpty()) {
             mergedSetting[key] = defaultItemObj;
@@ -98,4 +98,37 @@ QJsonObject merge(QJsonObject defaultConfig, const QJsonObject &rawConfig) {
     }
 
     return mergedSetting;
+}
+
+QJsonObject loadSetting(
+        QJsonObject config,
+        const QString &qqRemark,
+        const QString &redRemark,
+        QJsonObject defaultSetting
+) {
+    for (auto qqRef: config["account"].toArray()) {
+        auto qqObj = qqRef.toObject();
+        if (qqObj["remark"] != qqRemark) continue;
+
+        for (auto redRef: qqObj["red"].toArray()) {
+            auto redObj = redRef.toObject();
+            if (redObj["remark"] != redRemark) continue;
+
+            return redObj["setting"].toObject();
+        }
+    }
+
+    return defaultSetting;
+}
+
+void sleep(std::atomic<bool> *stopFlag, float seconds) {
+    if (seconds <= 0) return;
+
+    auto sleepDuration = std::chrono::duration<float>(seconds);
+    auto startTime = std::chrono::steady_clock::now();
+
+    while (std::chrono::steady_clock::now() - startTime < sleepDuration) {
+        if (stopFlag->load()) return;
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
 }

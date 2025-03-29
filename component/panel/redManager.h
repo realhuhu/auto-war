@@ -28,7 +28,6 @@ public:
         RegionCol = 2,
         ActionCol = 3
     };
-
     QTableWidget *tableWidget;
 
     explicit RedManger(QWidget *parent = nullptr);

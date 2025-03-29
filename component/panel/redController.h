@@ -30,6 +30,8 @@ public slots:
 signals:
 
     void refreshBrowser();
+
+    void runCommand(QString command);
 };
 
 

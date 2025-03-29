@@ -7,14 +7,11 @@
 class Emitter : public QObject {
 Q_OBJECT
 public:
-    static Emitter *instance() {
-        static auto emitter = new Emitter();
-        return emitter;
-    }
+    explicit Emitter();
 
 signals:
 
-    void log(const QString &remark, const QString &message, const QString &color = "black");
+    void log(const QString &text, const QString &color = "black") const;
 };
 
 #endif //RED_EMITTER_H

@@ -4,25 +4,15 @@ RedConfigurer::RedConfigurer(
         QString qq,
         QString remark,
         QWidget *parent
-) : qqRemark(std::move(qq)), redRemark(std::move(remark)), QDialog(parent) {
+) : qqRemark(std::move(qq)),
+    redRemark(std::move(remark)), QDialog(parent),
+    listWidget(new QListWidget(this)),
+    stackedWidget(new QStackedWidget(this)) {
     setWindowTitle(QString("配置账号: %1 %2").arg(qqRemark, redRemark));
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
-    for (auto qqRef: state.config["account"].toArray()) {
-        auto qqObj = qqRef.toObject();
-        if (qqObj["remark"] != qqRemark) continue;
-
-        for (auto redRef: qqObj["red"].toArray()) {
-            auto redObj = redRef.toObject();
-            if (redObj["remark"] != redRemark) continue;
-
-            config = redObj["setting"].toObject();
-            break;
-        }
-        break;
-    }
-
-    for (auto it = config.begin(); it != config.end(); ++it) {
+    auto setting = loadSetting(state.config, qqRemark, redRemark, state.settingDefault);
+    for (auto it = setting.begin(); it != setting.end(); ++it) {
         auto obj = it.value().toObject();
         modules.insert(it.key(), ModuleConfig{
                 .order = obj["order"].toInt(),
@@ -41,7 +31,6 @@ RedConfigurer::RedConfigurer(
     auto mainLayout = new QHBoxLayout(this);
     mainLayout->setContentsMargins(10, 10, 10, 10);
 
-    listWidget = new QListWidget(this);
     listWidget->setFixedWidth(100);
     std::sort(moduleNames.begin(), moduleNames.end(), [this](const QString &a, const QString &b) {
         return modules[a].order < modules[b].order;
@@ -50,7 +39,6 @@ RedConfigurer::RedConfigurer(
     listWidget->setCurrentRow(0);
     mainLayout->addWidget(listWidget);
 
-    stackedWidget = new QStackedWidget(this);
     std::sort(moduleNames.begin(), moduleNames.end(), [this](const QString &a, const QString &b) {
         return modules[a].order < modules[b].order;
     });

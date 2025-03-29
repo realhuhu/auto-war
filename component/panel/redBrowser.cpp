@@ -1,11 +1,58 @@
 ﻿#include "redBrowser.h"
 
+
+Worker::Worker(HWND hwnd, int region, const QString &qqRemark, const QString &redRemark) : workerThread(nullptr) {
+    env = {
+            .hwnd=hwnd,
+            .emitter=new Emitter(),
+            .stopFlag=new std::atomic<bool>(false),
+            .region=region,
+            .qqRemark=qqRemark,
+            .redRemark=redRemark,
+            .setting=loadSetting(state.config, qqRemark, redRemark, state.settingDefault)
+    };
+
+    tasks["test"] = test;
+}
+
+void Worker::runCommand(const QString& command) {
+    if (workerThread) {
+        emit log("正在运行中，请先结束命令");
+        return;
+    }
+
+    workerThread = new QThread(this);
+    connect(workerThread, &QThread::started, this, [this, command]() {
+        tasks[command](env);
+        emit log("结束");
+        workerThread->quit();
+        emit log("已结束");
+    });
+
+    connect(workerThread, &QThread::finished, workerThread, &QThread::deleteLater);
+    connect(workerThread, &QThread::destroyed, this, [this]() {
+        QMutexLocker locker(&workerMutex);
+        workerThread = nullptr;
+    });
+
+    workerThread->start();
+}
+
+void Worker::close() const {
+    if (!workerThread) return;
+
+    workerThread->quit();
+    workerThread->wait();
+}
+
 RedBrowser::RedBrowser(
-        const QString &qqRemark,
-        const QString &redRemark,
         const QString &link,
-        int region
-) : remark(redRemark), workerThread(nullptr) {
+        int region,
+        const QString &qqRemark,
+        const QString &redRemark
+) : url(QString("%1&region=%2").arg(link, QString::number(region - 1))),
+    redRemark(redRemark),
+    browser(new QWebEngineView(this)) {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(QString("%1 %2 %3区").arg(qqRemark, redRemark, QString::number(region)));
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
@@ -32,17 +79,20 @@ RedBrowser::RedBrowser(
         profileMap.insert(modifiedRemark, profile);
     }
 
-    url = QString("%1&region=%2").arg(link, QString::number(region - 1));
-
     auto mainLayout = new QHBoxLayout(this);
     mainLayout->setMargin(0);
-    browser = new QWebEngineView(this);
     browser->setPage(new QWebEnginePage(profile, browser));
     browser->settings()->setAttribute(QWebEngineSettings::PluginsEnabled, true);
     browser->load(url);
     mainLayout->addWidget(browser);
 
+    worker = new Worker(reinterpret_cast<HWND>(browser->winId()), region, qqRemark, redRemark);
+    connect(worker, &Worker::log, this, &RedBrowser::onLog);
+    connect(worker->env.emitter, &Emitter::log, this, &RedBrowser::onLog);
+
     emit log(QString("%1 游戏已打开").arg(redRemark));
+
+    worker->runCommand("test");
 }
 
 void RedBrowser::refresh() const {
@@ -50,41 +100,17 @@ void RedBrowser::refresh() const {
     browser->load(url);
 }
 
-
-void RedBrowser::runCommand() {
-    if (workerThread) {
-        workerThread->quit();
-        workerThread->wait();
-    }
-
-    workerThread = new QThread(this);
-    connect(workerThread, &QThread::started, this, [this]() {
-        test(remark);
-        workerThread->quit();
-        emit log("已结束");
-    });
-
-    connect(workerThread, &QThread::finished, workerThread, &QThread::deleteLater);
-    connect(workerThread, &QThread::destroyed, this, [this]() {
-        QMutexLocker locker(&workerMutex);
-        workerThread = nullptr;
-    });
-
-    workerThread->start();
-}
+void RedBrowser::onLog(const QString &text, const QString &color) const { emit log(text, color); }
 
 void RedBrowser::closeEvent(QCloseEvent *event) {
-    if (workerThread) {
-        workerThread->quit();
-        workerThread->wait();
-    }
+    worker->close();
 
     if (browser) {
         browser->deleteLater();
         browser = nullptr;
     }
 
-    emit RedBrowser::closed(remark);
+    emit closed(redRemark);
     QDialog::closeEvent(event);
 }
 
@@ -96,3 +122,4 @@ RedBrowser::~RedBrowser() {
 }
 
 QMap<QString, QWebEngineProfile *> RedBrowser::profileMap;
+

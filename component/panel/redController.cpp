@@ -1,9 +1,11 @@
 ﻿#include "redController.h"
 
-RedController::RedController(QString redRemark, QWidget *parent) : remark(std::move(redRemark)), QWidget(parent) {
+RedController::RedController(
+        QString redRemark,
+        QWidget *parent
+) : remark(std::move(redRemark)), QWidget(parent), logTextEdit(new QTextEdit(this)) {
     auto mainLayout = new QVBoxLayout(this);
 
-    logTextEdit = new QTextEdit(this);
     logTextEdit->setReadOnly(true);
     mainLayout->addWidget(logTextEdit);
 
@@ -19,6 +21,9 @@ RedController::RedController(QString redRemark, QWidget *parent) : remark(std::m
     mainLayout->addLayout(footLayout);
 
     connect(refreshButton, &QPushButton::clicked, this, &RedController::refresh);
+    connect(runButton, &QPushButton::clicked, this, [this] {
+        emit runCommand("test");
+    });
     connect(clearButton, &QPushButton::clicked, this, &RedController::clear);
 }
 

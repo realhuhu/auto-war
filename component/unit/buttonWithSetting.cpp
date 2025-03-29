@@ -4,12 +4,11 @@ ButtonWithSetting::ButtonWithSetting(
         const QString &text,
         bool showSettingButton,
         QWidget *parent
-) : QWidget(parent) {
+) : QWidget(parent), textButton(new QPushButton(text)) {
     auto layout = new QHBoxLayout(this);
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    textButton = new QPushButton(text);
     textButton->setFixedHeight(25);
     textButton->setMinimumWidth(60);
     textButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -25,6 +24,4 @@ ButtonWithSetting::ButtonWithSetting(
     } else {
         settingButton = nullptr;
     }
-
-    setLayout(layout);
 }

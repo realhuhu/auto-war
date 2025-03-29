@@ -17,9 +17,9 @@ class QQBrowser : public QDialog {
 Q_OBJECT
 
 public:
+    QString modifiedRemark;
     QWebEngineView *browser;
     static QMap<QString, QWebEngineProfile *> profileMap;
-    static QMap<QString, LinkInterceptor *> interceptorMap;
 
     explicit QQBrowser(QWidget *parent, const QString &remark);
 

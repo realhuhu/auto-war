@@ -1,9 +1,11 @@
 ﻿#include "main.h"
 
 auto configName = "/config.json";
-auto configDefaultName = "/config-default.json";
+auto settingDefaultName = "/setting-default.json";
 
-AutoWar::AutoWar(QWidget *parent) : QWidget(parent) {
+AutoWar::AutoWar(
+        QWidget *parent
+) : QWidget(parent), consoleTextEdit(new QTextEdit(this)), panelTabWidget(new LabelTabWidget(this)) {
     setWindowTitle("红警多开");
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     resize(640, 480);
@@ -28,9 +30,7 @@ AutoWar::AutoWar(QWidget *parent) : QWidget(parent) {
     mainLayout->addLayout(topLayout);
 
     auto bodyLayout = new QHBoxLayout();
-    consoleTextEdit = new QTextEdit(this);
     consoleTextEdit->setReadOnly(true);
-    panelTabWidget = new LabelTabWidget(this);
     bodyLayout->addWidget(panelTabWidget, 3);
     bodyLayout->addWidget(consoleTextEdit, 2);
 
@@ -40,7 +40,6 @@ AutoWar::AutoWar(QWidget *parent) : QWidget(parent) {
     connect(qqConfigButton, &QPushButton::clicked, this, &AutoWar::openQQManager);
     connect(redConfigButton, &QPushButton::clicked, this, &AutoWar::openRedManager);
     connect(clearLogButton, &QPushButton::clicked, this, &AutoWar::clearConsole);
-    connect(Emitter::instance(), &Emitter::log, this, &AutoWar::redirectLog);
 
     loadConfig();
 }
@@ -99,17 +98,17 @@ void AutoWar::loadConfig() const {
         return;
     }
 
-    auto configDefaultPath = QCoreApplication::applicationDirPath() + configDefaultName;
-    QFile configDefaultFile(configDefaultPath);
-    if (!configDefaultFile.open(QIODevice::ReadWrite | QIODevice::Text)) {
-        consolePrint(QString("默认配置文件存在但无法打开: %1").arg(configDefaultFile.errorString()));
-        configDefaultFile.close();
+    auto settingDefaultPath = QCoreApplication::applicationDirPath() + settingDefaultName;
+    QFile settingDefaultFile(settingDefaultPath);
+    if (!settingDefaultFile.open(QIODevice::ReadWrite | QIODevice::Text)) {
+        consolePrint(QString("默认配置文件存在但无法打开: %1").arg(settingDefaultFile.errorString()));
+        settingDefaultFile.close();
         return;
     }
 
-    auto configDefaultJson = configDefaultFile.readAll();
-    auto configDefaultDoc = QJsonDocument::fromJson(configDefaultJson);
-    state.configDefault = configDefaultDoc.object();
+    auto settingDefaultJson = settingDefaultFile.readAll();
+    auto settingDefaultDoc = QJsonDocument::fromJson(settingDefaultJson);
+    state.settingDefault = settingDefaultDoc.object();
 
     auto configObj = configDoc.object();
     auto accountArray = configObj["account"].toArray();
@@ -119,7 +118,7 @@ void AutoWar::loadConfig() const {
         auto redArray = accountObj["red"].toArray();
         for (int j = 0; j < redArray.count(); ++j) {
             auto redObj = redArray[j].toObject();
-            redObj["setting"] = merge(state.configDefault, redObj["setting"].toObject());
+            redObj["setting"] = mergeSetting(state.settingDefault, redObj["setting"].toObject());
             redArray[j] = redObj;
         }
         accountObj["red"] = redArray;
@@ -130,7 +129,7 @@ void AutoWar::loadConfig() const {
     saveConfig();
 
     configFile.close();
-    configDefaultFile.close();
+    settingDefaultFile.close();
 }
 
 void AutoWar::openBrowser() {
@@ -211,10 +210,10 @@ void AutoWar::openBrowser() {
         }
 
         auto browser = new RedBrowser(
-                info["qqRemark"].toString(),
-                redRemark,
                 info["link"].toString(),
-                info["region"].toInt()
+                info["region"].toInt(),
+                info["qqRemark"].toString(),
+                redRemark
         );
 
         browsers.insert(redRemark, browser);
@@ -224,6 +223,7 @@ void AutoWar::openBrowser() {
         panelTabWidget->addTabWithLabel(panel, redRemark);
 
         connect(panel, &RedController::refreshBrowser, browser, &RedBrowser::refresh);
+        connect(panel, &RedController::runCommand, browser->worker, &Worker::runCommand);
         connect(browser, &RedBrowser::log, panel, &RedController::log);
         connect(browser, &RedBrowser::closed, this, &AutoWar::closeBrowser);
 
@@ -269,12 +269,6 @@ void AutoWar::saveConfig() const {
 }
 
 void AutoWar::clearConsole() const { consoleTextEdit->clear(); }
-
-void AutoWar::redirectLog(const QString &remark, const QString &message, const QString &color) const {
-    if (!browsers.contains(remark))return;
-
-    emit browsers[remark]->log(message, color);
-}
 
 void AutoWar::closeEvent(QCloseEvent *event) {
     for (auto it = browsers.begin(); it != browsers.end(); ++it) {

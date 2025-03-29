@@ -19,39 +19,57 @@ qt5_add_resources(qrc_FILES resource/resource.qrc)
 add_executable(Red
 #        WIN32
         ${qrc_FILES}
+
+        util/env.h
+        util/env.cpp
         util/tool.h
         util/tool.cpp
+        util/enum.h
+        util/enum.cpp
         util/state.h
         util/state.cpp
+        util/action.h
+        util/action.cpp
         util/emitter.h
+        util/emitter.cpp
+
         interceptor/link.h
         interceptor/link.cpp
         interceptor/storage.h
         interceptor/storage.cpp
-        component/unit/buttonWithSetting.h
-        component/unit/buttonWithSetting.cpp
-        component/unit/labelComboBox.h
-        component/unit/labelComboBox.cpp
+
         component/unit/labelSpinBox.h
         component/unit/labelSpinBox.cpp
+        component/unit/labelComboBox.h
+        component/unit/labelComboBox.cpp
         component/unit/labelTabWidget.h
         component/unit/labelTabWidget.cpp
+        component/unit/buttonWithSetting.h
+        component/unit/buttonWithSetting.cpp
         component/unit/placeholderDelegate.h
         component/unit/placeholderDelegate.cpp
+
         component/panel/qqManger.h
         component/panel/qqManger.cpp
         component/panel/qqBrowser.h
         component/panel/qqBrowser.cpp
         component/panel/redManager.h
         component/panel/redManager.cpp
-        component/panel/redController.h
-        component/panel/redController.cpp
         component/panel/redBrowser.h
         component/panel/redBrowser.cpp
-        component/panel/redConfigurer.cpp
+        component/panel/redController.h
+        component/panel/redController.cpp
         component/panel/redConfigurer.h
+        component/panel/redConfigurer.cpp
+
+        processor/cv.h
+        processor/cv.cpp
+        processor/segment.h
+        processor/segment.cpp
+
         task/daily.cpp
         task/daily.h
+
         main.h
         main.cpp
 )

@@ -14,7 +14,12 @@ public:
     QLabel *label;
     QComboBox *comboBox;
 
-    explicit LabelComboBox(const QString &text, const QJsonArray &options, const QString &initialValue = "");
+    explicit LabelComboBox(
+            const QString &text,
+            const QJsonArray &options,
+            const QString &initialValue = "",
+            QWidget *parent = nullptr
+    );
 };
 
 #endif //QT_LABELEDCOMBOBOX_H

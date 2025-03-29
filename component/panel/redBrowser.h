@@ -13,28 +13,42 @@
 #include <QWebEngineSettings>
 
 #include "redController.h"
+#include "../../util/env.h"
 #include "../../task/daily.h"
 #include "../../interceptor/storage.h"
 
+
+class Worker : public QObject {
+Q_OBJECT
+
+public:
+    Env env;
+    QThread *workerThread;
+    QBasicMutex workerMutex;
+    QMap<QString, std::function<void(const Env &env)>> tasks;
+
+    explicit Worker(HWND hwnd, int region, const QString &qqRemark, const QString &redRemark);
+
+    void runCommand(const QString& command);
+
+    void close() const;
+
+signals:
+
+    void log(const QString &text, const QString &color = "black") const;
+};
 
 class RedBrowser : public QDialog {
 Q_OBJECT
 
 public:
     QString url;
-    QString remark;
+    QString redRemark;
+    Worker *worker;
     QWebEngineView *browser;
-    QBasicMutex workerMutex;
-    QThread *workerThread;
-    QMap<QString, std::function<void()>> tasks;
     static QMap<QString, QWebEngineProfile *> profileMap;
 
-    explicit RedBrowser(
-            const QString &qqRemark,
-            const QString &redRemark,
-            const QString &link,
-            int region
-    );
+    explicit RedBrowser(const QString &link, int region, const QString &qqRemark, const QString &redRemark);
 
     void closeEvent(QCloseEvent *event) override;
 
@@ -44,7 +58,7 @@ public slots:
 
     void refresh() const;
 
-    void runCommand();
+    void onLog(const QString &text, const QString &color = "black") const;
 
 signals:
 

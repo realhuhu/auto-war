@@ -9,7 +9,7 @@ QQManger::QQManger(QWidget *parent) : QDialog(parent), networkManager(new QNetwo
 
     QStringList headers;
     headers << "备注" << "QQ号" << "密码" << "链接" << "状态" << "操作";
-    tableWidget = new QTableWidget(0, 6);
+    tableWidget = new QTableWidget(0, headers.size());
     tableWidget->setHorizontalHeaderLabels(headers);
     tableWidget->setEditTriggers(QAbstractItemView::AllEditTriggers);
     tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
