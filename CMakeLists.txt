@@ -20,8 +20,6 @@ add_executable(Red
 #        WIN32
         ${qrc_FILES}
 
-        util/env.h
-        util/env.cpp
         util/tool.h
         util/tool.cpp
         util/enum.h
@@ -64,6 +62,8 @@ add_executable(Red
 
         processor/cv.h
         processor/cv.cpp
+        processor/env.h
+        processor/env.cpp
         processor/segment.h
         processor/segment.cpp
 

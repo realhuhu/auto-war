@@ -6,22 +6,19 @@
 #include <QString>
 #include <QJsonObject>
 
-#include "emitter.h"
+#include "../util/emitter.h"
 
 struct Env {
-    HWND hwnd;
-    Emitter *emitter;
-    std::atomic<bool> *stopFlag;
+    HWND hwnd{};
+    Emitter *emitter{};
+    std::atomic<bool> *stopFlag{};
 
-    int region;
+    int region{};
     QString qqRemark;
     QString redRemark;
     QJsonObject setting;
 };
 
-class EnvBase {
-public:
-    static thread_local Env env;
-};
+extern thread_local Env env;
 
 #endif //RED_ENV_H

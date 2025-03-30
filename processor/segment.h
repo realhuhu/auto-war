@@ -4,13 +4,13 @@
 #include <random>
 #include <vector>
 
-#include "../util/env.h"
+#include "env.h"
 #include "../util/tool.h"
 #include "../util/enum.h"
 #include "../util/state.h"
 #include "../util/action.h"
 
-class Segment : public EnvBase {
+class Segment {
 public:
     std::string path;
     float similarity;
@@ -39,7 +39,7 @@ public:
 
     [[nodiscard]] Segment copy() const;
 
-    friend  bool operator==(const Segment &a, const Segment &b);
+    friend bool operator==(const Segment &a, const Segment &b);
 
     [[nodiscard]] virtual std::string toString() const;
 };

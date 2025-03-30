@@ -4,9 +4,9 @@
 #include <QString>
 #include <QThreadStorage>
 
-#include "../util/env.h"
+#include "../processor/env.h"
 #include "../processor/segment.h"
 
-void test(const Env& env);
+void test(const Env &e);
 
 #endif //RED_DAILY_H
