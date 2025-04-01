@@ -1,6 +1,6 @@
 ﻿#include "enum.h"
 
-std::string PreviousToString(Previous previous) {
+QString PreviousToString(Previous previous) {
     switch (previous) {
         case Previous::LEFT:
             return "左侧";

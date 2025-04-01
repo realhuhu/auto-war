@@ -31,6 +31,8 @@ public:
 
     void runCommand(const QString& command);
 
+    void stopCommand();
+
     void close() const;
 
 signals:

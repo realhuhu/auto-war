@@ -24,6 +24,9 @@ RedController::RedController(
     connect(runButton, &QPushButton::clicked, this, [this] {
         emit runCommand("test");
     });
+    connect(stopButton, &QPushButton::clicked, this, [this] {
+        emit stopCommand();
+    });
     connect(clearButton, &QPushButton::clicked, this, &RedController::clear);
 }
 

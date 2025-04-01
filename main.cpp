@@ -224,6 +224,7 @@ void AutoWar::openBrowser() {
 
         connect(panel, &RedController::refreshBrowser, browser, &RedBrowser::refresh);
         connect(panel, &RedController::runCommand, browser->worker, &Worker::runCommand);
+        connect(panel, &RedController::stopCommand, browser->worker, &Worker::stopCommand);
         connect(browser, &RedBrowser::log, panel, &RedController::log);
         connect(browser, &RedBrowser::closed, this, &AutoWar::closeBrowser);
 

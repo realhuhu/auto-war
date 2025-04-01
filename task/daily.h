@@ -4,8 +4,7 @@
 #include <QString>
 #include <QThreadStorage>
 
-#include "../processor/env.h"
-#include "../processor/segment.h"
+#include "../processor/runner.h"
 
 void test(const Env &e);
 

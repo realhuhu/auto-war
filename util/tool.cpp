@@ -132,3 +132,7 @@ void sleep(std::atomic<bool> *stopFlag, float seconds) {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
+
+QString res(const QString &name, const QString &dir) {
+    return QString("%1/%2/%3").arg(QApplication::applicationDirPath(), dir, name);
+}

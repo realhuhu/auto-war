@@ -6,6 +6,7 @@
 
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QApplication>
 
 QJsonArray mergeCheckbox(QJsonArray defaultCheckboxArray, QJsonArray rawCheckboxArray);
 
@@ -23,5 +24,7 @@ QJsonObject loadSetting(
 );
 
 void sleep(std::atomic<bool> *stopFlag, float seconds);
+
+QString res(const QString &name, const QString &dir = "游戏图片");
 
 #endif //RED_TOOL_H

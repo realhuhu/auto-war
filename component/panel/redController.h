@@ -32,6 +32,8 @@ signals:
     void refreshBrowser();
 
     void runCommand(QString command);
+
+    void stopCommand();
 };
 
 

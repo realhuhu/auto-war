@@ -3,6 +3,7 @@
 
 #include <random>
 #include <vector>
+#include <QString>
 
 #include "env.h"
 #include "../util/tool.h"
@@ -12,7 +13,7 @@
 
 class Segment {
 public:
-    std::string path;
+    QString path;
     float similarity;
     int w;
     int h;
@@ -24,7 +25,7 @@ public:
     int yCenter;
 
     Segment(
-            std::string p,
+            QString p,
             float sim,
             int width,
             int height,
@@ -35,13 +36,13 @@ public:
 
     void drag(float wait = 0.1, int distance = 0) const;
 
-    [[nodiscard]] std::string on(const Segment &segment, const std::string &basis) const;
+    [[nodiscard]] QString on(const Segment &segment, const QString &basis) const;
 
     [[nodiscard]] Segment copy() const;
 
     friend bool operator==(const Segment &a, const Segment &b);
 
-    [[nodiscard]] virtual std::string toString() const;
+    [[nodiscard]] virtual QString toString() const;
 };
 
 template<typename T>
@@ -60,10 +61,10 @@ using Selector = std::function<Segment(const std::vector<Segment> &)>;
 
 Segment similaritySelector(const std::vector<Segment> &segments);
 
-Selector positionSelector(const std::string &attribute, const std::string &option);
+Selector positionSelector(const QString &attribute, const QString &option);
 
 Segment randomSelector(const std::vector<Segment> &segments);
 
-Selector orderedRandomSelector(const std::string &attribute, const std::string &option, size_t top);
+Selector orderedRandomSelector(const QString &attribute, const QString &option, size_t top);
 
 #endif //RED_SEGMENT_H

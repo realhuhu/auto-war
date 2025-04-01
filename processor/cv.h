@@ -11,6 +11,7 @@
 #include <QCoreApplication>
 
 #include "../util/enum.h"
+#include "../util/tool.h"
 #include "../util/state.h"
 #include "segment.h"
 
@@ -20,7 +21,7 @@ public:
 
     static std::vector<Segment> findPositions(
             const cv::Mat &rawImg,
-            const std::string &templatePath,
+            const QString &templatePath,
             float threshold = 0.9,
             Mode mode = Mode::GRAY
     );

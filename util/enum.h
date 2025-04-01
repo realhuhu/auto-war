@@ -2,6 +2,7 @@
 #define RED_ENUM_H
 
 #include <iostream>
+#include <QString>
 
 enum class Mode {
     GRAY,
@@ -29,6 +30,6 @@ enum class Previous {
     NONE,
 };
 
-std::string PreviousToString(Previous previous);
+QString PreviousToString(Previous previous);
 
 #endif //RED_ENUM_H

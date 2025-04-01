@@ -1,7 +1,7 @@
 ﻿#include "segment.h"
 
 Segment::Segment(
-        std::string p,
+        QString p,
         float sim,
         int width,
         int height,
@@ -82,7 +82,7 @@ void Segment::drag(float wait, int distance) const {
     sleep(env.stopFlag, wait);
 }
 
-std::string Segment::on(const Segment &segment, const std::string &basis) const {
+QString Segment::on(const Segment &segment, const QString &basis) const {
     if (basis == "vertical") {
         if (x2 <= segment.x1) {
             return "left";
@@ -119,14 +119,12 @@ bool operator!=(const Segment &a, const Segment &b) {
     return !(a == b);
 }
 
-std::string Segment::toString() const {
-    return QString(
-            "(%3, %4)<img src='%1' height='14'>"
-    ).arg(
-            QString::fromStdString(this->path),
-            QString::number(this->xCenter),
-            QString::number(this->yCenter)
-    ).toStdString();
+QString Segment::toString() const {
+    return QString("(%2, %3)<img src='%1' height='14'>").arg(
+            path,
+            QString::number(xCenter),
+            QString::number(yCenter)
+    );
 }
 
 Segment similaritySelector(const std::vector<Segment> &segments) {
@@ -140,7 +138,7 @@ Segment similaritySelector(const std::vector<Segment> &segments) {
     return result[0];
 }
 
-Selector positionSelector(const std::string &attribute, const std::string &option) {
+Selector positionSelector(const QString &attribute, const QString &option) {
     auto selectorFunc = [attribute, option](const std::vector<Segment> &segments) {
         if (segments.empty()) throw std::runtime_error("positionSelector: 列表为空");
 
@@ -172,8 +170,8 @@ Segment randomSelector(const std::vector<Segment> &segments) {
 }
 
 Selector orderedRandomSelector(
-        const std::string &attribute,
-        const std::string &option,
+        const QString &attribute,
+        const QString &option,
         size_t top
 ) {
     auto selectorFunc = [attribute, option, top](const std::vector<Segment> &segments) {

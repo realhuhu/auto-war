@@ -15,19 +15,28 @@ Worker::Worker(HWND hwnd, int region, const QString &qqRemark, const QString &re
     tasks["test"] = test;
 }
 
-void Worker::runCommand(const QString& command) {
+void Worker::runCommand(const QString &command) {
     if (workerThread) {
         emit log("正在运行中，请先结束命令");
         return;
     }
 
+    env.stopFlag->store(false);
     workerThread = new QThread(this);
     connect(workerThread, &QThread::started, this, [this, command]() {
-        tasks[command](env);
-        emit log("结束");
-        workerThread->quit();
-        emit log("已结束");
-    });
+        try {
+            tasks[command](env);
+            workerThread->quit();
+        } catch (const std::exception &e) {
+            if (!env.stopFlag->load()) {
+                emit log("出错了: " + QString(e.what()), "red");
+                emit log("运行结束", "red");
+            } else {
+                emit log("运行完成", "red");
+            }
+            workerThread->quit();
+        }
+    }, Qt::DirectConnection);
 
     connect(workerThread, &QThread::finished, workerThread, &QThread::deleteLater);
     connect(workerThread, &QThread::destroyed, this, [this]() {
@@ -36,6 +45,20 @@ void Worker::runCommand(const QString& command) {
     });
 
     workerThread->start();
+}
+
+void Worker::stopCommand() {
+    env.stopFlag->store(true);
+
+    QMutexLocker locker(&workerMutex);
+
+    if (!workerThread) {
+        log("当前无命令正在执行");
+        return;
+    }
+
+    workerThread->quit();
+    log("命令已停止执行");
 }
 
 void Worker::close() const {
@@ -91,8 +114,6 @@ RedBrowser::RedBrowser(
     connect(worker->env.emitter, &Emitter::log, this, &RedBrowser::onLog);
 
     emit log(QString("%1 游戏已打开").arg(redRemark));
-
-    worker->runCommand("test");
 }
 
 void RedBrowser::refresh() const {
@@ -103,6 +124,7 @@ void RedBrowser::refresh() const {
 void RedBrowser::onLog(const QString &text, const QString &color) const { emit log(text, color); }
 
 void RedBrowser::closeEvent(QCloseEvent *event) {
+    worker->stopCommand();
     worker->close();
 
     if (browser) {

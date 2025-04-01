@@ -3,6 +3,9 @@
 
 void test(const Env &e) {
     env = e;
-    emit env.emitter->log(QString("remark %1").arg(env.redRemark));
-    emit env.emitter->log(QString("segment remark %1").arg(env.redRemark));
+
+    auto clicker = new Clicker("测试/123.png", {});
+    clicker->locate({
+                            .startUntilList={new Image("测试/123.png", {})}
+                    })->end();
 }
