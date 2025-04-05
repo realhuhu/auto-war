@@ -4,14 +4,16 @@
 
 
 Worker::Worker(HWND hwnd, int region, const QString &qqRemark, const QString &redRemark) : workerThread(nullptr) {
+    auto emitter = new Emitter();
     env = {
             .hwnd=hwnd,
-            .emitter=new Emitter(),
+            .emitter=emitter,
             .stopFlag=new std::atomic<bool>(false),
             .region=region,
             .qqRemark=qqRemark,
             .redRemark=redRemark
     };
+    connect(emitter, &Emitter::log, this, &Worker::onEmitterLog);
 }
 
 void Worker::runTask(const std::function<void(Env &env)> &task) {
@@ -67,6 +69,8 @@ void Worker::close() const {
     workerThread->wait();
 }
 
+void Worker::onEmitterLog(const QString &text, const QString &color) const { emit toLog(text, color); }
+
 RedBrowser::RedBrowser(
         const QString &link,
         int region,
@@ -110,13 +114,12 @@ RedBrowser::RedBrowser(
 
     worker = new Worker(reinterpret_cast<HWND>(browser->winId()), region, qqRemark, redRemark);
     connect(worker, &Worker::toLog, this, &RedBrowser::onLog);
-    connect(worker->env.emitter, &Emitter::log, this, &RedBrowser::onLog);
 
     emit toLog(QString("%1 游戏已打开").arg(redRemark));
 }
 
 
-void RedBrowser::runTask(const std::function<void(Env &)>& task) const { worker->runTask(task); }
+void RedBrowser::runTask(const std::function<void(Env &)> &task) const { worker->runTask(task); }
 
 void RedBrowser::stopTask() const { worker->stopTask(); }
 
@@ -127,7 +130,7 @@ void RedBrowser::onRefresh() const {
 
 void RedBrowser::onLog(const QString &text, const QString &color) const { emit toLog(text, color); }
 
-void RedBrowser::onRunTask(const std::function<void(Env &)>& task) const { runTask(task); }
+void RedBrowser::onRunTask(const std::function<void(Env &)> &task) const { runTask(task); }
 
 void RedBrowser::onStopTask() const { stopTask(); }
 

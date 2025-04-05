@@ -33,8 +33,9 @@ QQBrowser::QQBrowser(
     mainLayout->setMargin(0);
     browser->setPage(new QWebEnginePage(profile, browser));
     browser->settings()->setAttribute(QWebEngineSettings::PluginsEnabled, true);
-    browser->load(QUrl("https://qqgame.qq.com/webappframe/?appid=10407"));
     mainLayout->addWidget(browser);
+
+    browser->load(QUrl("https://qqgame.qq.com/webappframe/?appid=10407"));
 }
 
 void QQBrowser::closeEvent(QCloseEvent *event) {

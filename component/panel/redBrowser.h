@@ -34,6 +34,10 @@ public:
 
     void close() const;
 
+public slots:
+
+    void onEmitterLog(const QString &text, const QString &color = "black") const;
+
 signals:
 
     void toLog(const QString &text, const QString &color = "black") const;
@@ -51,7 +55,7 @@ public:
 
     explicit RedBrowser(const QString &link, int region, const QString &qqRemark, const QString &redRemark);
 
-    void runTask(const std::function<void(Env &env)>& task) const;
+    void runTask(const std::function<void(Env &env)> &task) const;
 
     void stopTask() const;
 
@@ -65,7 +69,7 @@ public slots:
 
     void onLog(const QString &text, const QString &color = "black") const;
 
-    void onRunTask(const std::function<void(Env &env)>& task) const;
+    void onRunTask(const std::function<void(Env &env)> &task) const;
 
     void onStopTask() const;
 
