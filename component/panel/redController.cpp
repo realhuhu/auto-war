@@ -22,7 +22,7 @@ RedController::RedController(
 
     connect(refreshButton, &QPushButton::clicked, this, &RedController::refresh);
     connect(runButton, &QPushButton::clicked, this, [this] {
-        emit runCommand("test");
+        emit runCommand("国家战争");
     });
     connect(stopButton, &QPushButton::clicked, this, [this] {
         emit stopCommand();

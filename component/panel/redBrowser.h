@@ -14,8 +14,10 @@
 
 #include "redController.h"
 #include "../../processor/env.h"
-#include "../../task/daily.h"
 #include "../../interceptor/storage.h"
+
+#include "../../task/daily.h"
+#include "../../task/battle.h"
 
 
 class Worker : public QObject {

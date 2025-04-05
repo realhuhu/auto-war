@@ -12,7 +12,8 @@ Worker::Worker(HWND hwnd, int region, const QString &qqRemark, const QString &re
             .setting=loadSetting(state.config, qqRemark, redRemark, state.settingDefault)
     };
 
-    tasks["test"] = test;
+    tasks["英雄中心"] = heroCenter;
+    tasks["国家战争"] = countryWar;
 }
 
 void Worker::runCommand(const QString &command) {

@@ -22,14 +22,15 @@ struct ClickerInitConfig {
 };
 
 struct ClickerRunConfig {
-    const std::vector<Until *> &startUntilList = {};
-    const std::vector<Until *> &runUntilList = {};
-    const std::vector<Until *> &finishUntilList = {};
-    const Selector &selector = similaritySelector;
     float startWait = 0;
+    const Selector selector = similaritySelector;
+    const std::vector<Until *> startUntilList = {};
+    const std::vector<Until *> runUntilList = {};
+    const std::vector<Until *> finishUntilList = {};
     float finishWait = 0;
     bool homing = true;
 };
+
 
 class Clicker {
 public:
@@ -39,18 +40,18 @@ public:
     std::vector<Segment> targetSegmentList;
     std::unique_ptr<Segment> previousSegment;
 
-    explicit Clicker(QString templatePath, ClickerInitConfig config);
+    explicit Clicker(QString templatePath, ClickerInitConfig config = {});
 
-    explicit Clicker(QString templatePath, const Segment &segment, ClickerInitConfig config);
+    explicit Clicker(QString templatePath, const Segment &segment, ClickerInitConfig config = {});
 
-    explicit Clicker(QString templatePath, const std::vector<Segment> &segmentList, ClickerInitConfig config);
+    explicit Clicker(QString templatePath, const std::vector<Segment> &segmentList, ClickerInitConfig config = {});
 
     [[nodiscard]]  std::unique_ptr<Clicker> _createNext(
-            const std::vector<Until *> &runUntilList,
-            const std::vector<Until *> &finishUntilList
+            const std::vector<std::unique_ptr<Until>> &runUntilList,
+            const std::vector<std::unique_ptr<Until>> &finishUntilList
     );
 
-    void _start(float startWait, const std::vector<Until *> &startUntilList);
+    void _start(float startWait, const std::vector<std::unique_ptr<Until>> &startUntilList);
 
     [[nodiscard]]  std::unique_ptr<Clicker> _run(
             const QString &name,
@@ -63,20 +64,20 @@ public:
             bool homing
     );
 
-    void _finish(float finishWait, const std::vector<Until *> &finishUntilList);
+    void _finish(float finishWait, const std::vector<std::unique_ptr<Until>> &finishUntilList);
 
-    [[nodiscard]] std::unique_ptr<Clicker> locate(ClickerRunConfig config);
+    [[nodiscard]] std::unique_ptr<Clicker> locate(ClickerRunConfig config = {});
 
     [[nodiscard]] std::unique_ptr<Clicker> click(
-            ClickerRunConfig config,
-            Click position = Click::CENTER,
+            ClickerRunConfig config = {},
+            float interval = 1,
             int offsetX = 0,
             int offsetY = 0,
-            float interval = 1
+            Click position = Click::CENTER
     );
 
     [[nodiscard]] std::unique_ptr<Clicker> drag(
-            ClickerRunConfig config,
+            ClickerRunConfig config = {},
             int step = 10,
             bool reverse = false
     );

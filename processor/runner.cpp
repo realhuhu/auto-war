@@ -5,10 +5,15 @@
 Clicker::Clicker(
         QString templatePath,
         ClickerInitConfig config
-) : globalThreshold(config.threshold), globalTimeout(config.timeout), imgPath(std::move(templatePath)) {
+) : imgPath(std::move(templatePath)),
+    globalThreshold(config.threshold),
+    globalTimeout(config.timeout) {
     sleep(env.stopFlag, config.wait);
+    qDebug() << "1";
+    auto screen = CV::getScreen(env.hwnd, config.mode);
+    qDebug() << "2";
     targetSegmentList = CV::findPositions(
-            CV::getScreen(env.hwnd, config.mode),
+            screen,
             imgPath,
             globalThreshold,
             config.mode
@@ -19,9 +24,9 @@ Clicker::Clicker(
         QString templatePath,
         const Segment &segment,
         ClickerInitConfig config
-) : globalThreshold(config.threshold),
-    globalTimeout(config.timeout),
-    imgPath(std::move(templatePath)) {
+) : imgPath(std::move(templatePath)),
+    globalThreshold(config.threshold),
+    globalTimeout(config.timeout) {
     targetSegmentList.push_back(segment);
 }
 
@@ -29,21 +34,21 @@ Clicker::Clicker(
         QString templatePath,
         const std::vector<Segment> &segmentList,
         ClickerInitConfig config
-) : globalThreshold(config.threshold),
+) : imgPath(std::move(templatePath)),
+    globalThreshold(config.threshold),
     globalTimeout(config.timeout),
-    imgPath(std::move(templatePath)),
     targetSegmentList(segmentList) {}
 
 std::unique_ptr<Clicker> Clicker::_createNext(
-        const std::vector<Until *> &runUntilList,
-        const std::vector<Until *> &finishUntilList
+        const std::vector<std::unique_ptr<Until>> &runUntilList,
+        const std::vector<std::unique_ptr<Until>> &finishUntilList
 ) {
     const Until *until;
 
     if (!empty(finishUntilList)) {
-        until = finishUntilList.back();
+        until = finishUntilList.back().get();
     } else if (!empty(runUntilList)) {
-        until = runUntilList.back();
+        until = runUntilList.back().get();
     } else {
         return nullptr;
     }
@@ -55,7 +60,7 @@ std::unique_ptr<Clicker> Clicker::_createNext(
     );
 }
 
-void Clicker::_start(float startWait, const std::vector<Until *> &startUntilList) {
+void Clicker::_start(float startWait, const std::vector<std::unique_ptr<Until>> &startUntilList) {
     sleep(env.stopFlag, startWait);
 
     for (const auto &startUntil: startUntilList) {
@@ -75,17 +80,27 @@ std::unique_ptr<Clicker> Clicker::_run(
         const std::vector<Until *> &finishUntilList,
         bool homing
 ) {
+    std::vector<std::unique_ptr<Until>> startUntilLs;
+    std::vector<std::unique_ptr<Until>> runUntilLs;
+    std::vector<std::unique_ptr<Until>> finishUntilLs;
+    startUntilLs.reserve(startUntilList.size());
+    runUntilLs.reserve(runUntilList.size());
+    finishUntilLs.reserve(finishUntilList.size());
+    for (auto ptr: startUntilList) { startUntilLs.push_back(std::unique_ptr<Until>(ptr)); }
+    for (auto ptr: runUntilList) { runUntilLs.push_back(std::unique_ptr<Until>(ptr)); }
+    for (auto ptr: finishUntilList) { finishUntilLs.push_back(std::unique_ptr<Until>(ptr)); }
+
     if (homing) Mouse::moveTo(env.hwnd, 0, 0);
 
     emit env.emitter->log(toString() + "开始" + name + "流程", "green");
 
-    _start(startWait, startUntilList);
+    _start(startWait, startUntilLs);
 
     executor();
 
-    _finish(finishWait, finishUntilList);
+    _finish(finishWait, finishUntilLs);
 
-    auto clicker = _createNext(runUntilList, finishUntilList);
+    auto clicker = _createNext(runUntilLs, finishUntilLs);
 
     emit env.emitter->log(toString() + "结束" + name + "流程", "green");
 
@@ -94,7 +109,7 @@ std::unique_ptr<Clicker> Clicker::_run(
     return clicker;
 }
 
-void Clicker::_finish(float finishWait, const std::vector<Until *> &finishUntilList) {
+void Clicker::_finish(float finishWait, const std::vector<std::unique_ptr<Until>> &finishUntilList) {
     sleep(env.stopFlag, finishWait);
 
     for (const auto &finishUntil: finishUntilList) {
@@ -129,10 +144,10 @@ std::unique_ptr<Clicker> Clicker::locate(ClickerRunConfig config) {
 
 std::unique_ptr<Clicker> Clicker::click(
         ClickerRunConfig config,
-        Click position,
+        float interval,
         int offsetX,
         int offsetY,
-        float interval
+        Click position
 ) {
     auto executor = [this, &config, &offsetX, &offsetY, &position, &interval] {
         if (targetSegmentList.empty()) throw std::runtime_error("未匹配到图像: " + imgPath.toStdString());
@@ -260,12 +275,10 @@ std::unique_ptr<Clicker> Clicker::drag(ClickerRunConfig config, int step, bool r
     );
 }
 
-bool Clicker::founded() const {
-    return !targetSegmentList.empty();
-}
+bool Clicker::founded() const { return !targetSegmentList.empty(); }
 
-void Clicker::end() {};
+void Clicker::end() {}
 
-QString Clicker::toString() const {
-    return QString("[%1]").arg(QFileInfo(imgPath).baseName());
-}
+QString Clicker::toString() const { return QString("[%1]").arg(QFileInfo(imgPath).baseName()); }
+
+

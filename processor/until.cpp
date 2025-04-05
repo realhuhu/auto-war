@@ -134,24 +134,18 @@ bool Image::flag(std::unique_ptr<Segment> &previous) {
 
     std::vector<Segment> filteredPositions = filter(matchedPositions, previous);
 
-    if (!filteredPositions.empty()) {
-        targetSegmentList = filteredPositions;
-        return true;
-    }
+    if (filteredPositions.empty()) return false;
 
-    return false;
+    targetSegmentList = filteredPositions;
+    return true;
 }
 
-QString Image::toString() const {
-    return QString("等待%1<img src='%2' height='14'>").arg(QString(config.reverse ? "消失" : ""), res(imgPath));
-}
+QString Image::toString() const { return QString("等待%1<img src='%2' height='14'>").arg(QString(config.reverse ? "消失" : ""), res(imgPath)); }
 
 AnyImage::AnyImage(
-        const std::initializer_list<const QString> &imgList,
+        const std::vector<QString> &templatePathList,
         UntilConfig untilConfig
-) : Until(untilConfig) {
-    for (const auto &i: imgList) { imgPathList.push_back(i); }
-}
+) : Until(untilConfig), imgPathList(templatePathList) {}
 
 bool AnyImage::flag(std::unique_ptr<Segment> &previous) {
     cv::Mat screen = CV::getScreen(env.hwnd, config.mode);
@@ -161,11 +155,11 @@ bool AnyImage::flag(std::unique_ptr<Segment> &previous) {
 
         auto filtered = filter(matched, previous);
 
-        if (filtered.empty()) {
-            imgPath = currentImgPath;
-            targetSegmentList = filtered;
-            return true;
-        }
+        if (filtered.empty()) continue;
+
+        imgPath = currentImgPath;
+        targetSegmentList = filtered;
+        return true;
     }
 
     return false;
@@ -226,9 +220,7 @@ bool ImageStable::flag(std::unique_ptr<Segment> &previous) {
     return true;
 }
 
-QString ImageStable::toString() const {
-    return QString("等待稳定<img src='%1' height='14'>").arg(res(imgPath));
-}
+QString ImageStable::toString() const { return QString("等待稳定<img src='%1' height='14'>").arg(res(imgPath)); }
 
 
 IfImage::IfImage(
@@ -238,15 +230,12 @@ IfImage::IfImage(
 
 void IfImage::loop(std::unique_ptr<Segment> &previous, float globalTimeout) { fulfilled(previous); }
 
-QString IfImage::toString() const {
-    return QString("尝试等待<img src='%1' height='14'>").arg(res(imgPath));
-}
-
+QString IfImage::toString() const { return QString("尝试等待<img src='%1' height='14'>").arg(res(imgPath)); }
 
 IfAnyImage::IfAnyImage(
-        const std::initializer_list<const QString> &imgList,
+        const std::vector<QString> &templatePathList,
         UntilConfig untilConfig
-) : AnyImage(imgList, untilConfig) {}
+) : AnyImage(templatePathList, untilConfig) {}
 
 void IfAnyImage::loop(std::unique_ptr<Segment> &previous, float globalTimeout) { fulfilled(previous); }
 

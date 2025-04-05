@@ -17,7 +17,7 @@ find_package(OpenCV REQUIRED)
 qt5_add_resources(qrc_FILES resource/resource.qrc)
 
 add_executable(Red
-#        WIN32
+        WIN32
         ${qrc_FILES}
 
         util/tool.h
@@ -71,8 +71,12 @@ add_executable(Red
         processor/segment.h
         processor/segment.cpp
 
+        task/common.cpp
+        task/common.h
         task/daily.cpp
         task/daily.h
+        task/battle.cpp
+        task/battle.h
 
         main.h
         main.cpp

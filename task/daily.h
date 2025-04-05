@@ -1,11 +1,8 @@
 ﻿#ifndef RED_DAILY_H
 #define RED_DAILY_H
 
-#include <QString>
-#include <QThreadStorage>
+#include "common.h"
 
-#include "../processor/runner.h"
-
-void test(const Env &e);
+void heroCenter(const Env &e);
 
 #endif //RED_DAILY_H

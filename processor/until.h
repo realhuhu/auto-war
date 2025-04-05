@@ -26,7 +26,7 @@ public:
     UntilConfig config;
     std::vector<Segment> targetSegmentList;
 
-    explicit Until(UntilConfig untilConfig);
+    explicit Until(UntilConfig untilConfig = {});
 
     virtual void loop(std::unique_ptr<Segment> &previous, float globalTimeout);
 
@@ -48,7 +48,7 @@ class Image : public Until {
 public:
     explicit Image(
             QString templatePath,
-            UntilConfig config
+            UntilConfig config = {}
     );
 
     bool flag(std::unique_ptr<Segment> &previous) override;
@@ -61,8 +61,8 @@ public:
     std::vector<QString> imgPathList;
 
     explicit AnyImage(
-            const std::initializer_list<const QString> &imgList,
-            UntilConfig config
+            const std::vector<QString> &templatePathList,
+            UntilConfig config = {}
     );
 
     bool flag(std::unique_ptr<Segment> &previous) override;
@@ -76,7 +76,7 @@ public:
 
     explicit ImageStable(
             QString templatePath,
-            UntilConfig config
+            UntilConfig config = {}
     );
 
     void preHook(std::unique_ptr<Segment> &previous) override;
@@ -90,7 +90,7 @@ class IfImage : public Image {
 public:
     explicit IfImage(
             const QString &imgPath,
-            UntilConfig config
+            UntilConfig config = {}
     );
 
     [[nodiscard]] QString toString() const override;
@@ -101,8 +101,8 @@ public:
 class IfAnyImage : public AnyImage {
 public:
     explicit IfAnyImage(
-            const std::initializer_list<const QString> &imgList,
-            UntilConfig config
+            const std::vector<QString> &templatePathList,
+            UntilConfig config = {}
     );
 
     [[nodiscard]] QString toString() const override;

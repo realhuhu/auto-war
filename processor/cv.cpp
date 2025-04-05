@@ -58,7 +58,9 @@ std::vector<Segment> singleFindPositions(
         cv::matchTemplate(rawChannels[1], templateChannels[1], resultsG, cv::TM_CCOEFF_NORMED);
         cv::matchTemplate(rawChannels[2], templateChannels[2], resultsR, cv::TM_CCOEFF_NORMED);
 
-        result = (resultsB + resultsG + resultsR) / 3.0;
+        cv::Mat tempMin;
+        cv::min(resultsB, resultsG, tempMin);
+        cv::min(tempMin, resultsR, result);
     } else {
         templateImg = cv::imdecode(cv::Mat(data), cv::IMREAD_GRAYSCALE);
         cv::matchTemplate(rawImg, templateImg, result, cv::TM_CCOEFF_NORMED);
@@ -86,6 +88,7 @@ std::vector<Segment> CV::findPositions(
         Mode mode
 ) {
     QFile imgFile(res(templatePath));
+    qDebug() << "3" << imgFile.fileName();
     if (!imgFile.open(QIODevice::ReadOnly)) throw std::runtime_error("文件不存在: " + imgFile.fileName().toStdString());
 
     auto ps = singleFindPositions(rawImg, &imgFile, threshold, mode);
