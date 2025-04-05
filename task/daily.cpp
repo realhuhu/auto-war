@@ -1,6 +1,6 @@
 ﻿#include "daily.h"
 
-void heroCenter(const Env &e) {
+void heroCenter(Env &e) {
     env = e;
     std::unique_ptr<Clicker> clicker;
     auto setting = parseBoolSetting("英雄中心", "checkbox", env.setting);

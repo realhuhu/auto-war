@@ -46,13 +46,13 @@ public:
 
     void closeEvent(QCloseEvent *event) override;
 
-public slots:
-
     void handleConfig(int row);
 
     void handleDelete(int row);
 
-    void handleAdd();
+public slots:
+
+    void onAdd();
 
 signals:
 

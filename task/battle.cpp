@@ -1,6 +1,6 @@
 ﻿#include "battle.h"
 
-void countryWar(const Env &e) {
+void countryWar(Env &e) {
     env = e;
     std::unique_ptr<Clicker> clicker;
     auto setting = parseBoolSetting("国家战争", "checkbox", env.setting);

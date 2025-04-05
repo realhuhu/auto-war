@@ -37,12 +37,6 @@ QQBrowser::QQBrowser(
     mainLayout->addWidget(browser);
 }
 
-
-void QQBrowser::onLinkDetected(QUrl url) {
-    emit linkDetected(std::move(url));
-    close();
-}
-
 void QQBrowser::closeEvent(QCloseEvent *event) {
     if (browser) {
         browser->deleteLater();
@@ -59,5 +53,11 @@ QQBrowser::~QQBrowser() {
     browser->page()->deleteLater();
     browser->close();
 }
+
+void QQBrowser::onLinkDetected(QUrl url) {
+    emit linkDetected(std::move(url));
+    close();
+}
+
 
 QMap<QString, QWebEngineProfile *> QQBrowser::profileMap;

@@ -30,9 +30,9 @@ QQManger::QQManger(QWidget *parent) : QDialog(parent), networkManager(new QNetwo
     auto addButton = new QPushButton("添加QQ账号");
     auto testAllButton = new QPushButton("全部测试");
     auto loginAllButton = new QPushButton("全部登录");
-    connect(addButton, &QPushButton::clicked, this, &QQManger::handleAdd);
-    connect(testAllButton, &QPushButton::clicked, this, &QQManger::testAll);
-    connect(loginAllButton, &QPushButton::clicked, this, &QQManger::loginAll);
+    connect(addButton, &QPushButton::clicked, this, &QQManger::onAdd);
+    connect(testAllButton, &QPushButton::clicked, this, &QQManger::onTestAll);
+    connect(loginAllButton, &QPushButton::clicked, this, &QQManger::onLoginAll);
     buttonLayout->addStretch();
     buttonLayout->addWidget(addButton);
     buttonLayout->addWidget(testAllButton);
@@ -287,7 +287,7 @@ void QQManger::handleLogin(int row) {
     browser->exec();
 }
 
-void QQManger::handleAdd() {
+void QQManger::onAdd() {
     bool ok;
     QString remark;
 
@@ -320,9 +320,9 @@ void QQManger::handleAdd() {
     insertRow(remark);
 }
 
-void QQManger::testAll() { for (int row = 0; row < tableWidget->rowCount(); ++row) handleTest(row); }
+void QQManger::onTestAll() { for (int row = 0; row < tableWidget->rowCount(); ++row) handleTest(row); }
 
-void QQManger::loginAll() { for (int row = 0; row < tableWidget->rowCount(); ++row) handleLogin(row); }
+void QQManger::onLoginAll() { for (int row = 0; row < tableWidget->rowCount(); ++row) handleLogin(row); }
 
 void QQManger::closeEvent(QCloseEvent *event) {
     saveConfig();

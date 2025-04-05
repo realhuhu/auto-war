@@ -25,7 +25,7 @@ RedManger::RedManger(QWidget *parent) : QDialog(parent) {
     auto buttonContainer = new QWidget();
     auto buttonLayout = new QHBoxLayout(buttonContainer);
     auto addButton = new QPushButton("添加红警账号");
-    connect(addButton, &QPushButton::clicked, this, &RedManger::handleAdd);
+    connect(addButton, &QPushButton::clicked, this, &RedManger::onAdd);
     buttonLayout->addStretch();
     buttonLayout->addWidget(addButton);
     mainLayout->addWidget(buttonContainer);
@@ -167,7 +167,7 @@ void RedManger::handleDelete(int row) {
     if (reply == QMessageBox::Yes) tableWidget->removeRow(row);
 }
 
-void RedManger::handleAdd() {
+void RedManger::onAdd() {
     QDialog dialog(this);
     dialog.setWindowTitle("添加红警账号");
     QFormLayout form(&dialog);

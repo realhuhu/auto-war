@@ -1,5 +1,7 @@
 ﻿#include "redBrowser.h"
 
+#include <utility>
+
 
 Worker::Worker(HWND hwnd, int region, const QString &qqRemark, const QString &redRemark) : workerThread(nullptr) {
     env = {
@@ -11,29 +13,26 @@ Worker::Worker(HWND hwnd, int region, const QString &qqRemark, const QString &re
             .redRemark=redRemark,
             .setting=loadSetting(state.config, qqRemark, redRemark, state.settingDefault)
     };
-
-    tasks["英雄中心"] = heroCenter;
-    tasks["国家战争"] = countryWar;
 }
 
-void Worker::runCommand(const QString &command) {
+void Worker::runTask(const std::function<void(Env &env)> &task) {
     if (workerThread) {
-        emit log("正在运行中，请先结束命令");
+        emit toLog("正在运行中，请先结束命令");
         return;
     }
 
     env.stopFlag->store(false);
     workerThread = new QThread(this);
-    connect(workerThread, &QThread::started, this, [this, command]() {
+    connect(workerThread, &QThread::started, this, [this, task]() {
         try {
-            tasks[command](env);
+            task(env);
             workerThread->quit();
         } catch (const std::exception &e) {
             if (!env.stopFlag->load()) {
-                emit log("出错了: " + QString(e.what()), "red");
-                emit log("运行结束", "red");
+                emit toLog("出错了: " + QString(e.what()), "red");
+                emit toLog("运行结束", "red");
             } else {
-                emit log("运行完成", "red");
+                emit toLog("运行完成", "red");
             }
             workerThread->quit();
         }
@@ -48,18 +47,18 @@ void Worker::runCommand(const QString &command) {
     workerThread->start();
 }
 
-void Worker::stopCommand() {
+void Worker::stopTask() {
     env.stopFlag->store(true);
 
     QMutexLocker locker(&workerMutex);
 
     if (!workerThread) {
-        log("当前无命令正在执行");
+        emit  toLog("当前无命令正在执行");
         return;
     }
 
     workerThread->quit();
-    log("命令已停止执行");
+    emit toLog("命令已停止执行");
 }
 
 void Worker::close() const {
@@ -111,21 +110,30 @@ RedBrowser::RedBrowser(
     mainLayout->addWidget(browser);
 
     worker = new Worker(reinterpret_cast<HWND>(browser->winId()), region, qqRemark, redRemark);
-    connect(worker, &Worker::log, this, &RedBrowser::onLog);
+    connect(worker, &Worker::toLog, this, &RedBrowser::onLog);
     connect(worker->env.emitter, &Emitter::log, this, &RedBrowser::onLog);
 
-    emit log(QString("%1 游戏已打开").arg(redRemark));
+    emit toLog(QString("%1 游戏已打开").arg(redRemark));
 }
 
-void RedBrowser::refresh() const {
-    emit log(QString("刷新游戏"));
+
+void RedBrowser::runTask(const std::function<void(Env &)>& task) const { worker->runTask(task); }
+
+void RedBrowser::stopTask() const { worker->stopTask(); }
+
+void RedBrowser::onRefresh() const {
+    emit toLog(QString("刷新游戏"));
     browser->load(url);
 }
 
-void RedBrowser::onLog(const QString &text, const QString &color) const { emit log(text, color); }
+void RedBrowser::onLog(const QString &text, const QString &color) const { emit toLog(text, color); }
+
+void RedBrowser::onRunTask(const std::function<void(Env &)>& task) const { runTask(task); }
+
+void RedBrowser::onStopTask() const { stopTask(); }
 
 void RedBrowser::closeEvent(QCloseEvent *event) {
-    worker->stopCommand();
+    worker->stopTask();
     worker->close();
 
     if (browser) {
@@ -143,6 +151,7 @@ RedBrowser::~RedBrowser() {
     browser->page()->deleteLater();
     browser->close();
 }
+
 
 QMap<QString, QWebEngineProfile *> RedBrowser::profileMap;
 

@@ -18,6 +18,7 @@
 #include "util/emitter.h"
 #include "component/panel/qqManger.h"
 #include "component/panel/redManager.h"
+#include "component/panel/cmdSelector.h"
 #include "component/panel/redController.h"
 #include "component/unit/labelTabWidget.h"
 #include "component/panel/redBrowser.h"
@@ -41,17 +42,22 @@ public:
 
 public slots:
 
-    void openBrowser();
+    void onOpenAllBrowser();
 
-    void closeBrowser(const QString &remark);
+    void onOpenQQManager();
 
-    void openQQManager();
+    void onOpenRedManager();
 
-    void openRedManager();
+    void onOpenCmdSelector();
 
-    void saveConfig() const;
+    void onClearConsole() const;
 
-    void clearConsole() const;
+    void onBrowserClosed(const QString &remark);
+
+    void onTaskCreated(const std::function<void(Env &env)>& task) const;
+
+    void onConfigChanged() const;
+
 };
 
 #endif //RED_MAIN_H

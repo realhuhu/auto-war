@@ -3,6 +3,6 @@
 
 #include "common.h"
 
-void heroCenter(const Env &e);
+void heroCenter(Env &e);
 
 #endif //RED_DAILY_H

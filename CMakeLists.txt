@@ -42,8 +42,6 @@ add_executable(Red
         component/unit/labelComboBox.cpp
         component/unit/labelTabWidget.h
         component/unit/labelTabWidget.cpp
-        component/unit/buttonWithSetting.h
-        component/unit/buttonWithSetting.cpp
         component/unit/placeholderDelegate.h
         component/unit/placeholderDelegate.cpp
 
@@ -59,6 +57,8 @@ add_executable(Red
         component/panel/redController.cpp
         component/panel/redConfigurer.h
         component/panel/redConfigurer.cpp
+        component/panel/cmdSelector.h
+        component/panel/cmdSelector.cpp
 
         processor/cv.h
         processor/cv.cpp

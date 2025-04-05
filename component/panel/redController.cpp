@@ -1,5 +1,7 @@
 ﻿#include "redController.h"
 
+#include <utility>
+
 RedController::RedController(
         QString redRemark,
         QWidget *parent
@@ -20,17 +22,13 @@ RedController::RedController(
     footLayout->addWidget(clearButton);
     mainLayout->addLayout(footLayout);
 
-    connect(refreshButton, &QPushButton::clicked, this, &RedController::refresh);
-    connect(runButton, &QPushButton::clicked, this, [this] {
-        emit runCommand("国家战争");
-    });
-    connect(stopButton, &QPushButton::clicked, this, [this] {
-        emit stopCommand();
-    });
-    connect(clearButton, &QPushButton::clicked, this, &RedController::clear);
+    connect(refreshButton, &QPushButton::clicked, this, &RedController::onRefresh);
+    connect(runButton, &QPushButton::clicked, this, &RedController::onRun);
+    connect(stopButton, &QPushButton::clicked, this, &RedController::onStop);
+    connect(clearButton, &QPushButton::clicked, this, &RedController::onClear);
 }
 
-void RedController::log(const QString &text, const QString &color) const {
+void RedController::onLog(const QString &text, const QString &color) const {
     QDateTime currentDateTime = QDateTime::currentDateTime();
     QTime currentTime = currentDateTime.time();
     QString timeString = currentTime.toString("hh:mm:ss");
@@ -46,7 +44,7 @@ void RedController::log(const QString &text, const QString &color) const {
     ).arg(timeString, color, text));
 }
 
-void RedController::refresh() {
+void RedController::onRefresh() {
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(
             this,
@@ -55,9 +53,19 @@ void RedController::refresh() {
             QMessageBox::Yes | QMessageBox::No
     );
 
-    if (reply == QMessageBox::Yes) emit refreshBrowser();
+    if (reply == QMessageBox::Yes) emit toRefreshBrowser();
 }
 
-void RedController::clear() const {
-    logTextEdit->clear();
+
+void RedController::onRun() {
+    auto dialog = new CmdSelector(this);
+    connect(dialog, &CmdSelector::taskCreated, this, &RedController::onTaskCreated);
+    dialog->show();
 }
+
+void RedController::onStop() { emit toStopTask(); }
+
+
+void RedController::onClear() const { logTextEdit->clear(); }
+
+void RedController::onTaskCreated(std::function<void(Env &env)> task) { emit toRunTask(std::move(task)); }

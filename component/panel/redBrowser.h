@@ -13,12 +13,10 @@
 #include <QWebEngineSettings>
 
 #include "redController.h"
+#include "../../util/tool.h"
+#include "../../util/state.h"
 #include "../../processor/env.h"
 #include "../../interceptor/storage.h"
-
-#include "../../task/daily.h"
-#include "../../task/battle.h"
-
 
 class Worker : public QObject {
 Q_OBJECT
@@ -27,19 +25,18 @@ public:
     Env env;
     QThread *workerThread;
     QBasicMutex workerMutex;
-    QMap<QString, std::function<void(const Env &env)>> tasks;
 
     explicit Worker(HWND hwnd, int region, const QString &qqRemark, const QString &redRemark);
 
-    void runCommand(const QString& command);
+    void runTask(const std::function<void(Env &env)> &task);
 
-    void stopCommand();
+    void stopTask();
 
     void close() const;
 
 signals:
 
-    void log(const QString &text, const QString &color = "black") const;
+    void toLog(const QString &text, const QString &color = "black") const;
 };
 
 class RedBrowser : public QDialog {
@@ -54,21 +51,29 @@ public:
 
     explicit RedBrowser(const QString &link, int region, const QString &qqRemark, const QString &redRemark);
 
+    void runTask(const std::function<void(Env &env)>& task) const;
+
+    void stopTask() const;
+
     void closeEvent(QCloseEvent *event) override;
 
     ~RedBrowser() override;
 
 public slots:
 
-    void refresh() const;
+    void onRefresh() const;
 
     void onLog(const QString &text, const QString &color = "black") const;
+
+    void onRunTask(const std::function<void(Env &env)>& task) const;
+
+    void onStopTask() const;
 
 signals:
 
     void closed(QString remark);
 
-    void log(const QString &text, const QString &color = "black") const;
+    void toLog(const QString &text, const QString &color = "black") const;
 
 };
 

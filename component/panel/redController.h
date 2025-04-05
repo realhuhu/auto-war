@@ -10,6 +10,8 @@
 #include <QHBoxLayout>
 #include <QMessageBox>
 
+#include "cmdSelector.h"
+
 class RedController : public QWidget {
 Q_OBJECT
 
@@ -21,19 +23,25 @@ public:
 
 public slots:
 
-    void log(const QString &text, const QString &color = "black") const;
+    void onLog(const QString &text, const QString &color = "black") const;
 
-    void clear() const;
+    void onRefresh();
 
-    void refresh();
+    void onRun();
+
+    void onStop();
+
+    void onClear() const;
+
+    void onTaskCreated(std::function<void(Env &env)> task);
 
 signals:
 
-    void refreshBrowser();
+    void toRefreshBrowser();
 
-    void runCommand(QString command);
+    void toRunTask(std::function<void(Env &env)> task);
 
-    void stopCommand();
+    void toStopTask();
 };
 
 

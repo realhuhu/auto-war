@@ -14,13 +14,13 @@ AutoWar::AutoWar(
 
     auto topLayout = new QHBoxLayout();
 
-    auto openAllButton = new QPushButton("打开游戏", this);
+    auto allBrowserButton = new QPushButton("打开游戏", this);
     auto qqConfigButton = new QPushButton("QQ账号", this);
     auto redConfigButton = new QPushButton("红警账号", this);
     auto batchRunButton = new QPushButton("全部执行", this);
     auto batchStopButton = new QPushButton("全部停止", this);
     auto clearLogButton = new QPushButton("清空日志", this);
-    topLayout->addWidget(openAllButton);
+    topLayout->addWidget(allBrowserButton);
     topLayout->addWidget(qqConfigButton);
     topLayout->addWidget(redConfigButton);
     topLayout->addWidget(batchRunButton);
@@ -36,10 +36,11 @@ AutoWar::AutoWar(
 
     mainLayout->addLayout(bodyLayout);
 
-    connect(openAllButton, &QPushButton::clicked, this, &AutoWar::openBrowser);
-    connect(qqConfigButton, &QPushButton::clicked, this, &AutoWar::openQQManager);
-    connect(redConfigButton, &QPushButton::clicked, this, &AutoWar::openRedManager);
-    connect(clearLogButton, &QPushButton::clicked, this, &AutoWar::clearConsole);
+    connect(allBrowserButton, &QPushButton::clicked, this, &AutoWar::onOpenAllBrowser);
+    connect(qqConfigButton, &QPushButton::clicked, this, &AutoWar::onOpenQQManager);
+    connect(redConfigButton, &QPushButton::clicked, this, &AutoWar::onOpenRedManager);
+    connect(batchRunButton, &QPushButton::clicked, this, &AutoWar::onOpenCmdSelector);
+    connect(clearLogButton, &QPushButton::clicked, this, &AutoWar::onClearConsole);
 
     loadConfig();
 }
@@ -126,13 +127,13 @@ void AutoWar::loadConfig() const {
     }
     configObj["account"] = accountArray;
     state.config = configObj;
-    saveConfig();
+    onConfigChanged();
 
     configFile.close();
     settingDefaultFile.close();
 }
 
-void AutoWar::openBrowser() {
+void AutoWar::onOpenAllBrowser() {
     const auto accounts = state.config["account"].toArray();
 
     QList<QVariantMap> redAccountList;
@@ -222,40 +223,53 @@ void AutoWar::openBrowser() {
         auto panel = new RedController(redRemark, panelTabWidget);
         panelTabWidget->addTabWithLabel(panel, redRemark);
 
-        connect(panel, &RedController::refreshBrowser, browser, &RedBrowser::refresh);
-        connect(panel, &RedController::runCommand, browser->worker, &Worker::runCommand);
-        connect(panel, &RedController::stopCommand, browser->worker, &Worker::stopCommand);
-        connect(browser, &RedBrowser::log, panel, &RedController::log);
-        connect(browser, &RedBrowser::closed, this, &AutoWar::closeBrowser);
+        connect(panel, &RedController::toRefreshBrowser, browser, &RedBrowser::onRefresh);
+        connect(panel, &RedController::toRunTask, browser, &RedBrowser::onRunTask);
+        connect(panel, &RedController::toStopTask, browser, &RedBrowser::onStopTask);
+        connect(browser, &RedBrowser::toLog, panel, &RedController::onLog);
+        connect(browser, &RedBrowser::closed, this, &AutoWar::onBrowserClosed);
 
         consolePrint(QString("已打开游戏窗口(%1)").arg(redRemark));
     }
 }
 
-void AutoWar::closeBrowser(const QString &remark) {
+void AutoWar::onBrowserClosed(const QString &remark) {
     panelTabWidget->removeTabByLabel(remark);
     browsers.remove(remark);
     consolePrint(QString("已关闭游戏窗口(%1)").arg(remark), "red");
 }
 
-void AutoWar::openQQManager() {
+void AutoWar::onOpenQQManager() {
     auto dialog = new QQManger(this);
-    connect(dialog, &QQManger::configChanged, this, &AutoWar::saveConfig);
+    connect(dialog, &QQManger::configChanged, this, &AutoWar::onConfigChanged);
     dialog->exec();
 }
 
-void AutoWar::openRedManager() {
+void AutoWar::onOpenRedManager() {
     if (state.config["account"].toArray().isEmpty()) {
         consolePrint("请先配置QQ账号", "red");
         return;
     }
 
     auto dialog = new RedManger(this);
-    connect(dialog, &RedManger::configChanged, this, &AutoWar::saveConfig);
+    connect(dialog, &RedManger::configChanged, this, &AutoWar::onConfigChanged);
     dialog->exec();
 }
 
-void AutoWar::saveConfig() const {
+void AutoWar::onOpenCmdSelector() {
+    auto dialog = new CmdSelector(this);
+    connect(dialog, &CmdSelector::taskCreated, this, &AutoWar::onTaskCreated);
+    dialog->exec();
+}
+
+void AutoWar::onTaskCreated(const std::function<void(Env &env)>& task) const {
+    for (auto it = browsers.begin(); it != browsers.end(); ++it) {
+        RedBrowser *browser = it.value();
+        if (browser) browser->runTask(task);
+    }
+}
+
+void AutoWar::onConfigChanged() const {
     QString configPath = QCoreApplication::applicationDirPath() + configName;
 
     QFile file(configPath);
@@ -269,7 +283,7 @@ void AutoWar::saveConfig() const {
     }
 }
 
-void AutoWar::clearConsole() const { consoleTextEdit->clear(); }
+void AutoWar::onClearConsole() const { consoleTextEdit->clear(); }
 
 void AutoWar::closeEvent(QCloseEvent *event) {
     for (auto it = browsers.begin(); it != browsers.end(); ++it) {

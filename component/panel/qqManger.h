@@ -63,21 +63,21 @@ public:
 
     void saveConfig();
 
-    void closeEvent(QCloseEvent *event) override;
-
-public slots:
-
     void handleTest(int row);
 
     void handleLogin(int row);
 
     void handleDelete(int row);
 
-    void handleAdd();
+    void closeEvent(QCloseEvent *event) override;
 
-    void testAll();
+public slots:
 
-    void loginAll();
+    void onAdd();
+
+    void onTestAll();
+
+    void onLoginAll();
 
 signals:
 

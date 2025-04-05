@@ -3,6 +3,6 @@
 
 #include "common.h"
 
-void countryWar(const Env &e);
+void countryWar(Env &e);
 
 #endif //RED_BATTLE_H

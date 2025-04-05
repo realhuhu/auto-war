@@ -11,6 +11,7 @@
 #include <QWebEngineProfile>
 #include <QWebEngineSettings>
 
+#include "../../processor/env.h"
 #include "../../interceptor/link.h"
 
 class QQBrowser : public QDialog {
@@ -23,11 +24,13 @@ public:
 
     explicit QQBrowser(QWidget *parent, const QString &remark);
 
-    void onLinkDetected(QUrl url);
-
     void closeEvent(QCloseEvent *event) override;
 
     ~QQBrowser() override;
+
+public slots:
+
+    void onLinkDetected(QUrl url);
 
 signals:
 
