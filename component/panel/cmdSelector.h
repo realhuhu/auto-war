@@ -18,13 +18,13 @@ public:
 
     explicit CmdSelector(QWidget *parent);
 
-    QGroupBox *createCmdGroup(const QString& groupTitle, const QStringList& cmdList);
+    QGroupBox *createCmdGroup(const QString &groupTitle, const QStringList &cmdList);
 
-    std::function<void(Env &env)> createTask(const QString& cmd);
+    std::function<void(Env &env)> createTask(const QString &cmd);
 
 signals:
 
-    void taskCreated(std::function<void(Env &env)> task);
+    void taskCreated(QString command, std::function<void(Env &env)> task);
 
 };
 

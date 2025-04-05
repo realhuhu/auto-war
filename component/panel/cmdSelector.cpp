@@ -63,7 +63,7 @@ QGroupBox *CmdSelector::createCmdGroup(const QString &groupTitle, const QStringL
 
         connect(btn, &QPushButton::clicked, [this, command]() {
             this->accept();
-            emit taskCreated(createTask(command));
+            emit taskCreated(command, createTask(command));
         });
 
         gridLayout->addWidget(btn, row, col);

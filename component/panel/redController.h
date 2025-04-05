@@ -21,6 +21,8 @@ public:
 
     explicit RedController(QString redRemark, QWidget *parent = nullptr);
 
+    void log(const QString &text, const QString &color = "black") const;
+
 public slots:
 
     void onLog(const QString &text, const QString &color = "black") const;
@@ -33,7 +35,7 @@ public slots:
 
     void onClear() const;
 
-    void onTaskCreated(std::function<void(Env &env)> task);
+    void onTaskCreated(const QString &command, std::function<void(Env &env)> task);
 
 signals:
 

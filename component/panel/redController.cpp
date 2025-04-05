@@ -28,7 +28,7 @@ RedController::RedController(
     connect(clearButton, &QPushButton::clicked, this, &RedController::onClear);
 }
 
-void RedController::onLog(const QString &text, const QString &color) const {
+void RedController::log(const QString &text, const QString &color) const {
     QDateTime currentDateTime = QDateTime::currentDateTime();
     QTime currentTime = currentDateTime.time();
     QString timeString = currentTime.toString("hh:mm:ss");
@@ -43,6 +43,8 @@ void RedController::onLog(const QString &text, const QString &color) const {
                 )"
     ).arg(timeString, color, text));
 }
+
+void RedController::onLog(const QString &text, const QString &color) const { log(text, color); }
 
 void RedController::onRefresh() {
     QMessageBox::StandardButton reply;
@@ -63,9 +65,15 @@ void RedController::onRun() {
     dialog->show();
 }
 
-void RedController::onStop() { emit toStopTask(); }
+void RedController::onStop() {
+    emit toStopTask();
+}
 
 
 void RedController::onClear() const { logTextEdit->clear(); }
 
-void RedController::onTaskCreated(std::function<void(Env &env)> task) { emit toRunTask(std::move(task)); }
+void RedController::onTaskCreated(const QString &command, std::function<void(Env &env)> task) {
+    log(QString("开始运行: %1").arg(command));
+    emit toRunTask(std::move(task));
+}
+

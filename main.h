@@ -50,11 +50,13 @@ public slots:
 
     void onOpenCmdSelector();
 
+    void onBatchStop();
+
     void onClearConsole() const;
 
     void onBrowserClosed(const QString &remark);
 
-    void onTaskCreated(const std::function<void(Env &env)>& task) const;
+    void onTaskCreated(const QString &command, const std::function<void(Env &env)> &task) const;
 
     void onConfigChanged() const;
 

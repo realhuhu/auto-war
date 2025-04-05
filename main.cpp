@@ -40,6 +40,7 @@ AutoWar::AutoWar(
     connect(qqConfigButton, &QPushButton::clicked, this, &AutoWar::onOpenQQManager);
     connect(redConfigButton, &QPushButton::clicked, this, &AutoWar::onOpenRedManager);
     connect(batchRunButton, &QPushButton::clicked, this, &AutoWar::onOpenCmdSelector);
+    connect(batchStopButton, &QPushButton::clicked, this, &AutoWar::onBatchStop);
     connect(clearLogButton, &QPushButton::clicked, this, &AutoWar::onClearConsole);
 
     loadConfig();
@@ -262,7 +263,16 @@ void AutoWar::onOpenCmdSelector() {
     dialog->exec();
 }
 
-void AutoWar::onTaskCreated(const std::function<void(Env &env)>& task) const {
+void AutoWar::onBatchStop() {
+    consolePrint("全部停止");
+    for (auto it = browsers.begin(); it != browsers.end(); ++it) {
+        RedBrowser *browser = it.value();
+        if (browser) browser->stopTask();
+    }
+}
+
+void AutoWar::onTaskCreated(const QString &command, const std::function<void(Env &env)> &task) const {
+    consolePrint(QString("全部运行: %1").arg(command));
     for (auto it = browsers.begin(); it != browsers.end(); ++it) {
         RedBrowser *browser = it.value();
         if (browser) browser->runTask(task);
