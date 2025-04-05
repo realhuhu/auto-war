@@ -10,8 +10,7 @@ Worker::Worker(HWND hwnd, int region, const QString &qqRemark, const QString &re
             .stopFlag=new std::atomic<bool>(false),
             .region=region,
             .qqRemark=qqRemark,
-            .redRemark=redRemark,
-            .setting=loadSetting(state.config, qqRemark, redRemark, state.settingDefault)
+            .redRemark=redRemark
     };
 }
 

@@ -3,13 +3,14 @@
 void countryWar(Env &e) {
     env = e;
     std::unique_ptr<Clicker> clicker;
-    auto setting = parseBoolSetting("国家战争", "checkbox", env.setting);
+    auto setting = loadSetting(state.config, env.qqRemark, env.redRemark, state.settingDefault);
+    auto boolSetting = parseBoolSetting("国家战争", "checkbox", setting);
 
     std::time_t now = std::time(nullptr);
     std::tm *local_time = std::localtime(&now);
     int hour = local_time->tm_hour;
 
-    if (hour >= 20 && (setting["8点领签到体力"] || setting["8点领VIP体力"] || setting["8点领VIP国战大礼"])) {
+    if (hour >= 20 && (boolSetting["8点领签到体力"] || boolSetting["8点领VIP体力"] || boolSetting["8点领VIP国战大礼"])) {
         clicker = std::make_unique<Clicker>("国家战争/返回基地.png");
 
         if (clicker->founded()) {
@@ -19,7 +20,7 @@ void countryWar(Env &e) {
         }
 
 
-        if (setting["8点领签到体力"]) {
+        if (boolSetting["8点领签到体力"]) {
             clicker = std::make_unique<Clicker>("国家战争/活动及公告.png")->click(
                     {
                             .runUntilList={new Image("国家战争/连续登录.png", {.finishWait=2})},
@@ -40,7 +41,7 @@ void countryWar(Env &e) {
             )->end();
         }
 
-        if (setting["8点领VIP体力"]) {
+        if (boolSetting["8点领VIP体力"]) {
             clicker = std::make_unique<Clicker>("国家战争/vip福利礼包.png")->click(
                     {.runUntilList={new Image("国家战争/vip福利礼包标题.png")}}
             )->locate(
@@ -76,7 +77,7 @@ void countryWar(Env &e) {
         }
 
 
-        if (setting["8点领VIP国战大礼"]) {
+        if (boolSetting["8点领VIP国战大礼"]) {
             clicker = std::make_unique<Clicker>("国家战争/vip国战大礼.png");
 
             if (clicker->founded()) {

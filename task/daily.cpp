@@ -3,13 +3,14 @@
 void heroCenter(Env &e) {
     env = e;
     std::unique_ptr<Clicker> clicker;
-    auto setting = parseBoolSetting("英雄中心", "checkbox", env.setting);
+    auto setting = loadSetting(state.config, env.qqRemark, env.redRemark, state.settingDefault);
+    auto boolSetting = parseBoolSetting("英雄中心", "checkbox", setting);
 
     clicker = std::make_unique<Clicker>("英雄中心/英雄.png")->click(
             {.runUntilList={new Image("英雄中心/英雄中心.png")}}
     );
 
-    if (setting["免费抽奖"]) {
+    if (boolSetting["免费抽奖"]) {
         while (!env.stopFlag->load()) {
             clicker = clicker->locate({.finishUntilList={new Image("英雄中心/英雄免费.png")}});
 
@@ -27,7 +28,7 @@ void heroCenter(Env &e) {
         }
     }
 
-    if (setting["英雄训练"]) {
+    if (boolSetting["英雄训练"]) {
         clicker = clicker->locate(
                 {.finishUntilList={new Image("英雄中心/英雄培养.png")}}
         )->click(

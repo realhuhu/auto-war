@@ -16,7 +16,6 @@ struct Env {
     int region{};
     QString qqRemark;
     QString redRemark;
-    QJsonObject setting;
 };
 
 extern thread_local Env env;
