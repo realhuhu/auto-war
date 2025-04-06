@@ -494,6 +494,226 @@ void arms(Env &e) {
     )->end();
 }
 
+void signIn(Env &e) {
+    env = e;
+    std::unique_ptr<Clicker> clicker;
+
+    clicker = std::make_unique<Clicker>(
+            "每日签到/每日签到.png"
+    )->click(
+            {.runUntilList={new AnyImage({"每日签到/签到.png", "每日签到/已签到.png",}, {.mode=Mode::RGB})}}
+    );
+
+    if (clicker->imgPath == "每日签到/签到.png") {
+        clicker->click({.runUntilList={new Image("每日签到/签到.png", InnerReverse)}})->end();
+    }
+
+    for (const auto &i: QList<QString>{"7天", "14天", "21天", "28天"}) {
+        clicker = std::make_unique<Clicker>(QString("每日签到/%1.png").arg(i), ClickerInitConfig{.mode=Mode::RGB});
+
+        if (!clicker->founded())continue;
+
+        clicker->click({.finishUntilList={new Image(QString("每日签到/%1.png").arg(i), {.onPrevious=Previous::INNER, .mode=Mode::RGB, .reverse=true})}})->end();
+    }
+
+    std::make_unique<Clicker>(
+            "每日签到/关闭窗口.png"
+    )->click(
+            {.runUntilList={new Image("每日签到/关闭窗口.png", InnerReverse)}}
+    )->end();
+}
+
+void oreField(Env &e) {
+    env = e;
+    std::unique_ptr<Clicker> clicker;
+    auto setting = loadSetting(state.config, env.qqRemark, env.redRemark, state.settingDefault);
+    auto boolSetting = parseBoolSetting("矿区争夺", "checkbox", setting);
+
+    clicker = std::make_unique<Clicker>(
+            "矿区争夺/矿区争夺战.png"
+    )->click(
+            {.runUntilList{new Image("矿区争夺/矿区争夺.png")}}
+    )->locate(
+            {.finishUntilList={new IfImage("矿区争夺/撤军.png")}}
+    );
+
+    if (clicker->founded()) {
+        emit env.emitter->log("已有占领的矿区", "red");
+
+        std::make_unique<Clicker>(
+                "矿区争夺/关闭窗口.png"
+        )->click(
+                {.finishUntilList={new Image("矿区争夺/关闭窗口.png", InnerReverse)}}
+        )->end();
+
+        return;
+    }
+
+    while (!env.stopFlag->load()) {
+        clicker = std::make_unique<Clicker>("矿区争夺/刷新次数.png");
+
+        if (!clicker->founded()) {
+            emit env.emitter->log("免费次数已用完", "red");
+
+            std::make_unique<Clicker>(
+                    "/矿区争夺/关闭窗口.png"
+            )->click(
+                    {.finishUntilList={new Image("矿区争夺/关闭窗口.png", InnerReverse)}}
+            )->end();
+
+            return;
+        }
+
+        clicker = clicker->click(
+                {
+                        .selector=positionSelector("xCenter", "max"),
+                        .finishUntilList={new AnyImage({"矿区争夺/确定.png", "矿区争夺/占领.png", "矿区争夺/抢占.png"})},
+                        .finishWait=1
+                }, 1, 0, -26
+        );
+
+        if (boolSetting["只刷新不打"]) {
+            clicker->locate(
+                    {.finishUntilList={new Image("矿区争夺/关闭窗口.png")}}
+            )->click(
+                    {.finishUntilList={new Image("矿区争夺/关闭窗口.png", InnerReverse)}}
+            )->end();
+
+            return;
+        }
+
+        if (clicker->imgPath == "矿区争夺/确定.png") {
+            clicker->click(
+                    {.finishUntilList={new Image("矿区争夺/确定.png", InnerReverse), new Image("矿区争夺/关闭窗口.png")}}
+            )->click(
+                    {.finishUntilList={new Image("矿区争夺/关闭窗口.png", InnerReverse)}}
+            )->end();
+
+            return;
+        }
+
+        if (clicker->imgPath == "矿区争夺/占领.png") {
+            clicker->click(
+                    {.finishUntilList={new Image("矿区争夺/撤军.png")}}
+            )->click(
+                    {.finishUntilList={new Image("矿区争夺/关闭窗口.png", {.onPrevious=Previous::TOP})}}
+            )->click(
+                    {.finishUntilList={new Image("矿区争夺/关闭窗口.png", InnerReverse)}}
+            )->end();
+
+            return;
+        }
+
+        auto ps = CV::findPositions(CV::getScreen(env.hwnd), "矿区争夺/抢占.png");
+
+        for (const auto &p: ps) {
+            clicker = std::make_unique<Clicker>(
+                    "矿区争夺/抢占.png", p
+            )->click(
+                    {.finishUntilList={new Image("矿区争夺/跳过.png")}}
+            )->click(
+                    {.runUntilList={new Image("矿区争夺/确定.png")}}
+            )->click(
+                    {.finishUntilList={new Image("矿区争夺/矿区争夺.png"), new IfImage("矿区争夺/撤军.png")}}
+            );
+
+
+            if (clicker->founded()) {
+                std::make_unique<Clicker>(
+                        "矿区争夺/关闭窗口.png"
+                )->click(
+                        {.finishUntilList={new Image("矿区争夺/关闭窗口.png", InnerReverse)}}
+                )->end();
+
+                return;
+            }
+        }
+    }
+}
+
+void monthlyCard(Env &e) {
+    env = e;
+    std::unique_ptr<Clicker> clicker;
+
+    std::make_unique<Clicker>(
+            "月卡领取/畅玩月卡.png"
+    )->click(
+            {.runUntilList={new Image("月卡领取/一键领取.png")}}
+    )->click()->end();
+
+    while (!env.stopFlag->load()) {
+        clicker = std::make_unique<Clicker>("月卡领取/关闭窗口.png");
+
+        if (!clicker->founded()) break;
+
+        clicker->click(
+                {.selector=positionSelector("xCenter", "min"), .runUntilList={new Image("月卡领取/关闭窗口.png", InnerReverse)}}
+        )->end();
+    }
+}
+
+void otherActivity(Env &e) {
+
+}
+
+void dailyTask(Env &e) {
+    env = e;
+    std::unique_ptr<Clicker> clicker;
+
+    std::make_unique<Clicker>(
+            "每日任务/每日任务.png"
+    )->click(
+            {.runUntilList={new Image("每日任务/奖励.png")}}
+    )->end();
+
+    for (const auto &i: std::vector<QString>{"10", "30", "50", "80", "100"}) {
+        clicker = std::make_unique<Clicker>(QString("每日任务/%1活跃度.png").arg(i), ClickerInitConfig{.mode=Mode::RGB});
+
+        if (!clicker->founded()) continue;
+
+        clicker->click(
+                {.finishUntilList={new Image("每日任务/领取活跃度奖励.png")}, .finishWait=1}
+        )->click(
+                {.finishUntilList={new Image("每日任务/领取活跃度奖励.png", InnerReverse)}}
+        )->end();
+    }
+
+    std::make_unique<Clicker>(
+            "每日任务/每日激战.png"
+    )->click(
+            {.finishUntilList={new Image("每日任务/领取积分奖励.png")}}
+    )->click(
+            {.finishUntilList={new Image("每日任务/关闭窗口.png")}}
+    )->click(
+            {.finishUntilList={new Image("每日任务/关闭窗口.png", InnerReverse)}}
+    )->end();
+}
+
+void weeklyTask(Env &e) {
+    env = e;
+    std::unique_ptr<Clicker> clicker;
+
+    std::make_unique<Clicker>(
+            "周任务/周任务.png"
+    )->click(
+            {.runUntilList={new Image("周任务/周目标标题.png")}}
+    )->end();
+
+    while (!env.stopFlag->load()) {
+        clicker = std::make_unique<Clicker>("周任务/领取.png", ClickerInitConfig{.mode=Mode::RGB});
+
+        if (!clicker->founded()) break;
+
+        clicker->click({.runUntilList={new Image("周任务/领取.png", {.onPrevious=Previous::INNER, .mode=Mode::RGB, .reverse=true})}})->end();
+    }
+
+    std::make_unique<Clicker>(
+            "周任务/关闭窗口.png"
+    )->click(
+            {.finishUntilList={new Image("周任务/关闭窗口.png", InnerReverse)}}
+    )->end();
+}
+
 void guild(Env &e) {
     env = e;
     std::unique_ptr<Clicker> clicker;
@@ -578,9 +798,11 @@ void guild(Env &e) {
         clicker = std::make_unique<Clicker>("公会领奖/领取夺城战奖励.png");
 
         if (clicker->founded()) {
-            clicker->click(
-                    {.finishUntilList={new Image("公会领奖/领取夺城战奖励.png", InnerReverse)}}
-            )->end();
+            clicker = clicker->click({.finishUntilList={new IfImage("公会领奖/确定.png")}});
+
+            if (clicker->founded()) {
+                clicker->click({.finishUntilList={new Image("公会领奖/确定.png", InnerReverse)}})->end();
+            }
         }
     }
 
@@ -588,7 +810,7 @@ void guild(Env &e) {
         clicker = std::make_unique<Clicker>(
                 "公会领奖/公会战役.png"
         )->click(
-                {.finishUntilList={new Image("公会领奖/查看成员排名.png"), new Image("公会领奖/领取公会战役奖励.png")}}
+                {.finishUntilList={new Image("公会领奖/查看成员排名.png"), new IfImage("公会领奖/领取公会战役奖励.png")}}
         );
 
         if (clicker->founded()) {

@@ -22,7 +22,7 @@ void countryArena(Env &e) {
         return;
     }
 
-    clicker = clicker->locate({.finishUntilList={new IfImage("国家争霸/领取积分.png", {.mode=Mode::RGB})}});
+    clicker = std::make_unique<Clicker>("国家争霸/领取积分.png", ClickerInitConfig{.mode=Mode::RGB});
 
     if (clicker->founded()) {
         clicker->click({.finishUntilList={new Image("国家争霸/领取积分.png", {.onPrevious=Previous::INNER, .mode=Mode::RGB, .reverse=true})}})->end();
@@ -254,13 +254,11 @@ void countryWar(Env &e) {
             );
 
             if (clicker->founded()) {
-                clicker = clicker->click(
-                        {.runUntilList={new Image("国家战争/领取连续登录奖励.png", InnerReverse)}}
-                );
+                clicker->click({.runUntilList={new Image("国家战争/领取连续登录奖励.png", {.onPrevious=Previous::INNER, .mode=Mode::RGB, .reverse=true})}})->end();
             }
 
-            clicker->locate(
-                    {.finishUntilList={new Image("国家战争/关闭窗口.png")}}
+            std::make_unique<Clicker>(
+                    "国家战争/关闭窗口.png"
             )->click(
                     {.finishUntilList={new Image("国家战争/关闭窗口.png", InnerReverse)}}
             )->end();
@@ -274,28 +272,29 @@ void countryWar(Env &e) {
             );
 
             if (clicker->founded()) {
-                clicker = clicker->click(
+                clicker->click(
                         {.finishUntilList={new AnyImage({"国家战争/未购买vip月卡.png", "国家战争/已成功领取.png"}), new Image("国家战争/关闭窗口.png")}}
                 )->click(
                         {.selector=positionSelector("yCenter", "max"), .finishUntilList={new Image("国家战争/关闭窗口.png", InnerReverse)}}
-                );
+                )->end();
             }
 
-            clicker = clicker->locate(
-                    {.finishUntilList={new Image("国家战争/每周折扣礼包.png")}}
+            clicker = std::make_unique<Clicker>(
+                    "国家战争/每周折扣礼包.png"
             )->click(
                     {.finishUntilList={new Image("国家战争/vip恢复卡.png"), new IfImage("国家战争/免费领取.png", {.mode=Mode::RGB})}}
             );
 
             if (clicker->founded()) {
-                clicker = clicker->click(
+                clicker->click(
                         {.finishUntilList={new AnyImage({"国家战争/未开通vip.png", "国家战争/未购买vip月卡.png", "国家战争/已成功领取.png"}), new Image("国家战争/关闭窗口.png")}}
                 )->click(
                         {.selector=positionSelector("yCenter", "max"), .finishUntilList={new Image("国家战争/关闭窗口.png", InnerReverse)}}
-                );
+                )->end();
             }
-            clicker->locate(
-                    {.finishUntilList={new Image("国家战争/关闭窗口.png")}}
+
+            std::make_unique<Clicker>(
+                    "国家战争/关闭窗口.png"
             )->click(
                     {.finishUntilList={new Image("国家战争/关闭窗口.png", InnerReverse)}}
             )->end();
@@ -338,7 +337,9 @@ void countryWar(Env &e) {
         );
 
         if (!clicker->founded()) {
-            std::make_unique<Clicker>("国家战争/返回基地.png")->click(
+            std::make_unique<Clicker>(
+                    "国家战争/返回基地.png"
+            )->click(
                     {.finishUntilList={new Image("国家战争/国家.png")}}
             )->end();
 

@@ -49,18 +49,26 @@ std::vector<Segment> singleFindPositions(
     cv::Mat result;
     if (mode == Mode::RGB) {
         templateImg = cv::imdecode(cv::Mat(data), cv::IMREAD_COLOR);
-        std::vector<cv::Mat> templateChannels, rawChannels;
+
+        cv::Mat rawImgHsv, templateImgHsv;
+        cvtColor(rawImg, rawImgHsv, cv::COLOR_BGR2HSV);
+        cvtColor(templateImg, templateImgHsv, cv::COLOR_BGR2HSV);
+
+        std::vector<cv::Mat> templateChannels, rawChannels, templateHsvChannels, rawHsvChannels;
         cv::split(templateImg, templateChannels);
         cv::split(rawImg, rawChannels);
+        split(templateImgHsv, templateHsvChannels);
+        split(rawImgHsv, rawHsvChannels);
 
-        cv::Mat resultsB, resultsG, resultsR;
+        cv::Mat resultsB, resultsG, resultsR, resultH, resultS, resultV;
         cv::matchTemplate(rawChannels[0], templateChannels[0], resultsB, cv::TM_CCOEFF_NORMED);
         cv::matchTemplate(rawChannels[1], templateChannels[1], resultsG, cv::TM_CCOEFF_NORMED);
         cv::matchTemplate(rawChannels[2], templateChannels[2], resultsR, cv::TM_CCOEFF_NORMED);
+        matchTemplate(rawHsvChannels[0], templateHsvChannels[0], resultH, cv::TM_CCOEFF_NORMED);
+        matchTemplate(rawHsvChannels[1], templateHsvChannels[1], resultS, cv::TM_CCOEFF_NORMED);
+        matchTemplate(rawHsvChannels[2], templateHsvChannels[2], resultV, cv::TM_CCOEFF_NORMED);
 
-        cv::Mat tempMin;
-        cv::min(resultsB, resultsG, tempMin);
-        cv::min(tempMin, resultsR, result);
+        result = (resultsB + resultsG + resultsR + resultH + resultS + resultV) / 6;
     } else {
         templateImg = cv::imdecode(cv::Mat(data), cv::IMREAD_GRAYSCALE);
         cv::matchTemplate(rawImg, templateImg, result, cv::TM_CCOEFF_NORMED);

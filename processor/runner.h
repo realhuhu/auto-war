@@ -15,7 +15,7 @@
 #include "segment.h"
 
 struct ClickerInitConfig {
-    float threshold = 0.95;
+    float threshold = 0.9;
     float timeout = 60;
     float wait = 0;
     Mode mode = Mode::GRAY;

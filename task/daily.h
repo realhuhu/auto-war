@@ -19,6 +19,18 @@ void equipment(Env &e);
 
 void arms(Env &e);
 
+void signIn(Env &e);
+
+void oreField(Env &e);
+
+void monthlyCard(Env &e);
+
+void otherActivity(Env &e);
+
+void dailyTask(Env &e);
+
+void weeklyTask(Env &e);
+
 void guild(Env &e);
 
 #endif //RED_DAILY_H

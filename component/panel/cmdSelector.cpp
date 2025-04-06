@@ -1,6 +1,6 @@
 ﻿#include "cmdSelector.h"
 
-CmdSelector::CmdSelector(const QString& title, QWidget *parent) : QDialog(parent) {
+CmdSelector::CmdSelector(const QString &title, QWidget *parent) : QDialog(parent) {
     setWindowTitle(title);
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
@@ -18,6 +18,12 @@ CmdSelector::CmdSelector(const QString& title, QWidget *parent) : QDialog(parent
     tasks["火炮抽奖"] = mortar;
     tasks["配件抽奖"] = equipment;
     tasks["军备抽奖"] = arms;
+    tasks["每日签到"] = signIn;
+    tasks["矿区争夺"] = oreField;
+    tasks["月卡领取"] = monthlyCard;
+    tasks["其它活动"] = otherActivity;
+    tasks["每日任务"] = dailyTask;
+    tasks["周任务"] = weeklyTask;
     tasks["公会领奖"] = guild;
 
     auto mainLayout = new QVBoxLayout(this);
