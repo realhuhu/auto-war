@@ -258,7 +258,7 @@ void AutoWar::onOpenRedManager() {
 }
 
 void AutoWar::onOpenCmdSelector() {
-    auto dialog = new CmdSelector(this);
+    auto dialog = new CmdSelector("全部运行", this);
     connect(dialog, &CmdSelector::taskCreated, this, &AutoWar::onTaskCreated);
     dialog->exec();
 }
@@ -296,6 +296,18 @@ void AutoWar::onConfigChanged() const {
 void AutoWar::onClearConsole() const { consoleTextEdit->clear(); }
 
 void AutoWar::closeEvent(QCloseEvent *event) {
+    if (!browsers.empty()) {
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(
+                this,
+                "关闭",
+                "已打开游戏窗口，是否关闭并退出?",
+                QMessageBox::Yes | QMessageBox::No
+        );
+
+        if (reply == QMessageBox::No) return;
+    }
+
     for (auto it = browsers.begin(); it != browsers.end(); ++it) {
         RedBrowser *browser = it.value();
         if (browser) browser->close();

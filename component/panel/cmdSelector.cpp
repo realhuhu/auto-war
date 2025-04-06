@@ -1,6 +1,9 @@
 ﻿#include "cmdSelector.h"
 
-CmdSelector::CmdSelector(QWidget *parent) : QDialog(parent) {
+CmdSelector::CmdSelector(QString title, QWidget *parent) : QDialog(parent) {
+    setWindowTitle(title);
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+
     tasks["国家争霸"] = countryArena;
     tasks["世界争霸"] = worldArena;
     tasks["剿灭将领"] = exterminateEnemy;
@@ -9,6 +12,12 @@ CmdSelector::CmdSelector(QWidget *parent) : QDialog(parent) {
 
     tasks["英雄中心"] = heroCenter;
     tasks["战争学院"] = warCenter;
+    tasks["国家宝箱"] = countryChest;
+    tasks["将领抽奖"] = admiral;
+    tasks["参谋抽奖"] = adviser;
+    tasks["火炮抽奖"] = mortar;
+    tasks["配件抽奖"] = equipment;
+    tasks["军备抽奖"] = arms;
 
     auto mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(createCmdGroup(

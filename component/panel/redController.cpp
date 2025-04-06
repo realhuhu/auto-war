@@ -60,7 +60,7 @@ void RedController::onRefresh() {
 
 
 void RedController::onRun() {
-    auto dialog = new CmdSelector(this);
+    auto dialog = new CmdSelector(QString("%1 运行指令").arg(remark), this);
     connect(dialog, &CmdSelector::taskCreated, this, &RedController::onTaskCreated);
     dialog->show();
 }
