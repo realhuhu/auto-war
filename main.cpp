@@ -305,7 +305,10 @@ void AutoWar::closeEvent(QCloseEvent *event) {
                 QMessageBox::Yes | QMessageBox::No
         );
 
-        if (reply == QMessageBox::No) return;
+        if (reply == QMessageBox::No) {
+            event->ignore();
+            return;
+        }
     }
 
     for (auto it = browsers.begin(); it != browsers.end(); ++it) {

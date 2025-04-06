@@ -493,3 +493,121 @@ void arms(Env &e) {
             {.runUntilList={new Image{"军备抽奖/关闭窗口.png", InnerReverse}}}
     )->end();
 }
+
+void guild(Env &e) {
+    env = e;
+    std::unique_ptr<Clicker> clicker;
+    auto setting = loadSetting(state.config, env.qqRemark, env.redRemark, state.settingDefault);
+    auto boolSetting = parseBoolSetting("公会领奖", "checkbox", setting);
+
+    if (boolSetting["领取公会战奖励"]) {
+        clicker = std::make_unique<Clicker>("公会领奖/参加公会战.png");
+
+        if (clicker->founded()) {
+            clicker = clicker->click({.finishUntilList={new Image("公会领奖/公会战争标题.png"), new IfImage("公会领奖/报名公会战.png")}});
+
+            if (!clicker->founded()) {
+                std::make_unique<Clicker>(
+                        "公会领奖/领取奖励.png"
+                )->click(
+                        {.finishUntilList={new Image("公会领奖/领取奖励.png", {.onPrevious=Previous::RIGHT})}}
+                )->click(
+                        {.finishUntilList={new Image("公会领奖/确定.png")}}
+                )->click(
+                        {.finishUntilList={new Image("公会领奖/报名公会战.png")}}
+                )->end();
+            }
+
+            std::make_unique<Clicker>(
+                    "公会领奖/报名公会战.png"
+            )->click(
+                    {.finishUntilList={new Image("公会领奖/确定.png")}}
+            )->click(
+                    {.finishUntilList={new Image("公会领奖/关闭公会战窗口.png")}}
+            )->click(
+                    {.finishUntilList={new Image("公会领奖/公会.png")}}
+            )->end();
+        }
+    }
+
+    std::make_unique<Clicker>(
+            "公会领奖/公会.png"
+    )->click(
+            {.runUntilList={new Image("公会领奖/公会福利.png")}}
+    )->end();
+
+
+    if (boolSetting["领取活跃度奖励"]) {
+        std::make_unique<Clicker>(
+                "公会领奖/捐献.png"
+        )->locate(
+                {.finishUntilList={new Image("公会领奖/活跃任务.png", {.onPrevious=Previous::RIGHT})}}
+        )->click(
+                {.runUntilList={new Image("公会领奖/活跃任务按钮.png")}}
+        )->click(
+                {.finishUntilList={new Image("公会领奖/今日公会活跃.png")}}
+        )->end();
+
+        for (const auto &i: std::vector<QString>{"第一档", "第二档", "第三档", "第四档", "第五档"}) {
+            clicker = std::make_unique<Clicker>(QString("公会领奖/%1.png").arg(i), ClickerInitConfig{.mode=Mode::RGB});
+
+            if (!clicker->founded()) continue;
+
+            clicker->click(
+                    {.runUntilList={new Image("公会领奖/确定.png")}, .finishWait=1}
+            )->click(
+                    {.runUntilList={new Image("公会领奖/确定.png", InnerReverse)}}
+            )->end();
+        }
+
+        std::make_unique<Clicker>(
+                "/公会领奖/关闭公会捐献窗口.png"
+        )->click(
+                {.finishUntilList={new Image("公会领奖/关闭公会捐献窗口.png", InnerReverse)}}
+        )->end();
+    }
+
+
+    std::make_unique<Clicker>(
+            "公会领奖/公会争霸.png"
+    )->click(
+            {.finishUntilList={new Image("公会领奖/公会争霸标题.png")}}
+    )->end();
+
+    if (boolSetting["领取夺城战奖励"]) {
+        clicker = std::make_unique<Clicker>("公会领奖/领取夺城战奖励.png");
+
+        if (clicker->founded()) {
+            clicker->click(
+                    {.finishUntilList={new Image("公会领奖/领取夺城战奖励.png", InnerReverse)}}
+            )->end();
+        }
+    }
+
+    if (boolSetting["领取公会战役宝箱"]) {
+        clicker = std::make_unique<Clicker>(
+                "公会领奖/公会战役.png"
+        )->click(
+                {.finishUntilList={new Image("公会领奖/查看成员排名.png"), new Image("公会领奖/领取公会战役奖励.png")}}
+        );
+
+        if (clicker->founded()) {
+            clicker->click({.finishWait=0.5})->end();
+
+            while (!env.stopFlag->load()) {
+                clicker = std::make_unique<Clicker>("公会领奖/确定.png");
+
+                if (!clicker->founded()) break;
+
+                clicker->click({.finishWait=1})->end();
+            }
+
+        }
+    }
+
+    std::make_unique<Clicker>(
+            "公会领奖/关闭公会争霸窗口.png"
+    )->click(
+            {.finishUntilList={new Image("公会领奖/关闭公会争霸窗口.png", InnerReverse)}}
+    )->end();
+}

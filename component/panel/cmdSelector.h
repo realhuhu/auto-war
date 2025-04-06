@@ -16,7 +16,7 @@ Q_OBJECT
 public:
     QMap<QString, std::function<void(Env &env)>> tasks;
 
-    explicit CmdSelector(QString title,QWidget *parent);
+    explicit CmdSelector(const QString& title,QWidget *parent);
 
     QGroupBox *createCmdGroup(const QString &groupTitle, const QStringList &cmdList);
 

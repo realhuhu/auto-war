@@ -19,4 +19,6 @@ void equipment(Env &e);
 
 void arms(Env &e);
 
+void guild(Env &e);
+
 #endif //RED_DAILY_H
