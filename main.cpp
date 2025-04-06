@@ -313,7 +313,10 @@ void AutoWar::closeEvent(QCloseEvent *event) {
 
     for (auto it = browsers.begin(); it != browsers.end(); ++it) {
         RedBrowser *browser = it.value();
-        if (browser) browser->close();
+        if (browser) {
+            browser->stopTask();
+            browser->close();
+        }
     }
 
     browsers.clear();
