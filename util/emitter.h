@@ -12,6 +12,8 @@ public:
 signals:
 
     void log(const QString &text, const QString &color = "black") const;
+
+    void error(const QString &text) const;
 };
 
 #endif //RED_EMITTER_H

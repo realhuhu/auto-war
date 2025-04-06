@@ -8,6 +8,7 @@ CmdSelector::CmdSelector(QWidget *parent) : QDialog(parent) {
     tasks["国家战争"] = countryWar;
 
     tasks["英雄中心"] = heroCenter;
+    tasks["战争学院"] = warCenter;
 
     auto mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(createCmdGroup(

@@ -26,8 +26,19 @@ void Until::loop(std::unique_ptr<Segment> &previous, float globalTimeout) {
 bool Until::fulfilled(std::unique_ptr<Segment> &previous) {
     preHook(previous);
     bool isFulfilled = config.reverse == !flag(previous);
-    emit env.emitter->log((isFulfilled ? "条件满足: " : "条件未满足: ") + toString());
-    return isFulfilled;
+
+    if (isFulfilled) {
+        emit env.emitter->log("条件满足: " + toString());
+        env.logFlag.remove(QString("%1-until-not-fulfilled").arg(toString()));
+        return true;
+    }
+
+    if (!env.logFlag.contains(QString("%1-until-not-fulfilled").arg(toString()))) {
+        env.logFlag[QString("%1-until-not-fulfilled").arg(toString())] = true;
+        emit env.emitter->log("条件未满足: " + toString());
+    }
+
+    return false;
 }
 
 std::vector<Segment> Until::filter(const std::vector<Segment> &positions, std::unique_ptr<Segment> &previous) const {
@@ -35,7 +46,7 @@ std::vector<Segment> Until::filter(const std::vector<Segment> &positions, std::u
 
     if (!previous) throw std::runtime_error("Previous segment为空: " + toString().toStdString());
 
-    std::vector<Segment> result;
+    std::vector<Segment> result = {};
 
     emit env.emitter->log("筛选: 在" + previous->toString() + "" + PreviousToString(config.onPrevious));
 

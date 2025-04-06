@@ -190,8 +190,8 @@ void RedManger::onAdd() {
     QDialogButtonBox btnBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
     form.addRow(&btnBox);
 
-    QObject::connect(&btnBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
-    QObject::connect(&btnBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    connect(&btnBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+    connect(&btnBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
 
     if (dialog.exec() != QDialog::Accepted) return;
 

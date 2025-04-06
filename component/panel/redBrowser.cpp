@@ -14,6 +14,7 @@ Worker::Worker(HWND hwnd, int region, const QString &qqRemark, const QString &re
             .redRemark=redRemark
     };
     connect(emitter, &Emitter::log, this, &Worker::onEmitterLog);
+    connect(emitter, &Emitter::error, this, &Worker::onEmitterError);
 }
 
 void Worker::runTask(const std::function<void(Env &env)> &task) {
@@ -23,6 +24,7 @@ void Worker::runTask(const std::function<void(Env &env)> &task) {
     }
 
     env.stopFlag->store(false);
+    errorList.clear();
     workerThread = new QThread(this);
     connect(workerThread, &QThread::started, this, [this, task]() {
         try {
@@ -35,6 +37,7 @@ void Worker::runTask(const std::function<void(Env &env)> &task) {
             } else {
                 emit toLog("运行完成", "red");
             }
+
             workerThread->quit();
         }
     }, Qt::DirectConnection);
@@ -42,6 +45,7 @@ void Worker::runTask(const std::function<void(Env &env)> &task) {
     connect(workerThread, &QThread::finished, workerThread, &QThread::deleteLater);
     connect(workerThread, &QThread::destroyed, this, [this]() {
         QMutexLocker locker(&workerMutex);
+        for (auto error: errorList) emit toLog(error, "red");
         workerThread = nullptr;
     });
 
@@ -69,7 +73,13 @@ void Worker::close() const {
     workerThread->wait();
 }
 
-void Worker::onEmitterLog(const QString &text, const QString &color) const { emit toLog(text, color); }
+void Worker::onEmitterLog(const QString &text, const QString &color) const {
+    if (!env.stopFlag->load()) emit toLog(text, color);
+}
+
+void Worker::onEmitterError(const QString &text) {
+    if (!env.stopFlag->load()) errorList.append(text);
+}
 
 RedBrowser::RedBrowser(
         const QString &link,

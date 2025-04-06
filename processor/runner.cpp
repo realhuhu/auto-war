@@ -9,11 +9,9 @@ Clicker::Clicker(
     globalThreshold(config.threshold),
     globalTimeout(config.timeout) {
     sleep(env.stopFlag, config.wait);
-    qDebug() << "1";
-    auto screen = CV::getScreen(env.hwnd, config.mode);
-    qDebug() << "2";
+
     targetSegmentList = CV::findPositions(
-            screen,
+            CV::getScreen(env.hwnd, config.mode),
             imgPath,
             globalThreshold,
             config.mode
@@ -22,7 +20,7 @@ Clicker::Clicker(
 
 
 Clicker::Clicker(
-        const std::vector<QString>& templatePathList,
+        const std::vector<QString> &templatePathList,
         ClickerInitConfig config
 ) : globalThreshold(config.threshold),
     globalTimeout(config.timeout) {
@@ -199,12 +197,17 @@ std::unique_ptr<Clicker> Clicker::click(
 
             if (allFulfilled) {
                 emit env.emitter->log("所有CLICK满足，结束循环点击");
+                env.logFlag.remove(QString("%1-click-not-fulfilled").arg(toString()));
                 break;
             }
 
             segment.click(0, offsetX, offsetY, position);
 
-            emit env.emitter->log("CLICK不满足，继续循环点击");
+            if (!env.logFlag.contains(QString("%1-click-not-fulfilled").arg(toString()))) {
+                env.logFlag[QString("%1-click-not-fulfilled").arg(toString())] = true;
+
+                emit env.emitter->log("CLICK不满足，继续循环点击");
+            }
 
             sleep(env.stopFlag, interval);
         }

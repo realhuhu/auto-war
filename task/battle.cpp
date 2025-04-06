@@ -342,7 +342,7 @@ void countryWar(Env &e) {
                     {.finishUntilList={new Image("国家战争/国家.png")}}
             )->end();
 
-            emit env.emitter->log("国家战争: 已提前结束，请先移动到与摩多城相邻的城");
+            emit env.emitter->error("[国家战争] 提前结束: 请先移动到与摩多城相邻的城");
             return;
         }
 

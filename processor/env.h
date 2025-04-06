@@ -3,6 +3,7 @@
 
 #include <windows.h>
 
+#include <QHash>
 #include <QString>
 #include <QJsonObject>
 
@@ -14,8 +15,10 @@ struct Env {
     std::atomic<bool> *stopFlag{};
 
     int region{};
-    QString qqRemark;
-    QString redRemark;
+    QString qqRemark{};
+    QString redRemark{};
+
+    QHash<QString, bool> logFlag{};
 };
 
 extern thread_local Env env;

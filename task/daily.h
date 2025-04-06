@@ -5,4 +5,6 @@
 
 void heroCenter(Env &e);
 
+void warCenter(Env &e);
+
 #endif //RED_DAILY_H

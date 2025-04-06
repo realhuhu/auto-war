@@ -25,6 +25,7 @@ public:
     Env env;
     QThread *workerThread;
     QBasicMutex workerMutex;
+    QList<QString> errorList{};
 
     explicit Worker(HWND hwnd, int region, const QString &qqRemark, const QString &redRemark);
 
@@ -37,6 +38,8 @@ public:
 public slots:
 
     void onEmitterLog(const QString &text, const QString &color = "black") const;
+
+    void onEmitterError(const QString &text);
 
 signals:
 
