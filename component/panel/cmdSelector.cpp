@@ -1,8 +1,13 @@
 ﻿#include "cmdSelector.h"
 
 CmdSelector::CmdSelector(QWidget *parent) : QDialog(parent) {
-    tasks["英雄中心"] = heroCenter;
+    tasks["国家争霸"] = countryArena;
+    tasks["世界争霸"] = worldArena;
+    tasks["剿灭将领"] = exterminateEnemy;
+    tasks["军备合成"] = armsCompound;
     tasks["国家战争"] = countryWar;
+
+    tasks["英雄中心"] = heroCenter;
 
     auto mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(createCmdGroup(
@@ -23,10 +28,9 @@ CmdSelector::CmdSelector(QWidget *parent) : QDialog(parent) {
                     }
             ));
     mainLayout->addWidget(createCmdGroup(
-            "自动战斗",
+            "一键执行",
             {
-                    "国家争霸", "世界争霸", "剿灭将领", "军备合成",
-                    "公会战役", "国家战争"
+                    "预设1", "预设2", "预设3", "预设4"
             }
     ));
     mainLayout->addWidget(createCmdGroup(

@@ -20,6 +20,23 @@ Clicker::Clicker(
     );
 }
 
+
+Clicker::Clicker(
+        const std::vector<QString>& templatePathList,
+        ClickerInitConfig config
+) : globalThreshold(config.threshold),
+    globalTimeout(config.timeout) {
+    sleep(env.stopFlag, config.wait);
+
+    for (const auto &templatePath: templatePathList) {
+        auto ps = CV::findPositions(CV::getScreen(env.hwnd, config.mode), imgPath, globalThreshold, config.mode);
+        if (!ps.empty()) {
+            imgPath = templatePath;
+            targetSegmentList = ps;
+        }
+    }
+}
+
 Clicker::Clicker(
         QString templatePath,
         const Segment &segment,
@@ -280,5 +297,6 @@ bool Clicker::founded() const { return !targetSegmentList.empty(); }
 void Clicker::end() {}
 
 QString Clicker::toString() const { return QString("[%1]").arg(QFileInfo(imgPath).baseName()); }
+
 
 

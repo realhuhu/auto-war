@@ -15,7 +15,7 @@
 #include "segment.h"
 
 struct ClickerInitConfig {
-    float threshold = 0.9;
+    float threshold = 0.95;
     float timeout = 60;
     float wait = 0;
     Mode mode = Mode::GRAY;
@@ -41,6 +41,8 @@ public:
     std::unique_ptr<Segment> previousSegment;
 
     explicit Clicker(QString templatePath, ClickerInitConfig config = {});
+
+    explicit Clicker(const std::vector<QString>& templatePathList, ClickerInitConfig config = {});
 
     explicit Clicker(QString templatePath, const Segment &segment, ClickerInitConfig config = {});
 
