@@ -194,10 +194,9 @@ void exterminateEnemy(Env &e) {
                     {.finishUntilList={new IfImage("剿灭将领/确定.png")}}
             );
 
-            if (clicker->founded()) {
-                clicker->click({.finishUntilList={new Image("剿灭将领/确定.png", InnerReverse)}})->end();
-                continue;
-            }
+            if (clicker->founded()) clicker->click({.finishUntilList={new Image("剿灭将领/确定.png", InnerReverse)}})->end();
+
+            continue;
         }
 
         clicker = clicker->locate(

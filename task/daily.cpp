@@ -509,11 +509,16 @@ void signIn(Env &e) {
     }
 
     for (const auto &i: QList<QString>{"7天", "14天", "21天", "28天"}) {
-        clicker = std::make_unique<Clicker>(QString("每日签到/%1.png").arg(i), ClickerInitConfig{.mode=Mode::RGB});
+        auto templateImage = QString("每日签到/%1.png").arg(i);
+        clicker = std::make_unique<Clicker>(templateImage, ClickerInitConfig{.mode=Mode::RGB});
 
         if (!clicker->founded())continue;
 
-        clicker->click({.finishUntilList={new Image(QString("每日签到/%1.png").arg(i), {.onPrevious=Previous::INNER, .mode=Mode::RGB, .reverse=true})}})->end();
+        clicker->click(
+                {.finishUntilList={new Image(templateImage, {.onPrevious=Previous::INNER, .mode=Mode::RGB, .finishWait=1, .reverse=true}), new Image("每日签到/关闭窗口.png")}}
+        )->click(
+                {.selector=positionSelector("yCenter", "max"), .runUntilList={new Image("每日签到/关闭窗口.png", InnerReverse)}}
+        )->end();
     }
 
     std::make_unique<Clicker>(
