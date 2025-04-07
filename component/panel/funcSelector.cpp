@@ -1,6 +1,6 @@
 ﻿#include "funcSelector.h"
 
-FuncSelector::FuncSelector(QWidget *parent) : QDialog(parent) {
+FuncSelector::FuncSelector(const QMap<QString, RedBrowser *> &browsers, QWidget *parent) : QDialog(parent) {
     setWindowTitle("其它功能");
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
@@ -23,9 +23,41 @@ FuncSelector::FuncSelector(QWidget *parent) : QDialog(parent) {
         }
     });
 
-    connect(replaceBtn, &QPushButton::clicked, [this]() {});
+    connect(replaceBtn, &QPushButton::clicked, [this, browsers]() {
+        if (browsers.empty()) {
+            accept();
+            emit toConsole("请先打开游戏窗口!", "red");
+            return;
+        }
+        auto selector = new BrowserSelector(browsers, this);
+        connect(selector, &BrowserSelector::browserSelected, [this, selector](RedBrowser *browser) {
+            selector->accept();
+            accept();
+            parentWidget()->showMinimized();
 
-    connect(clickerBtn, &QPushButton::clicked, [this]() {});
+            auto replacer = new ReplaceDialog(browser, parentWidget());
+            replacer->show();
+        });
+        selector->exec();
+    });
+
+    connect(clickerBtn, &QPushButton::clicked, [this, browsers]() {
+        if (browsers.empty()) {
+            accept();
+            emit toConsole("请先打开游戏窗口!", "red");
+            return;
+        }
+        auto selector = new BrowserSelector(browsers, this);
+        connect(selector, &BrowserSelector::browserSelected, [this, selector](RedBrowser *browser) {
+            selector->accept();
+            accept();
+            parentWidget()->showMinimized();
+
+            auto clicker = new ClickerDialog(browser, parentWidget());
+            clicker->show();
+        });
+        selector->exec();
+    });
 
     connect(activityBtn, &QPushButton::clicked, [this]() {
         auto *dialog = new ActivityDialog(this);

@@ -91,7 +91,7 @@ QGroupBox *CmdSelector::createCmdGroup(const QString &groupTitle, const QStringL
         btn->setAutoDefault(false);
 
         connect(btn, &QPushButton::clicked, [this, command]() {
-            this->accept();
+            accept();
             emit taskCreated(command, createTask(command));
         });
 

@@ -37,14 +37,15 @@ Name: "chs"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
 Source: "platforms\*"; DestDir: "{app}\platforms"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full
 Source: "resources\*"; DestDir: "{app}\resources"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full
-Source: "*.dll"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
-Source: "setting-default.json"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
 Source: "游戏图片\*"; DestDir: "{app}\游戏图片"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full
 Source: "自定义图片\使用说明.txt"; DestDir: "{app}\自定义图片"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full
-Source: "游戏图片\*"; DestDir: "{app}\游戏图片"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full
+
+Source: "setting-default.json"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
+Source: "QtWebEngineProcess.exe"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
+Source: "{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
+Source: "*.dll"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
 ; 注意:  在任何共享系统文件上不要使用 "Flags: ignoreversion"
 
 [Icons]

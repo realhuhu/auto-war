@@ -8,12 +8,15 @@
 #include <QDesktopServices>
 #include <QCoreApplication>
 
+#include "browserSelector.h"
+#include "../function/clickerDialog.h"
+#include "../function/replaceDialog.h"
 #include "../function/activityDialog.h"
 
 class FuncSelector : public QDialog {
 Q_OBJECT
 public:
-    explicit FuncSelector(QWidget *parent);
+    explicit FuncSelector(const QMap<QString, RedBrowser *> &browsers, QWidget *parent);
 
 signals:
 

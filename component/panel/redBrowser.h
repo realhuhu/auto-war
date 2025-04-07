@@ -34,8 +34,6 @@ public:
 
     void stopTask();
 
-    void close() const;
-
 public slots:
 
     void onEmitterLog(const QString &text, const QString &color = "black") const;

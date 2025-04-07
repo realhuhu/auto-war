@@ -87,12 +87,6 @@ void Worker::stopTask() {
     emit toLog("命令已停止执行", "red");
 }
 
-void Worker::close() const {
-    if (!workerThread) return;
-
-    workerThread->quit();
-    workerThread->wait();
-}
 
 void Worker::onEmitterLog(const QString &text, const QString &color) const { if (!env.stopFlag->load()) emit toLog(text, color); }
 
@@ -147,9 +141,13 @@ RedBrowser::RedBrowser(
 }
 
 
-void RedBrowser::runTask(const QString &command, const std::function<void(Env &)> &task) const { worker->runTask(command, task); }
+void RedBrowser::runTask(const QString &command, const std::function<void(Env &)> &task) const {
+    if (worker) worker->runTask(command, task);
+}
 
-void RedBrowser::stopTask() const { worker->stopTask(); }
+void RedBrowser::stopTask() const {
+    if (worker) worker->stopTask();
+}
 
 void RedBrowser::onRefresh() const {
     emit toLog(QString("刷新游戏"));
@@ -165,8 +163,7 @@ void RedBrowser::onRunTask(const QString &command, const std::function<void(Env 
 void RedBrowser::onStopTask() const { stopTask(); }
 
 void RedBrowser::closeEvent(QCloseEvent *event) {
-    worker->stopTask();
-    worker->close();
+    if (worker) worker->stopTask();
 
     if (browser) {
         browser->deleteLater();

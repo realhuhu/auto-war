@@ -276,7 +276,7 @@ void AutoWar::onBatchStop() {
 }
 
 void AutoWar::onShowOther() {
-    auto dialog = new FuncSelector(this);
+    auto dialog = new FuncSelector(browsers, this);
     connect(dialog, &FuncSelector::toConsole, this, &AutoWar::onConsolePrint);
 
     dialog->exec();
@@ -311,29 +311,17 @@ void AutoWar::onClearConsole() const { consoleTextEdit->clear(); }
 
 void AutoWar::closeEvent(QCloseEvent *event) {
     if (!browsers.empty()) {
-        QMessageBox::StandardButton reply;
-        reply = QMessageBox::question(
+        QMessageBox::question(
                 this,
                 "关闭",
-                "已打开游戏窗口，是否关闭并退出?",
-                QMessageBox::Yes | QMessageBox::No
+                "请先关闭全部游戏窗口，再关闭程序",
+                QMessageBox::Yes
         );
 
-        if (reply == QMessageBox::No) {
-            event->ignore();
-            return;
-        }
+        event->ignore();
+        return;
     }
 
-    for (auto it = browsers.begin(); it != browsers.end(); ++it) {
-        RedBrowser *browser = it.value();
-        if (browser) {
-            browser->stopTask();
-            browser->close();
-        }
-    }
-
-    browsers.clear();
     QWidget::closeEvent(event);
 }
 

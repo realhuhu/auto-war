@@ -96,7 +96,6 @@ std::vector<Segment> CV::findPositions(
         Mode mode
 ) {
     QFile imgFile(res(templatePath));
-    qDebug() << "3" << imgFile.fileName();
     if (!imgFile.open(QIODevice::ReadOnly)) throw std::runtime_error("文件不存在: " + imgFile.fileName().toStdString());
 
     auto ps = singleFindPositions(rawImg, &imgFile, threshold, mode);

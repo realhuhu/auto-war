@@ -36,6 +36,10 @@ add_executable(Red
         interceptor/storage.h
         interceptor/storage.cpp
 
+        component/function/replaceDialog.h
+        component/function/replaceDialog.cpp
+        component/function/clickerDialog.h
+        component/function/clickerDialog.cpp
         component/function/activityDialog.h
         component/function/activityDialog.cpp
 
@@ -64,6 +68,8 @@ add_executable(Red
         component/panel/cmdSelector.cpp
         component/panel/funcSelector.h
         component/panel/funcSelector.cpp
+        component/panel/browserSelector.h
+        component/panel/browserSelector.cpp
 
         processor/cv.h
         processor/cv.cpp
@@ -87,6 +93,7 @@ add_executable(Red
         main.cpp
         task/presupposition.cpp
         task/presupposition.h
+
 )
 target_link_libraries(Red ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network Qt5::WebEngineWidgets)
 set_target_properties(Red PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
