@@ -21,7 +21,7 @@ void heroCenter(Env &e) {
             clicker = clicker->locate(
                     {.finishUntilList={new Image("英雄中心/英雄抽奖.png", {.onPrevious=Previous::TOP_CENTER, .finishWait=1})}}
             )->click(
-                    {.finishUntilList={new IfImage("英雄中心/确定.png", {.finishWait=1})}}
+                    {.finishUntilList={new IfImage("英雄中心/确定.png", {.startWait=1})}}
             );
 
             if (!clicker->founded()) continue;

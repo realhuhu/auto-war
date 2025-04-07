@@ -47,6 +47,7 @@ AutoWar::AutoWar(
     connect(clearLogButton, &QPushButton::clicked, this, &AutoWar::onClearConsole);
 
     loadConfig();
+    consolePrint("运行命令时由于在频繁点击，按钮可能需要连续快速点击才能触发!", "red");
 }
 
 void AutoWar::consolePrint(const QString &text, const QString &color) const {
