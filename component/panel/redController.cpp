@@ -72,8 +72,8 @@ void RedController::onStop() {
 
 void RedController::onClear() const { logTextEdit->clear(); }
 
-void RedController::onTaskCreated(const QString &command, std::function<void(Env &env)> task) {
+void RedController::onTaskCreated(const QString &command, const std::function<void(Env &env)>& task) {
     log(QString("开始运行: %1").arg(command));
-    emit toRunTask(std::move(task));
+    emit toRunTask(command, std::move(task));
 }
 

@@ -26,10 +26,11 @@ public:
     QThread *workerThread;
     QBasicMutex workerMutex;
     QList<QString> errorList{};
+    QString abortMessage;
 
     explicit Worker(HWND hwnd, int region, const QString &qqRemark, const QString &redRemark);
 
-    void runTask(const std::function<void(Env &env)> &task);
+    void runTask(const QString &command, const std::function<void(Env &env)> &task);
 
     void stopTask();
 
@@ -44,6 +45,8 @@ public slots:
 signals:
 
     void toLog(const QString &text, const QString &color = "black") const;
+
+    void toConsole(const QString &text, const QString &color = "black") const;
 };
 
 class RedBrowser : public QDialog {
@@ -58,7 +61,7 @@ public:
 
     explicit RedBrowser(const QString &link, int region, const QString &qqRemark, const QString &redRemark);
 
-    void runTask(const std::function<void(Env &env)> &task) const;
+    void runTask(const QString &command, const std::function<void(Env &env)> &task) const;
 
     void stopTask() const;
 
@@ -72,7 +75,9 @@ public slots:
 
     void onLog(const QString &text, const QString &color = "black") const;
 
-    void onRunTask(const std::function<void(Env &env)> &task) const;
+    void onConsole(const QString &text, const QString &color = "black") const;
+
+    void onRunTask(const QString &command, const std::function<void(Env &env)> &task) const;
 
     void onStopTask() const;
 
@@ -81,6 +86,8 @@ signals:
     void closed(QString remark);
 
     void toLog(const QString &text, const QString &color = "black") const;
+
+    void toConsole(const QString &text, const QString &color = "black") const;
 
 };
 

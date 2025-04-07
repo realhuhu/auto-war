@@ -117,7 +117,7 @@ std::vector<Segment> Until::filter(const std::vector<Segment> &positions, std::u
     }
 
     emit env.emitter->log(
-            QString("筛选前: %1, 筛选后:").arg(
+            QString("筛选前: %1, 筛选后: %2").arg(
                     QString::number(positions.size()),
                     QString::number(result.size())
             )

@@ -52,6 +52,8 @@ public slots:
 
     void onBatchStop();
 
+    void onConsolePrint(const QString &text, const QString &color) const;
+
     void onClearConsole() const;
 
     void onBrowserClosed(const QString &remark);

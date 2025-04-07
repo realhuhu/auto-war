@@ -228,16 +228,17 @@ void AutoWar::onOpenAllBrowser() {
         connect(panel, &RedController::toRunTask, browser, &RedBrowser::onRunTask);
         connect(panel, &RedController::toStopTask, browser, &RedBrowser::onStopTask);
         connect(browser, &RedBrowser::toLog, panel, &RedController::onLog);
+        connect(browser, &RedBrowser::toConsole, this, &AutoWar::onConsolePrint);
         connect(browser, &RedBrowser::closed, this, &AutoWar::onBrowserClosed);
 
-        consolePrint(QString("已打开游戏窗口(%1)").arg(redRemark));
+        consolePrint(QString("(%1)已打开游戏窗口").arg(redRemark));
     }
 }
 
 void AutoWar::onBrowserClosed(const QString &remark) {
     panelTabWidget->removeTabByLabel(remark);
     browsers.remove(remark);
-    consolePrint(QString("已关闭游戏窗口(%1)").arg(remark), "red");
+    consolePrint(QString("(%1)已关闭游戏窗口").arg(remark), "red");
 }
 
 void AutoWar::onOpenQQManager() {
@@ -264,7 +265,7 @@ void AutoWar::onOpenCmdSelector() {
 }
 
 void AutoWar::onBatchStop() {
-    consolePrint("全部停止");
+    consolePrint("全部停止", "red");
     for (auto it = browsers.begin(); it != browsers.end(); ++it) {
         RedBrowser *browser = it.value();
         if (browser) browser->stopTask();
@@ -272,10 +273,10 @@ void AutoWar::onBatchStop() {
 }
 
 void AutoWar::onTaskCreated(const QString &command, const std::function<void(Env &env)> &task) const {
-    consolePrint(QString("全部运行: %1").arg(command));
+    consolePrint(QString("全部运行: %1").arg(command), "green");
     for (auto it = browsers.begin(); it != browsers.end(); ++it) {
         RedBrowser *browser = it.value();
-        if (browser) browser->runTask(task);
+        if (browser) browser->runTask(command, task);
     }
 }
 
@@ -292,6 +293,9 @@ void AutoWar::onConfigChanged() const {
         consolePrint("配置保存失败", "red");
     }
 }
+
+
+void AutoWar::onConsolePrint(const QString &text, const QString &color) const { consolePrint(text, color); }
 
 void AutoWar::onClearConsole() const { consoleTextEdit->clear(); }
 
@@ -322,6 +326,7 @@ void AutoWar::closeEvent(QCloseEvent *event) {
     browsers.clear();
     QWidget::closeEvent(event);
 }
+
 
 int main(int argc, char *argv[]) {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);

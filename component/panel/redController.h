@@ -35,13 +35,13 @@ public slots:
 
     void onClear() const;
 
-    void onTaskCreated(const QString &command, std::function<void(Env &env)> task);
+    void onTaskCreated(const QString &command, const std::function<void(Env &env)> &task);
 
 signals:
 
     void toRefreshBrowser();
 
-    void toRunTask(std::function<void(Env &env)> task);
+    void toRunTask(const QString &command, std::function<void(Env &env)> task);
 
     void toStopTask();
 };
