@@ -561,7 +561,7 @@ void oreField(Env &e) {
             emit env.emitter->log("免费次数已用完", "red");
 
             std::make_unique<Clicker>(
-                    "/矿区争夺/关闭窗口.png"
+                    "矿区争夺/关闭窗口.png"
             )->click(
                     {.finishUntilList={new Image("矿区争夺/关闭窗口.png", InnerReverse)}}
             )->end();
@@ -658,7 +658,169 @@ void monthlyCard(Env &e) {
 }
 
 void otherActivity(Env &e) {
+    env = e;
+    std::unique_ptr<Clicker> clicker;
+    auto setting = loadSetting(state.config, env.qqRemark, env.redRemark, state.settingDefault);
+    auto boolSetting = parseBoolSetting("其它活动", "checkbox", setting);
 
+
+    if (boolSetting["七天乐"]) {
+        clicker = std::make_unique<Clicker>("其它活动/七天乐.png");
+
+        if (clicker->founded()) {
+            clicker = clicker->click({.finishUntilList={new Image("其它活动/七天乐标题.png"), new IfImage("其它活动/免费签到.png")}});
+
+            if (clicker->founded()) {
+                clicker = clicker->click(
+                        {.finishUntilList={new Image("其它活动/签到奖励.png"), new Image("其它活动/关闭窗口.png")}}
+                )->click(
+                        {.selector=positionSelector("xCenter", "min"), .finishUntilList={new Image("其它活动/关闭窗口.png", InnerReverse)}}
+                );
+            }
+
+            std::make_unique<Clicker>(
+                    "其它活动/关闭窗口.png"
+            )->click(
+                    {.finishUntilList={new Image("其它活动/关闭窗口.png", InnerReverse)}}
+            )->end();
+        }
+    }
+
+    if (boolSetting["捕猎火鸡"]) {
+        clicker = std::make_unique<Clicker>("其它活动/捕猎火鸡.png");
+
+        if (clicker->founded()) {
+            clicker = clicker->click({.finishUntilList={new Image("其它活动/捕猎火鸡标题.png"), new IfImage("其它活动/捕猎一次.png", InnerReverse)}});
+
+
+            if (!clicker->founded()) {
+                std::make_unique<Clicker>(
+                        "其它活动/关闭窗口.png"
+                )->click(
+                        {.finishUntilList={new Image("其它活动/关闭窗口.png", InnerReverse)}}
+                )->end();
+            } else {
+                clicker->click(
+                        {
+                                .runUntilList={new Image("其它活动/超级玉米不足.png")},
+                                .finishUntilList={new Image("其它活动/关闭窗口.png")}
+                        }
+                )->click(
+                        {.selector=positionSelector("xCenter", "min"), .finishUntilList={new Image("其它活动/关闭窗口.png", InnerReverse), new Image("其它活动/关闭窗口.png")}}
+                )->click(
+                        {.finishUntilList={new Image("其它活动/关闭窗口.png", InnerReverse)}}
+                )->end();
+
+                auto targetSegmentList = std::make_unique<Clicker>("其它活动/好友基地.png")->targetSegmentList;
+
+                bool finished = false;
+                for (const auto &i: targetSegmentList) {
+                    clicker = std::make_unique<Clicker>(
+                            "其它活动/好友基地.png", i
+                    )->click(
+                            {.finishUntilList={new Image("其它活动/返回基地.png"), new Image("其它活动/捕猎火鸡.png")}}
+                    )->click(
+                            {.finishUntilList={new AnyImage({"其它活动/捕猎一次.png", "其它活动/好友未上线.png"})}}
+                    );
+
+                    if (clicker->imgPath == "其它活动/好友未上线.png") {
+                        std::make_unique<Clicker>(
+                                "其它活动/关闭窗口.png"
+                        )->click(
+                                {.finishUntilList={new Image("其它活动/关闭窗口.png", InnerReverse), new Image("其它活动/返回基地.png")}}
+                        )->click(
+                                {.finishUntilList={new Image("其它活动/捕猎火鸡.png")}}
+                        )->end();
+
+                        continue;
+                    }
+
+                    clicker = clicker->click({.runUntilList={new AnyImage({"其它活动/捕猎上限.png", "其它活动/普通玉米不足.png"})}});
+
+
+                    if (clicker->imgPath == "其它活动/普通玉米不足.png") finished = true;
+
+                    std::make_unique<Clicker>(
+                            "其它活动/关闭窗口.png"
+                    )->click(
+                            {.selector=positionSelector("xCenter", "min"), .finishUntilList={new Image("其它活动/关闭窗口.png", InnerReverse), new Image("其它活动/关闭窗口.png")}}
+                    )->click(
+                            {.finishUntilList={new Image("其它活动/关闭窗口.png", InnerReverse), new Image("其它活动/返回基地.png")}}
+                    )->click(
+                            {.finishUntilList={new Image("其它活动/捕猎火鸡.png")}}
+                    )->end();
+
+
+                    if (finished) break;
+                }
+            }
+
+        }
+    }
+
+    if (boolSetting["探索藏宝库"]) {
+        clicker = std::make_unique<Clicker>("其它活动/探索藏宝库.png");
+
+        if (clicker->founded()) {
+            clicker->click(
+                    {.finishUntilList={new Image("其它活动/抽取一次.png")}}
+            )->click(
+                    {.startWait=1, .finishUntilList={new Image("其它活动/关闭窗口.png")}}
+            )->click(
+                    {.selector= positionSelector("xCenter", "min"), .finishUntilList={new Image("其它活动/关闭窗口.png", InnerReverse), new Image("其它活动/关闭窗口.png")}}
+            )->click(
+                    {.finishUntilList={new Image("其它活动/关闭窗口.png", InnerReverse)}}
+            )->end();
+        }
+    }
+
+    if (boolSetting["在线领好礼"]) {
+        clicker = std::make_unique<Clicker>("其它活动/在线领好礼.png");
+
+        if (clicker->founded()) {
+            clicker->click({.finishUntilList={new Image("其它活动/在线领好礼标题.png"), new Image("其它活动/免费领取.png", {.mode=Mode::RGB})}})->end();
+
+            auto targetList = clicker->targetSegmentList;
+
+            for (const auto &i: targetList) {
+                std::make_unique<Clicker>(
+                        "其它活动/免费领取.png", i
+                )->click(
+                        {.finishUntilList={new AnyImage({"其它活动/领取成功.png", "其它活动/已领取过.png", "其它活动/时间已到.png", "其它活动/时间未到.png"}), new Image("其它活动/关闭窗口.png")}}
+                )->click(
+                        {.selector=positionSelector("xCenter", "min"), .finishUntilList={new Image("其它活动/关闭窗口.png", InnerReverse)}}
+                )->end();
+            }
+
+            std::make_unique<Clicker>(
+                    "其它活动/关闭窗口.png"
+            )->click(
+                    {.finishUntilList={new Image("其它活动/关闭窗口.png", InnerReverse)}}
+            )->end();
+        }
+    }
+
+    if (boolSetting["论军功兑好礼"]) {
+        clicker = std::make_unique<Clicker>("其它活动/论军功兑好礼.png");
+
+        if (clicker->founded()) {
+            clicker->click({.runUntilList={new Image("其它活动/论军功兑好礼标题.png")}})->end();
+
+            while (!env.stopFlag->load()) {
+                clicker = std::make_unique<Clicker>("其它活动/兑换.png", ClickerInitConfig{.mode=Mode::RGB});
+
+                if (!clicker->founded()) break;
+
+                clicker->click({.finishWait=3})->end();
+            }
+
+            std::make_unique<Clicker>(
+                    "其它活动/关闭窗口.png"
+            )->click(
+                    {.finishUntilList={new Image("其它活动/关闭窗口.png", InnerReverse)}}
+            )->end();
+        }
+    }
 }
 
 void dailyTask(Env &e) {
@@ -786,7 +948,7 @@ void guild(Env &e) {
         }
 
         std::make_unique<Clicker>(
-                "/公会领奖/关闭公会捐献窗口.png"
+                "公会领奖/关闭公会捐献窗口.png"
         )->click(
                 {.finishUntilList={new Image("公会领奖/关闭公会捐献窗口.png", InnerReverse)}}
         )->end();
@@ -868,7 +1030,7 @@ void guildBuilding(Env &e) {
     clicker->click(
             {.finishUntilList={new Image("公会建筑/打开公会建筑.png")}}
     )->click(
-            {.runUntilList={new Image("公会建筑/公会建筑标题.png")}, .finishWait=1}
+            {.finishUntilList={new Image("公会建筑/公会建筑标题.png")}, .finishWait=1}
     )->click(
             {.finishUntilList={new Image("公会建筑/团体任务.png")}}
     )->click(

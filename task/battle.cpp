@@ -343,6 +343,7 @@ void countryWar(Env &e) {
             )->end();
 
             emit env.emitter->error("[国家战争] 提前结束: 请先移动到与摩多城相邻的城");
+            env.context["不在摩多城"] = true;
             return;
         }
 
@@ -520,13 +521,9 @@ void armsCompound(Env &e) {
         if (!clicker->founded()) clicker = std::make_unique<Clicker>(candidates);
     }
 
-    clicker = clicker->click(
-            {.finishUntilList={new IfImage("军备合成/合成军备.png", {.mode=Mode::RGB})}}
-    );
+    clicker = clicker->click({.finishUntilList={new IfImage("军备合成/合成军备.png", {.mode=Mode::RGB})}});
 
-    if (clicker->founded()) {
-        clicker->click({.runUntilList={new Image("军备合成/获取碎片.png")}})->end();
-    }
+    if (clicker->founded()) clicker->click({.runUntilList={new Image("军备合成/获取碎片.png")}})->end();
 
 
     clicker = std::make_unique<Clicker>(
@@ -557,3 +554,70 @@ void armsCompound(Env &e) {
         );
     }
 }
+
+void loopCountryWar(Env &e) {
+    env = e;
+    std::unique_ptr<Clicker> clicker;
+    auto setting = loadSetting(state.config, env.qqRemark, env.redRemark, state.settingDefault);
+    auto boolSetting = parseBoolSetting("开卡国战", "checkbox", setting);
+    auto intSetting = parseIntSetting("开卡国战", "input", setting);
+    std::vector<std::unique_ptr<Until>> runUntil;
+
+    auto current = intSetting["开卡数"];
+    auto rounds = intSetting["开卡数"];
+
+    std::vector<QString> candidates;
+    if (boolSetting["行动力恢复卡"]) candidates.emplace_back("开卡国战/行动力恢复卡.png");
+    if (boolSetting["国战恢复卡"]) candidates.emplace_back("开卡国战/国战恢复卡.png");
+
+    while (!env.stopFlag->load()) {
+        countryWar(e);
+
+        if (env.context["不在摩多城"]) return;
+
+        if (candidates.empty()) {
+            emit env.emitter->error("未设置开卡");
+            return;
+        }
+
+        if (intSetting["开卡数"] > 0) {
+            if (current == 0) {
+                emit env.emitter->log("开卡数已达到目标", "blue");
+                return;
+            }
+
+            emit env.emitter->log(QString("轮次: %1/%2").arg(QString::number(rounds - current + 1), QString::number(rounds)), "blue");
+        }
+
+        clicker = std::make_unique<Clicker>(
+                "开卡国战/背包.png"
+        )->click(
+                {.runUntilList={new AnyImage({"开卡国战/滚动条A.png", "开卡国战/滚动条B.png"})}}
+        )->drag(
+                {.runUntilList={new AnyImage(candidates)}}
+        );
+
+        if (!clicker->founded()) {
+            std::make_unique<Clicker>(
+                    "开卡国战/关闭窗口.png"
+            )->click(
+                    {.finishUntilList={new Image("开卡国战/关闭窗口.png", InnerReverse)}}
+            )->end();
+
+            emit env.emitter->error("恢复卡不足");
+            return;
+        }
+
+        clicker->click(
+                {.finishUntilList={new Image("开卡国战/使用.png")}}
+        )->click(
+                {.finishUntilList={new Image("开卡国战/使用.png", InnerReverse), new Image("开卡国战/关闭窗口.png")}}
+        )->click(
+                {.finishUntilList={new Image("开卡国战/关闭窗口.png", InnerReverse)}}
+        )->end();
+
+        current--;
+    }
+}
+
+

@@ -27,6 +27,13 @@ CmdSelector::CmdSelector(const QString &title, QWidget *parent) : QDialog(parent
     tasks["公会领奖"] = guild;
     tasks["公会建筑"] = guildBuilding;
 
+    tasks["预设1"] = presupposition1;
+    tasks["预设2"] = presupposition2;
+    tasks["预设3"] = presupposition3;
+    tasks["预设4"] = presupposition4;
+
+    tasks["开卡国战"] = loopCountryWar;
+
     auto mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(createCmdGroup(
             "自动战斗",

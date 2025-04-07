@@ -80,6 +80,8 @@ add_executable(Red
 
         main.h
         main.cpp
+        task/presupposition.cpp
+        task/presupposition.h
 )
 target_link_libraries(Red ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network Qt5::WebEngineWidgets)
 set_target_properties(Red PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})

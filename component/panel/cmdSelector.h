@@ -9,6 +9,7 @@
 
 #include "../../task/daily.h"
 #include "../../task/battle.h"
+#include "../../task/presupposition.h"
 #include "../../processor/env.h"
 
 class CmdSelector : public QDialog {

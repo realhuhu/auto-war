@@ -19,6 +19,7 @@ struct Env {
     QString redRemark{};
 
     QHash<QString, bool> logFlag{};
+    QHash<QString, bool> context{};
 };
 
 extern thread_local Env env;
