@@ -619,5 +619,3 @@ void loopCountryWar(Env &e) {
         current--;
     }
 }
-
-

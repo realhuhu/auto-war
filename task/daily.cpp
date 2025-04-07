@@ -47,12 +47,19 @@ void heroCenter(Env &e) {
             )->click(
                     {.selector=positionSelector("yCenter", "min"), .finishUntilList={new Image("英雄中心/开始训练.png")}}
             )->click(
-                    {.finishUntilList={new Image("英雄中心/英雄列表.png"), new IfImage("英雄中心/确定.png")}, .finishWait=1}
+                    {.finishUntilList={new Image("英雄中心/英雄列表.png"), new IfImage("英雄中心/资源不足.png")}, .finishWait=1}
             );
 
-            if (!clicker->founded()) continue;
+            if (clicker->founded()) {
+                clicker->locate(
+                        {.finishUntilList={new Image("英雄中心/关闭窗口.png")}}
+                )->click(
+                        {.selector=positionSelector("yCenter", "max"), .finishUntilList={new Image("英雄中心/关闭窗口.png", InnerReverse)}}
+                )->end();
 
-            clicker->click({.finishUntilList={new Image("英雄中心/确定.png", InnerReverse)}})->end();
+                emit env.emitter->error("资源不足, 英雄训练失败");
+                break;
+            }
         }
     }
 
@@ -73,7 +80,7 @@ void warCenter(Env &e) {
     std::make_unique<Clicker>(
             "战争学院/战争学院.png"
     )->click(
-            {.runUntilList={new Image("战争学院/战争学院标题.png")}}
+            {.runUntilList={new Image("战争学院/战争学院标题.png")}, .finishWait=1}
     )->end();
 
     if (boolSetting["技能训练"]) {
@@ -366,9 +373,7 @@ void adviser(Env &e) {
                 {.finishUntilList={new Image("参谋抽奖/参谋列表.png"), new IfImage("参谋抽奖/免费收集.png", {.mode=Mode::RGB})}}
         );
 
-        if (clicker->founded()) {
-            clicker->click({.finishUntilList{new Image("参谋抽奖/免费收集.png", InnerReverse)}})->end();
-        }
+        if (clicker->founded()) clicker->click()->end(); //TODO
     }
 
     std::make_unique<Clicker>(
@@ -1051,7 +1056,7 @@ void guildBuilding(Env &e) {
 
         if (clicker->founded()) {
             clicker->click(
-                    {.finishUntilList={new Image("公会建筑/确定领取.png")}}
+                    {.finishUntilList={new Image("公会建筑/确定领取.png", {.startWait=1})}}
             )->click(
                     {.finishUntilList={new Image("公会建筑/确定领取.png", InnerReverse)}}
             )->end();

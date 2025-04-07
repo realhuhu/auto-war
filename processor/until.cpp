@@ -5,6 +5,8 @@
 Until::Until(UntilConfig untilConfig) : config(untilConfig) {}
 
 void Until::loop(std::unique_ptr<Segment> &previous, float globalTimeout) {
+    sleep(env.stopFlag, config.startWait);
+
     auto start = std::chrono::high_resolution_clock::now();
     auto maxTime = (config.timeout == -1) ? globalTimeout : config.timeout;
 

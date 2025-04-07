@@ -27,7 +27,7 @@ Clicker::Clicker(
     sleep(env.stopFlag, config.wait);
 
     for (const auto &templatePath: templatePathList) {
-        auto ps = CV::findPositions(CV::getScreen(env.hwnd, config.mode), imgPath, globalThreshold, config.mode);
+        auto ps = CV::findPositions(CV::getScreen(env.hwnd, config.mode), templatePath, globalThreshold, config.mode);
         if (!ps.empty()) {
             imgPath = templatePath;
             targetSegmentList = ps;

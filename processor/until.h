@@ -15,6 +15,7 @@ struct UntilConfig {
     Mode mode = Mode::GRAY;
     float threshold = 0.9;
     float interval = 0.1;
+    float startWait = 0;
     float finishWait = 0;
     float timeout = -1;
     bool reverse = false;
