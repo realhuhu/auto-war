@@ -19,6 +19,7 @@ qt5_add_resources(qrc_FILES resource/resource.qrc)
 add_executable(Red
         WIN32
         ${qrc_FILES}
+        resource/ico/ico.o
 
         util/tool.h
         util/tool.cpp
