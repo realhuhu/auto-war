@@ -838,3 +838,69 @@ void guild(Env &e) {
             {.finishUntilList={new Image("公会领奖/关闭公会争霸窗口.png", InnerReverse)}}
     )->end();
 }
+
+void guildBuilding(Env &e) {
+    env = e;
+    std::unique_ptr<Clicker> clicker;
+    auto setting = loadSetting(state.config, env.qqRemark, env.redRemark, state.settingDefault);
+    auto intSetting = parseIntSetting("公会建筑", "input", setting);
+
+    auto step_x = intSetting["拖动X"];
+    auto step_y = intSetting["拖动Y"];
+    auto start_x = 500;
+    auto start_y = 500;
+
+
+    clicker = std::make_unique<Clicker>("公会建筑/公会建筑.png");
+
+    if (!clicker->founded()) {
+        Mouse::drag(env.hwnd, start_x, start_y, start_x + step_x, start_y + step_y);
+
+        clicker = std::make_unique<Clicker>("公会建筑/公会建筑.png");
+
+        if (!clicker->founded()) {
+            emit env.emitter->error("无法定位公会建筑");
+            return;
+        }
+
+    }
+
+    clicker->click(
+            {.finishUntilList={new Image("公会建筑/打开公会建筑.png")}}
+    )->click(
+            {.runUntilList={new Image("公会建筑/公会建筑标题.png")}, .finishWait=1}
+    )->click(
+            {.finishUntilList={new Image("公会建筑/团体任务.png")}}
+    )->click(
+            {.finishUntilList={new Image("公会建筑/参与任务.png")}}
+    )->click(
+            {.runUntilList={new Image("公会建筑/勋章刷新.png", InnerReverse)}}
+    )->end();
+
+
+    auto iterator = CV::findPositions(CV::getScreen(env.hwnd), "公会建筑/需要人数.png");
+
+    auto it = iterator.begin();
+
+    while (it != iterator.end() && !env.stopFlag->load()) {
+        it->click();
+
+        clicker = std::make_unique<Clicker>("公会建筑/领取奖励.png", ClickerInitConfig{.mode=Mode::RGB});
+
+        if (clicker->founded()) {
+            clicker->click(
+                    {.finishUntilList={new Image("公会建筑/确定领取.png")}}
+            )->click(
+                    {.finishUntilList={new Image("公会建筑/确定领取.png", InnerReverse)}}
+            )->end();
+        }
+
+        ++it;
+    }
+
+    std::make_unique<Clicker>(
+            "公会建筑/关闭窗口.png"
+    )->click(
+            {.finishUntilList={new Image("公会建筑/关闭窗口.png", InnerReverse)}}
+    )->end();
+}

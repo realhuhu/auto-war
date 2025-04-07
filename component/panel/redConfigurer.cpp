@@ -140,7 +140,6 @@ QWidget *RedConfigurer::createInputGroup(const QString &moduleName, const QJsonA
         spin->setProperty("order", order);
         spin->setProperty("text", text);
 
-
         moduleInputs[moduleName].append(spin);
         grid->addWidget(spin, order / 2, order % 2);
     }

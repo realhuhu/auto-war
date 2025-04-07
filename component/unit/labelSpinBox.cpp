@@ -12,7 +12,7 @@ LabelSpinBox::LabelSpinBox(
     layout->addWidget(label);
 
     spinBox->setValue(value);
-    spinBox->setMinimum(0);
+    spinBox->setRange(-1000, 1000);
     spinBox->setFixedWidth(100);
     spinBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     layout->addWidget(spinBox);

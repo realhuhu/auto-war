@@ -62,14 +62,7 @@ void Segment::drag(float wait, int distance) const {
     int xEnd = xStart;
     int yEnd = yStart + static_cast<int>(static_cast<float>(distance));
 
-    Mouse::leftDown(env.hwnd, xStart, yStart);
-    sleep(env.stopFlag, 0.1);
-
-    Mouse::moveTo(env.hwnd, xEnd, yEnd);
-    sleep(env.stopFlag, 0.1);
-
-    Mouse::leftUp(env.hwnd, xEnd, yEnd);
-    sleep(env.stopFlag, 0.1);
+    Mouse::drag(env.hwnd, xStart, yStart, xEnd, yEnd);
 
     emit env.emitter->log(
             QString::fromStdString("拖动: 从(%1,%2)到(%3,%4)").arg(

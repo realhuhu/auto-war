@@ -25,13 +25,14 @@ CmdSelector::CmdSelector(const QString &title, QWidget *parent) : QDialog(parent
     tasks["每日任务"] = dailyTask;
     tasks["周任务"] = weeklyTask;
     tasks["公会领奖"] = guild;
+    tasks["公会建筑"] = guildBuilding;
 
     auto mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(createCmdGroup(
             "自动战斗",
             {
                     "国家争霸", "世界争霸", "剿灭将领", "军备合成",
-                    "公会战役", "国家战争"
+                    "国家战争"
             }
     ));
     mainLayout->addWidget(

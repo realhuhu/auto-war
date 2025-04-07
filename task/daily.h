@@ -33,4 +33,6 @@ void weeklyTask(Env &e);
 
 void guild(Env &e);
 
+void guildBuilding(Env &e);
+
 #endif //RED_DAILY_H
