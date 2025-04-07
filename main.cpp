@@ -19,12 +19,14 @@ AutoWar::AutoWar(
     auto redConfigButton = new QPushButton("红警账号", this);
     auto batchRunButton = new QPushButton("全部执行", this);
     auto batchStopButton = new QPushButton("全部停止", this);
+    auto otherFunctionButton = new QPushButton("其它功能", this);
     auto clearLogButton = new QPushButton("清空日志", this);
     topLayout->addWidget(allBrowserButton);
     topLayout->addWidget(qqConfigButton);
     topLayout->addWidget(redConfigButton);
     topLayout->addWidget(batchRunButton);
     topLayout->addWidget(batchStopButton);
+    topLayout->addWidget(otherFunctionButton);
     topLayout->addWidget(clearLogButton);
 
     mainLayout->addLayout(topLayout);
@@ -41,6 +43,7 @@ AutoWar::AutoWar(
     connect(redConfigButton, &QPushButton::clicked, this, &AutoWar::onOpenRedManager);
     connect(batchRunButton, &QPushButton::clicked, this, &AutoWar::onOpenCmdSelector);
     connect(batchStopButton, &QPushButton::clicked, this, &AutoWar::onBatchStop);
+    connect(otherFunctionButton, &QPushButton::clicked, this, &AutoWar::onShowOther);
     connect(clearLogButton, &QPushButton::clicked, this, &AutoWar::onClearConsole);
 
     loadConfig();
@@ -191,8 +194,8 @@ void AutoWar::onOpenAllBrowser() {
     btnLayout.addWidget(&btnCancel);
     mainLayout.addLayout(&btnLayout);
 
-    QObject::connect(&btnOk, &QPushButton::clicked, &dialog, &QDialog::accept);
-    QObject::connect(&btnCancel, &QPushButton::clicked, &dialog, &QDialog::reject);
+    connect(&btnOk, &QPushButton::clicked, &dialog, &QDialog::accept);
+    connect(&btnCancel, &QPushButton::clicked, &dialog, &QDialog::reject);
 
     if (dialog.exec() != QDialog::Accepted) return;
 
@@ -270,6 +273,13 @@ void AutoWar::onBatchStop() {
         RedBrowser *browser = it.value();
         if (browser) browser->stopTask();
     }
+}
+
+void AutoWar::onShowOther() {
+    auto dialog = new FuncSelector(this);
+    connect(dialog, &FuncSelector::toConsole, this, &AutoWar::onConsolePrint);
+
+    dialog->exec();
 }
 
 void AutoWar::onTaskCreated(const QString &command, const std::function<void(Env &env)> &task) const {

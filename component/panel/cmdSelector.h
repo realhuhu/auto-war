@@ -3,8 +3,8 @@
 
 #include <QDialog>
 #include <QGroupBox>
-#include <QPushButton>
 #include <QVBoxLayout>
+#include <QPushButton>
 
 
 #include "../../task/daily.h"

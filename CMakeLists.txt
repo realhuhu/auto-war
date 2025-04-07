@@ -36,6 +36,9 @@ add_executable(Red
         interceptor/storage.h
         interceptor/storage.cpp
 
+        component/function/activityDialog.h
+        component/function/activityDialog.cpp
+
         component/unit/labelSpinBox.h
         component/unit/labelSpinBox.cpp
         component/unit/labelComboBox.h
@@ -59,6 +62,8 @@ add_executable(Red
         component/panel/redConfigurer.cpp
         component/panel/cmdSelector.h
         component/panel/cmdSelector.cpp
+        component/panel/funcSelector.h
+        component/panel/funcSelector.cpp
 
         processor/cv.h
         processor/cv.cpp

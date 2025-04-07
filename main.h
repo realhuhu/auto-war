@@ -16,12 +16,13 @@
 #include "util/tool.h"
 #include "util/state.h"
 #include "util/emitter.h"
+#include "component/unit/labelTabWidget.h"
 #include "component/panel/qqManger.h"
+#include "component/panel/redBrowser.h"
 #include "component/panel/redManager.h"
 #include "component/panel/cmdSelector.h"
+#include "component/panel/funcSelector.h"
 #include "component/panel/redController.h"
-#include "component/unit/labelTabWidget.h"
-#include "component/panel/redBrowser.h"
 
 
 class AutoWar : public QWidget {
@@ -51,6 +52,8 @@ public slots:
     void onOpenCmdSelector();
 
     void onBatchStop();
+
+    void onShowOther();
 
     void onConsolePrint(const QString &text, const QString &color) const;
 
