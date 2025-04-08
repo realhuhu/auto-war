@@ -14,8 +14,8 @@ QQManger::QQManger(QWidget *parent) : QDialog(parent), networkManager(new QNetwo
     tableWidget->setEditTriggers(QAbstractItemView::AllEditTriggers);
     tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    tableWidget->setItemDelegateForColumn(QQNumberCol, new PlaceholderDelegate("不填则为扫码登录", this));
-    tableWidget->setItemDelegateForColumn(PasswordCol, new PlaceholderDelegate("不填则为扫码登录", this));
+    tableWidget->setItemDelegateForColumn(QQNumberCol, new PlaceholderDelegate("不填则为手动登录", this));
+    tableWidget->setItemDelegateForColumn(PasswordCol, new PlaceholderDelegate("不填则为手动登录", this));
     tableWidget->setItemDelegateForColumn(LinkCol, new PlaceholderDelegate("点击登录按钮获取链接", this));
     tableWidget->horizontalHeader()->setStyleSheet(R"(
         QHeaderView::section {

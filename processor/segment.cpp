@@ -77,21 +77,21 @@ void Segment::drag(float wait, int distance) const {
 
 QString Segment::on(const Segment &segment, const QString &basis) const {
     if (basis == "vertical") {
-        if (x2 <= segment.x1) {
+        if (xCenter <= segment.x1) {
             return "left";
-        } else if (x1 >= segment.x2) {
+        } else if (xCenter >= segment.x2) {
             return "right";
-        } else if (x1 >= segment.x1 && x2 <= segment.x2) {
+        } else if (segment.x2 >= xCenter && xCenter >= segment.x1) {
             return "center";
         } else {
             return "none";
         }
     } else if (basis == "horizontal") {
-        if (y2 <= segment.y1) {
+        if (yCenter <= segment.y1) {
             return "top";
-        } else if (y1 >= segment.y2) {
+        } else if (yCenter >= segment.y2) {
             return "down";
-        } else if (y1 >= segment.y1 && y2 <= segment.y2) {
+        } else if (segment.y2 >= yCenter && yCenter >= segment.y1) {
             return "center";
         } else {
             return "none";
