@@ -695,7 +695,7 @@ void otherActivity(Env &e) {
         clicker = std::make_unique<Clicker>("其它活动/捕猎火鸡.png");
 
         if (clicker->founded()) {
-            clicker = clicker->click({.finishUntilList={new Image("其它活动/捕猎火鸡标题.png"), new IfImage("其它活动/捕猎一次.png", InnerReverse)}});
+            clicker = clicker->click({.finishUntilList={new Image("其它活动/捕猎火鸡标题.png"), new IfImage("其它活动/捕猎一次.png")}});
 
 
             if (!clicker->founded()) {
