@@ -495,7 +495,7 @@ void arms(Env &e) {
     std::make_unique<Clicker>(
             "军备抽奖/关闭窗口.png"
     )->click(
-            {.runUntilList={new Image{"军备抽奖/关闭窗口.png", InnerReverse}}}
+            {.finishUntilList={new Image{"军备抽奖/关闭窗口.png", InnerReverse}}}
     )->end();
 }
 
