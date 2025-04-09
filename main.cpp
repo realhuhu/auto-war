@@ -19,6 +19,7 @@ AutoWar::AutoWar(
     auto redConfigButton = new QPushButton("红警账号", this);
     auto batchRunButton = new QPushButton("全部执行", this);
     auto batchStopButton = new QPushButton("全部停止", this);
+    auto batchRefreshButton = new QPushButton("全部刷新", this);
     auto otherFunctionButton = new QPushButton("其它功能", this);
     auto clearLogButton = new QPushButton("清空日志", this);
     topLayout->addWidget(allBrowserButton);
@@ -26,6 +27,7 @@ AutoWar::AutoWar(
     topLayout->addWidget(redConfigButton);
     topLayout->addWidget(batchRunButton);
     topLayout->addWidget(batchStopButton);
+    topLayout->addWidget(batchRefreshButton);
     topLayout->addWidget(otherFunctionButton);
     topLayout->addWidget(clearLogButton);
 
@@ -43,6 +45,7 @@ AutoWar::AutoWar(
     connect(redConfigButton, &QPushButton::clicked, this, &AutoWar::onOpenRedManager);
     connect(batchRunButton, &QPushButton::clicked, this, &AutoWar::onOpenCmdSelector);
     connect(batchStopButton, &QPushButton::clicked, this, &AutoWar::onBatchStop);
+    connect(batchRefreshButton, &QPushButton::clicked, this, &AutoWar::onBatchRefresh);
     connect(otherFunctionButton, &QPushButton::clicked, this, &AutoWar::onShowOther);
     connect(clearLogButton, &QPushButton::clicked, this, &AutoWar::onClearConsole);
 
@@ -267,6 +270,23 @@ void AutoWar::onBatchStop() {
     }
 }
 
+void AutoWar::onBatchRefresh() {
+    auto reply = QMessageBox::question(
+            this,
+            "刷新",
+            "确定刷新全部游戏窗口吗?",
+            QMessageBox::Yes | QMessageBox::No
+    );
+
+    if (reply == QMessageBox::No) return;
+
+    consolePrint("全部刷新");
+    for (auto it = workers.begin(); it != workers.end(); ++it) {
+        auto worker = it.value();
+        if (worker) worker->refreshBrowser();
+    }
+}
+
 void AutoWar::onShowOther() {
     auto dialog = new FuncSelector(workers, this);
     connect(dialog, &FuncSelector::toConsole, this, &AutoWar::onConsolePrint);
@@ -321,7 +341,6 @@ void AutoWar::closeEvent(QCloseEvent *event) {
 
     QWidget::closeEvent(event);
 }
-
 
 int main(int argc, char *argv[]) {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);

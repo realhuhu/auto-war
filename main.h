@@ -53,6 +53,8 @@ public slots:
 
     void onBatchStop();
 
+    void onBatchRefresh();
+
     void onShowOther();
 
     void onConsolePrint(const QString &text, const QString &color) const;

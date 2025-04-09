@@ -117,8 +117,18 @@ void RedWorker::stopTask() {
     emit toLog("命令已停止执行", "red");
 }
 
+void RedWorker::refreshBrowser() const {
+    if (!browserSocket || browserSocket->state() != QLocalSocket::ConnectedState) {
+        emit toLog("未初始化!", "red");
+        return;
+    }
+
+    browserSocket->write(QString("REFRESH").toUtf8());
+    browserSocket->flush();
+}
+
 void RedWorker::onBrowserConnect() {
-    if(browserSocket) {  // 关闭旧连接
+    if (browserSocket) {  // 关闭旧连接
         browserSocket->disconnect();
         browserSocket->deleteLater();
         browserSocket = nullptr;
@@ -169,15 +179,7 @@ void RedWorker::onEmitterLog(const QString &text, const QString &color) const { 
 
 void RedWorker::onEmitterError(const QString &text) { if (!env.stopFlag->load()) errorList.append(text); }
 
-void RedWorker::onRefreshBrowser() const {
-    if (!browserSocket || browserSocket->state() != QLocalSocket::ConnectedState) {
-        emit toLog("未初始化!", "red");
-        return;
-    }
-
-    browserSocket->write(QString("REFRESH").toUtf8());
-    browserSocket->flush();
-}
+void RedWorker::onRefreshBrowser() const { refreshBrowser(); }
 
 RedWorker::~RedWorker() {
     server->close();        // 显式关闭服务器

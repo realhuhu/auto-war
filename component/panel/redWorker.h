@@ -42,9 +42,11 @@ public:
 
     void runTask(const QString &command, const std::function<void(Env &env)> &task);
 
+    void refreshBrowser() const;
+
     void stopTask();
 
-    ~RedWorker();
+    ~RedWorker() override;
 
 public slots:
 
