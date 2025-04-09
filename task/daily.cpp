@@ -1023,7 +1023,7 @@ void guildBuilding(Env &e) {
     if (!clicker->founded()) {
         Mouse::drag(env.hwnd, start_x, start_y, start_x + step_x, start_y + step_y);
 
-        clicker = std::make_unique<Clicker>("公会建筑/公会建筑.png");
+        clicker = std::make_unique<Clicker>("公会建筑/公会建筑.png", ClickerInitConfig{.wait=1});
 
         if (!clicker->founded()) {
             emit env.emitter->error("无法定位公会建筑");
