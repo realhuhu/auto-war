@@ -44,6 +44,8 @@ public:
 
     void stopTask();
 
+    ~RedWorker();
+
 public slots:
 
     void onBrowserConnect();

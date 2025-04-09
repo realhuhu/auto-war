@@ -118,6 +118,12 @@ void RedWorker::stopTask() {
 }
 
 void RedWorker::onBrowserConnect() {
+    if(browserSocket) {  // 关闭旧连接
+        browserSocket->disconnect();
+        browserSocket->deleteLater();
+        browserSocket = nullptr;
+    }
+
     browserSocket = server->nextPendingConnection();
     connect(browserSocket, &QLocalSocket::readyRead, this, &RedWorker::onBrowserData);
     connect(browserSocket, &QLocalSocket::disconnected, browserSocket, &QLocalSocket::deleteLater);
@@ -147,6 +153,11 @@ void RedWorker::onProcessStart() const { emit toConsole(QString("(%1)正在打�
 void RedWorker::onProcessFinish(int, QProcess::ExitStatus) {
     stopTask();
 
+    if (server->isListening()) {
+        server->close();
+        QLocalServer::removeServer(remark);
+    }
+
     emit closed(remark);
 }
 
@@ -168,3 +179,10 @@ void RedWorker::onRefreshBrowser() const {
     browserSocket->flush();
 }
 
+RedWorker::~RedWorker() {
+    server->close();        // 显式关闭服务器
+    QLocalServer::removeServer(remark); // 再次清理
+    if (browserProcess->state() == QProcess::Running) {
+        browserProcess->kill();
+    }
+}
