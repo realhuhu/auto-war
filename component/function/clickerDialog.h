@@ -18,7 +18,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
-#include "../panel/redBrowser.h"
+#include "../panel/redWorker.h"
 # include "../../util/action.h"
 
 class ClickThread : public QThread {
@@ -54,7 +54,7 @@ class ClickerDialog : public QDialog {
 Q_OBJECT
 
 public:
-    explicit ClickerDialog(RedBrowser *redBrowser, QWidget *parent = nullptr);
+    explicit ClickerDialog(RedWorker *redWorker, QWidget *parent = nullptr);
 
 private slots:
 
@@ -71,7 +71,7 @@ private slots:
     void endClick();
 
 private:
-    RedBrowser *browser;
+    RedWorker *worker;
     static ClickerDialog *instance;
     HHOOK hook = nullptr;
     bool isWaiting = false;

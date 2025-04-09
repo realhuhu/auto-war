@@ -18,7 +18,7 @@
 #include <QElapsedTimer>
 #include <QGuiApplication>
 
-#include "../panel/redBrowser.h"
+#include "../panel/redWorker.h"
 #include "../../util/tool.h"
 #include "../../util/state.h"
 #include "../../processor/cv.h"
@@ -66,7 +66,7 @@ class ReplaceDialog : public QDialog {
 Q_OBJECT
 public:
 
-    explicit ReplaceDialog(RedBrowser *redBrowser, QWidget *parent = nullptr);
+    explicit ReplaceDialog(RedWorker *redWorker, QWidget *parent = nullptr);
 
 private slots:
 
@@ -79,7 +79,7 @@ private slots:
     void saveFile();
 
 private:
-    RedBrowser *browser;
+    RedWorker *worker;
     QLabel *fileLabel;
     QLabel *tipLabel;
     QLabel *selectedImageLabel;

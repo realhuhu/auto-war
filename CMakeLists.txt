@@ -16,6 +16,16 @@ find_package(OpenCV REQUIRED)
 
 qt5_add_resources(qrc_FILES resource/resource.qrc)
 
+add_executable(Browser
+        WIN32
+        browser.h
+        browser.cpp
+)
+
+target_link_libraries(Browser ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network Qt5::WebEngineWidgets)
+set_target_properties(Browser PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
+set_target_properties(Browser PROPERTIES OUTPUT_NAME 游戏窗口)
+
 add_executable(Red
         WIN32
         ${qrc_FILES}
@@ -59,8 +69,8 @@ add_executable(Red
         component/panel/qqBrowser.cpp
         component/panel/redManager.h
         component/panel/redManager.cpp
-        component/panel/redBrowser.h
-        component/panel/redBrowser.cpp
+        component/panel/redWorker.h
+        component/panel/redWorker.cpp
         component/panel/redController.h
         component/panel/redController.cpp
         component/panel/redConfigurer.h
@@ -89,12 +99,11 @@ add_executable(Red
         task/daily.h
         task/battle.cpp
         task/battle.h
+        task/presupposition.h
+        task/presupposition.cpp
 
         main.h
         main.cpp
-        task/presupposition.cpp
-        task/presupposition.h
-
 )
 target_link_libraries(Red ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network Qt5::WebEngineWidgets)
 set_target_properties(Red PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})

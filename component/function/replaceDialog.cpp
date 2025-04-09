@@ -124,8 +124,8 @@ void ScreenshotArea::closeEvent(QCloseEvent *event) {
     QWidget::closeEvent(event);
 }
 
-ReplaceDialog::ReplaceDialog(RedBrowser *redBrowser, QWidget *parent) : QDialog(parent), browser(redBrowser) {
-    setWindowTitle(QString("替换图片 %1").arg(browser->redRemark));
+ReplaceDialog::ReplaceDialog(RedWorker *redWorker, QWidget *parent) : QDialog(parent), worker(redWorker) {
+    setWindowTitle(QString("替换图片 %1").arg(worker->remark));
     setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
 
     auto mainLayout = new QVBoxLayout(this);
@@ -228,7 +228,7 @@ void ReplaceDialog::showScreenshot(const QPoint p1, const QPoint p2) {
     RECT rect;
     POINT topLeft = {0, 0};
 
-    auto hwnd = reinterpret_cast<HWND>(browser->winId());
+    auto hwnd = worker->env.hwnd;
 
     if (!GetClientRect(hwnd, &rect)) {
         tipLabel->setText("获取窗口识别");

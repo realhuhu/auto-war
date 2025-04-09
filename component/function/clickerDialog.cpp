@@ -39,9 +39,9 @@ void ClickThread::run() {
     }
 }
 
-ClickerDialog::ClickerDialog(RedBrowser *redBrowser, QWidget *parent) : QDialog(parent), browser(redBrowser) {
+ClickerDialog::ClickerDialog(RedWorker *redWorker, QWidget *parent) : QDialog(parent), worker(redWorker) {
     instance = this;
-    this->setWindowTitle(QString("连点器 %1").arg(browser->redRemark));
+    this->setWindowTitle(QString("连点器 %1").arg(worker->remark));
     this->setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
     auto *mainLayout = new QVBoxLayout(this);
@@ -101,7 +101,7 @@ ClickerDialog::ClickerDialog(RedBrowser *redBrowser, QWidget *parent) : QDialog(
 void ClickerDialog::updateTextEdit(const QString &text) { textEdit->append(text); }
 
 [[maybe_unused]] void ClickerDialog::appendCoordinate(int x, int y) {
-    auto hwnd = reinterpret_cast<HWND>(browser->browser->winId());
+    auto hwnd = worker->env.hwnd;
     auto clicked_hwnd = WindowFromPoint(POINT{x, y});
 
     if (clicked_hwnd == reinterpret_cast<HWND>(winId())) return;
@@ -166,7 +166,7 @@ void ClickerDialog::endRecord() {
 }
 
 void ClickerDialog::startClick() {
-    auto hwnd = reinterpret_cast<HWND>(browser->browser->winId());
+    auto hwnd = worker->env.hwnd;
 
     if (clickThread) {
         textEdit->append("正在连点中");

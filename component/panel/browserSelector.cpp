@@ -1,14 +1,14 @@
 ﻿#include "browserSelector.h"
 
 BrowserSelector::BrowserSelector(
-        const QMap<QString, RedBrowser *> &browsers,
+        const QMap<QString, RedWorker *> &workers,
         QWidget *parent
-) : QDialog(parent), m_browsers(browsers) {
+) : QDialog(parent), m_workers(workers) {
     setWindowTitle("选择要操作的窗口");
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
     m_listWidget = new QListWidget(this);
-    for (const QString &key: m_browsers.keys()) {
+    for (const QString &key: m_workers.keys()) {
         m_listWidget->addItem(key);
     }
 
@@ -24,8 +24,8 @@ BrowserSelector::BrowserSelector(
 
 void BrowserSelector::onItemDoubleClicked(QListWidgetItem *item) {
     QString key = item->text();
-    if (m_browsers.contains(key)) {
-        emit browserSelected(m_browsers.value(key));
+    if (m_workers.contains(key)) {
+        emit browserSelected(m_workers.value(key));
         accept();
     }
 }
@@ -34,8 +34,8 @@ void BrowserSelector::onOkClicked() {
     QList<QListWidgetItem *> selectedItems = m_listWidget->selectedItems();
     if (!selectedItems.isEmpty()) {
         QString key = selectedItems.first()->text();
-        if (m_browsers.contains(key)) {
-            emit browserSelected(m_browsers.value(key));
+        if (m_workers.contains(key)) {
+            emit browserSelected(m_workers.value(key));
             accept();
         }
     }

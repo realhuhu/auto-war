@@ -47,7 +47,6 @@ AutoWar::AutoWar(
     connect(clearLogButton, &QPushButton::clicked, this, &AutoWar::onClearConsole);
 
     loadConfig();
-    consolePrint("运行命令时由于在频繁点击，按钮可能需要连续快速点击才能触发!", "red");
 }
 
 void AutoWar::consolePrint(const QString &text, const QString &color) const {
@@ -181,7 +180,7 @@ void AutoWar::onOpenAllBrowser() {
         QString itemText = QString("%1 %2 %3区").arg(qqRemark, redRemark, QString::number(region));
 
         auto item = new QListWidgetItem(itemText);
-        const bool isExisting = browsers.contains(redRemark);
+        const bool isExisting = workers.contains(redRemark);
 
         item->setCheckState(isExisting ? Qt::Checked : Qt::Unchecked);
         item->setFlags(isExisting ? (item->flags() & ~Qt::ItemIsEnabled) : (item->flags() | Qt::ItemIsUserCheckable));
@@ -207,42 +206,34 @@ void AutoWar::onOpenAllBrowser() {
         const QVariantMap info = item->data(Qt::UserRole).toMap();
         const QString redRemark = info["redRemark"].toString();
 
-        if (browsers.contains(redRemark)) continue;
+        if (workers.contains(redRemark)) continue;
 
         if (!QUrl(info["link"].toString()).isValid()) {
-            consolePrint(QString("链接无效，请点击[QQ账号]按钮，重新登录QQ号(%1)").arg(info["qqRemark"].toString()),
-                         "red");
+            consolePrint(QString("链接无效，请点击[QQ账号]按钮，重新登录QQ号(%1)").arg(info["qqRemark"].toString()), "red");
             continue;
         }
 
-        auto browser = new RedBrowser(
+        auto worker = new RedWorker(
                 info["link"].toString(),
                 info["region"].toInt(),
                 info["qqRemark"].toString(),
                 redRemark
         );
 
-        browsers.insert(redRemark, browser);
-        browser->show();
+        workers.insert(redRemark, worker);
 
         auto panel = new RedController(redRemark, panelTabWidget);
         panelTabWidget->addTabWithLabel(panel, redRemark);
 
-        connect(panel, &RedController::toRefreshBrowser, browser, &RedBrowser::onRefresh);
-        connect(panel, &RedController::toRunTask, browser, &RedBrowser::onRunTask);
-        connect(panel, &RedController::toStopTask, browser, &RedBrowser::onStopTask);
-        connect(browser, &RedBrowser::toLog, panel, &RedController::onLog);
-        connect(browser, &RedBrowser::toConsole, this, &AutoWar::onConsolePrint);
-        connect(browser, &RedBrowser::closed, this, &AutoWar::onBrowserClosed);
+        connect(panel, &RedController::toRefreshBrowser, worker, &RedWorker::onRefreshBrowser);
+        connect(panel, &RedController::toRunTask, worker, &RedWorker::onRunTask);
+        connect(panel, &RedController::toStopTask, worker, &RedWorker::onStopTask);
+        connect(worker, &RedWorker::toLog, panel, &RedController::onLog);
+        connect(worker, &RedWorker::toConsole, this, &AutoWar::onConsolePrint);
+        connect(worker, &RedWorker::closed, this, &AutoWar::onBrowserClosed);
 
         consolePrint(QString("(%1)已打开游戏窗口").arg(redRemark));
     }
-}
-
-void AutoWar::onBrowserClosed(const QString &remark) {
-    panelTabWidget->removeTabByLabel(remark);
-    browsers.remove(remark);
-    consolePrint(QString("(%1)已关闭游戏窗口").arg(remark), "red");
 }
 
 void AutoWar::onOpenQQManager() {
@@ -270,14 +261,14 @@ void AutoWar::onOpenCmdSelector() {
 
 void AutoWar::onBatchStop() {
     consolePrint("全部停止", "red");
-    for (auto it = browsers.begin(); it != browsers.end(); ++it) {
-        RedBrowser *browser = it.value();
-        if (browser) browser->stopTask();
+    for (auto it = workers.begin(); it != workers.end(); ++it) {
+        auto worker = it.value();
+        if (worker) worker->stopTask();
     }
 }
 
 void AutoWar::onShowOther() {
-    auto dialog = new FuncSelector(browsers, this);
+    auto dialog = new FuncSelector(workers, this);
     connect(dialog, &FuncSelector::toConsole, this, &AutoWar::onConsolePrint);
 
     dialog->exec();
@@ -285,9 +276,9 @@ void AutoWar::onShowOther() {
 
 void AutoWar::onTaskCreated(const QString &command, const std::function<void(Env &env)> &task) const {
     consolePrint(QString("全部运行: %1").arg(command), "green");
-    for (auto it = browsers.begin(); it != browsers.end(); ++it) {
-        RedBrowser *browser = it.value();
-        if (browser) browser->runTask(command, task);
+    for (auto it = workers.begin(); it != workers.end(); ++it) {
+        auto worker = it.value();
+        if (worker) worker->runTask(command, task);
     }
 }
 
@@ -305,13 +296,18 @@ void AutoWar::onConfigChanged() const {
     }
 }
 
-
 void AutoWar::onConsolePrint(const QString &text, const QString &color) const { consolePrint(text, color); }
 
 void AutoWar::onClearConsole() const { consoleTextEdit->clear(); }
 
+void AutoWar::onBrowserClosed(const QString &remark) {
+    panelTabWidget->removeTabByLabel(remark);
+    workers.remove(remark);
+    consolePrint(QString("(%1)已关闭游戏窗口").arg(remark), "red");
+}
+
 void AutoWar::closeEvent(QCloseEvent *event) {
-    if (!browsers.empty()) {
+    if (!workers.empty()) {
         QMessageBox::question(
                 this,
                 "关闭",
@@ -332,44 +328,11 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
     QLocale::setDefault(QLocale(QLocale::Chinese, QLocale::China));
 
-    std::vector<char *> newArgv;
-    newArgv.reserve(argc);
-    for (int i = 0; i < argc; ++i) newArgv.push_back(argv[i]);
-
-    const char *newParam = "--register-pepper-plugins='pepflashplayer.dll;application/x-demo'";
-    size_t newParamLen = strlen(newParam) + 1;
-    char *newParamCopy = new char[newParamLen];
-    errno_t err = strcpy_s(newParamCopy, newParamLen, newParam);
-    if (err != 0) {
-        for (auto ptr: newArgv) {
-            delete[] ptr;
-        }
-        delete[] newParamCopy;
-        return 1;
-    }
-    newArgv.push_back(newParamCopy);
-    argc = static_cast<int>(newArgv.size());
-    char **newArgvArray = new char *[argc];
-    for (int i = 0; i < argc; ++i) newArgvArray[i] = newArgv[i];
-
-    QApplication app(argc, newArgvArray);
+    QApplication app(argc, argv);
     QApplication::setStyle(QStyleFactory::create("Fusion"));
-    QWebEngineUrlScheme scheme("proxy");
-    scheme.setSyntax(QWebEngineUrlScheme::Syntax::HostAndPort);
-    scheme.setFlags(QWebEngineUrlScheme::SecureScheme | QWebEngineUrlScheme::LocalAccessAllowed);
-    QWebEngineUrlScheme::registerScheme(scheme);
 
     AutoWar autoWar;
     autoWar.show();
 
-    int result = QApplication::exec();
-
-    for (int i = 0; i < argc; ++i) {
-        if (i >= argc - 1) {
-            delete[] newArgvArray[i];
-        }
-    }
-    delete[] newArgvArray;
-
-    return result;
+    return QApplication::exec();
 }

@@ -16,7 +16,7 @@
 class FuncSelector : public QDialog {
 Q_OBJECT
 public:
-    explicit FuncSelector(const QMap<QString, RedBrowser *> &browsers, QWidget *parent);
+    explicit FuncSelector(const QMap<QString, RedWorker *> &workers, QWidget *parent);
 
 signals:
 

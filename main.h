@@ -18,7 +18,7 @@
 #include "util/emitter.h"
 #include "component/unit/labelTabWidget.h"
 #include "component/panel/qqManger.h"
-#include "component/panel/redBrowser.h"
+#include "component/panel/redWorker.h"
 #include "component/panel/redManager.h"
 #include "component/panel/cmdSelector.h"
 #include "component/panel/funcSelector.h"
@@ -31,7 +31,7 @@ Q_OBJECT
 public:
     QTextEdit *consoleTextEdit;
     LabelTabWidget *panelTabWidget;
-    QMap<QString, RedBrowser *> browsers;
+    QMap<QString, RedWorker *> workers;
 
     explicit AutoWar(QWidget *parent = nullptr);
 

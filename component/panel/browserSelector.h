@@ -8,17 +8,17 @@
 #include <QPushButton>
 #include <QListWidgetItem>
 
-#include "redBrowser.h"
+#include "redWorker.h"
 
 class BrowserSelector : public QDialog {
 Q_OBJECT
 
 public:
-    explicit BrowserSelector(const QMap<QString, RedBrowser *> &browsers, QWidget *parent = nullptr);
+    explicit BrowserSelector(const QMap<QString, RedWorker *> &workers, QWidget *parent = nullptr);
 
 signals:
 
-    void browserSelected(RedBrowser *selectedBrowser);
+    void browserSelected(RedWorker *selectedBrowser);
 
 private slots:
 
@@ -27,7 +27,7 @@ private slots:
     void onOkClicked();
 
 private:
-    QMap<QString, RedBrowser *> m_browsers;
+    QMap<QString, RedWorker *> m_workers;
     QListWidget *m_listWidget;
 };
 
