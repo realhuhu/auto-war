@@ -537,9 +537,9 @@ void armsCompound(Env &e) {
 
         if (clicker->imgPath == "军备合成/次数不足.png") {
             clicker->click(
-                    {.runUntilList{new Image("军备合成/次数不足.png", InnerReverse), new Image("军备合成/关闭窗口.png")}}
+                    {.runUntilList{new Image("军备合成/次数不足.png", InnerReverse), new Image("军备合成/关闭窗口.png", {.startWait=1})}}
             )->click(
-                    {.finishUntilList={new Image("军备合成/关闭窗口.png", InnerReverse), new Image("军备合成/关闭窗口.png")}}
+                    {.finishUntilList={new Image("军备合成/关闭窗口.png", InnerReverse), new Image("军备合成/关闭窗口.png", {.startWait=1})}}
             )->click(
                     {.finishUntilList={new Image("军备合成/关闭窗口.png", InnerReverse)}}
             )->end();

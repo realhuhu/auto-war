@@ -352,7 +352,7 @@ void adviser(Env &e) {
 
     if (boolSetting["免费抽奖"]) {
         while (!env.stopFlag->load()) {
-            clicker = std::make_unique<Clicker>("参谋抽奖/参谋免费.png", ClickerInitConfig{.wait=2});
+            clicker = std::make_unique<Clicker>(std::vector<QString>{"参谋抽奖/参谋免费.png", "参谋抽奖/必得紫.png"}, ClickerInitConfig{.wait=2});
 
             if (!clicker->founded()) break;
 
@@ -783,9 +783,11 @@ void otherActivity(Env &e) {
         clicker = std::make_unique<Clicker>("其它活动/在线领好礼.png");
 
         if (clicker->founded()) {
-            clicker->click({.finishUntilList={new Image("其它活动/在线领好礼标题.png"), new Image("其它活动/免费领取.png", {.mode=Mode::RGB})}})->end();
 
-            auto targetList = clicker->targetSegmentList;
+
+            auto targetList = clicker->click(
+                    {.finishUntilList={new Image("其它活动/在线领好礼标题.png"), new Image("其它活动/免费领取.png", {.mode=Mode::RGB})}}
+            )->targetSegmentList;
 
             for (const auto &i: targetList) {
                 std::make_unique<Clicker>(
@@ -1052,11 +1054,11 @@ void guildBuilding(Env &e) {
     while (it != iterator.end() && !env.stopFlag->load()) {
         it->click();
 
-        clicker = std::make_unique<Clicker>("公会建筑/领取奖励.png", ClickerInitConfig{.mode=Mode::RGB});
+        clicker = std::make_unique<Clicker>("公会建筑/领取奖励.png", ClickerInitConfig{.wait=1, .mode=Mode::RGB});
 
         if (clicker->founded()) {
             clicker->click(
-                    {.finishUntilList={new Image("公会建筑/确定领取.png", {.startWait=1})}}
+                    {.finishUntilList={new Image("公会建筑/确定领取.png")}}
             )->click(
                     {.finishUntilList={new Image("公会建筑/确定领取.png", InnerReverse)}}
             )->end();
