@@ -18,24 +18,27 @@ Browser::Browser(
     setMaximumHeight(890);
     resize(970, 890);
 
-    socket->connectToServer(remark);
-    if (!socket->waitForConnected(2000)) { return; }
-    connect(socket, &QLocalSocket::readyRead, this, &Browser::onMainData);
+    if (!remark.isEmpty()) {
+        socket->connectToServer(remark);
+        if (!socket->waitForConnected(2000)) { return; }
+        connect(socket, &QLocalSocket::readyRead, this, &Browser::onMainData);
 
-    auto modifiedRemark = redRemark.trimmed().replace("/", "_").replace("\\", "_");
-    QString storagePath = QCoreApplication::applicationDirPath() + "/web_profile/game/" + modifiedRemark;
+        auto modifiedRemark = remark.trimmed().replace("/", "_").replace("\\", "_");
+        QString storagePath = QCoreApplication::applicationDirPath() + "/web_profile/game/" + modifiedRemark;
+        QDir dir(storagePath);
+        if (!dir.exists()) dir.mkpath(".");
 
-    QDir dir(storagePath);
-    if (!dir.exists()) dir.mkpath(".");
+        auto profile = new QWebEngineProfile(modifiedRemark, QCoreApplication::instance());
+        profile->setPersistentStoragePath(storagePath);
+        profile->setCachePath(storagePath + "/cache");
+        profile->setPersistentCookiesPolicy(QWebEngineProfile::ForcePersistentCookies);
 
-    auto profile = new QWebEngineProfile(modifiedRemark, QCoreApplication::instance());
-    profile->setPersistentStoragePath(storagePath);
-    profile->setCachePath(storagePath + "/cache");
-    profile->setPersistentCookiesPolicy(QWebEngineProfile::ForcePersistentCookies);
+        browser->setPage(new QWebEnginePage(profile, browser));
+    }
+
 
     auto mainLayout = new QHBoxLayout(this);
     mainLayout->setMargin(0);
-    browser->setPage(new QWebEnginePage(profile, browser));
     browser->settings()->setAttribute(QWebEngineSettings::PluginsEnabled, true);
     browser->load(url);
     mainLayout->addWidget(browser);
@@ -69,10 +72,10 @@ int main(int argc, char *argv[]) {
     parser.setApplicationDescription("传入链接打开游戏");
     parser.addHelpOption();
 
-    QCommandLineOption urlOption("url", "传入获取的链接", "链接");
-    QCommandLineOption titleOption("title", "传入要设置的窗口标题", "窗口标题");
+    QCommandLineOption urlOption("url", "传入获取的链接", "链接", "http://www.bluepc.com.cn/web/utility/Flash%20Player%20%E6%B5%8B%E8%AF%95%E9%A1%B5%E9%9D%A2.htm");
+    QCommandLineOption titleOption("title", "传入要设置的窗口标题", "窗口标题", "标题");
     QCommandLineOption remarkOption("remark", "传入红警账号名称", "红警账号名称");
-    QCommandLineOption pepperOption("register-pepper-plugins", "传入path/to/pepflashplayer.dll;application/x-demo", "flash插件支持");
+    QCommandLineOption pepperOption("register-pepper-plugins", "传入path/to/pepflashplayer.dll;application/x-demo", "flash插件支持", "pepflashplayer.dll;application/x-demo");
 
     parser.addOption(urlOption);
     parser.addOption(titleOption);
