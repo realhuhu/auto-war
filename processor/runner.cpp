@@ -8,7 +8,9 @@ Clicker::Clicker(
 ) : imgPath(std::move(templatePath)),
     globalThreshold(config.threshold),
     globalTimeout(config.timeout) {
-    sleep(env.stopFlag, config.wait);
+    Mouse::leftDown(env.hwnd, 0, 0);
+
+    sleep(env.stopFlag, config.wait > 0 ? config.wait : 1);
 
     targetSegmentList = CV::findPositions(
             CV::getScreen(env.hwnd, config.mode),
@@ -24,7 +26,9 @@ Clicker::Clicker(
         ClickerInitConfig config
 ) : globalThreshold(config.threshold),
     globalTimeout(config.timeout) {
-    sleep(env.stopFlag, config.wait);
+    Mouse::leftDown(env.hwnd, 0, 0);
+
+    sleep(env.stopFlag, config.wait > 0 ? config.wait : 1);
 
     for (const auto &templatePath: templatePathList) {
         auto ps = CV::findPositions(CV::getScreen(env.hwnd, config.mode), templatePath, globalThreshold, config.mode);
