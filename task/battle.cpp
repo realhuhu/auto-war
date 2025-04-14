@@ -247,8 +247,8 @@ void countryWar(Env &e) {
         if (boolSetting["8点领签到体力"]) {
             clicker = std::make_unique<Clicker>("国家战争/活动及公告.png")->click(
                     {
-                            .runUntilList={new Image("国家战争/连续登录.png", {.finishWait=2})},
-                            .finishUntilList={new IfImage("国家战争/领取连续登录奖励.png", {.mode=Mode::RGB})}
+                            .runUntilList={new Image("国家战争/连续登录.png")},
+                            .finishUntilList={new IfImage("国家战争/领取连续登录奖励.png", {.mode=Mode::RGB, .startWait=3})}
                     }
             );
 

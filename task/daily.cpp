@@ -19,9 +19,9 @@ void heroCenter(Env &e) {
             if (!clicker->founded()) break;
 
             clicker = clicker->locate(
-                    {.finishUntilList={new Image("英雄中心/英雄抽奖.png", {.onPrevious=Previous::TOP_CENTER, .finishWait=1})}}
+                    {.finishUntilList={new Image("英雄中心/英雄抽奖.png", {.onPrevious=Previous::TOP_CENTER})}}
             )->click(
-                    {.finishUntilList={new IfImage("英雄中心/确定.png", {.startWait=1})}}
+                    {.finishUntilList={new IfImage("英雄中心/确定.png", {.startWait=3})}}
             );
 
             if (!clicker->founded()) continue;
@@ -695,7 +695,7 @@ void otherActivity(Env &e) {
         clicker = std::make_unique<Clicker>("其它活动/捕猎火鸡.png");
 
         if (clicker->founded()) {
-            clicker = clicker->click({.finishUntilList={new Image("其它活动/捕猎火鸡标题.png"), new IfImage("其它活动/捕猎一次.png")}});
+            clicker = clicker->click({.finishUntilList={new Image("其它活动/捕猎火鸡标题.png"), new IfImage("其它活动/捕猎一次.png", {.mode=Mode::RGB, .threshold=0.95})}});
 
 
             if (!clicker->founded()) {
