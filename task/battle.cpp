@@ -224,6 +224,73 @@ void exterminateEnemy(Env &e) {
     }
 }
 
+void armsCompound(Env &e) {
+    env = e;
+    std::unique_ptr<Clicker> clicker;
+    auto setting = loadSetting(state.config, env.qqRemark, env.redRemark, state.settingDefault);
+    auto boolSetting = parseBoolSetting("军备合成", "checkbox", setting);
+
+    clicker = std::make_unique<Clicker>("军备合成/合成军备.png");
+
+    if (!clicker->founded()) {
+        std::vector<QString> candidates;
+        for (const auto &[key, value]: boolSetting) {
+            if (value) candidates.push_back(QString("军备合成/%1.png").arg(QString::fromStdString(key)));
+        }
+
+        clicker = std::make_unique<Clicker>(
+                "军备合成/军备研究图标.png"
+        )->click(
+                {.runUntilList={new Image("军备合成/军备合成.png")}}
+        )->click(
+                {.runUntilList={new Image("军备合成/选择品质.png")}}
+        )->click(
+                {.finishUntilList={new Image("军备合成/橙色品质.png")}}
+        )->click(
+                {.finishUntilList={new Image("军备合成/合成军备.png")}}
+        )->click(
+                {.finishUntilList={new AnyImage({"军备合成/滚动条A.png", "军备合成/滚动条B.png"})}}
+        )->drag(
+                {.runUntilList={new Image(choice(candidates))}}
+        );
+
+        if (!clicker->founded()) clicker = std::make_unique<Clicker>(candidates);
+    }
+
+    clicker = clicker->click({.finishUntilList={new IfImage("军备合成/合成军备.png", {.mode=Mode::RGB})}});
+
+    if (clicker->founded()) clicker->click({.runUntilList={new Image("军备合成/获取碎片.png")}})->end();
+
+
+    clicker = std::make_unique<Clicker>(
+            "军备合成/获取碎片.png"
+    )->click(
+            {.finishUntilList={new Image("军备合成/开始战斗.png")}}
+    );
+
+    while (!env.stopFlag->load()) {
+        clicker = clicker->click({.finishUntilList={new AnyImage({"军备合成/跳过战斗.png", "军备合成/次数不足.png"})}});
+
+        if (clicker->imgPath == "军备合成/次数不足.png") {
+            clicker->click(
+                    {.runUntilList{new Image("军备合成/次数不足.png", InnerReverse), new Image("军备合成/关闭窗口.png", {.startWait=1})}}
+            )->click(
+                    {.finishUntilList={new Image("军备合成/关闭窗口.png", InnerReverse), new Image("军备合成/关闭窗口.png", {.startWait=1})}}
+            )->click(
+                    {.finishUntilList={new Image("军备合成/关闭窗口.png", InnerReverse)}}
+            )->end();
+
+            return;
+        }
+
+        clicker = clicker->click(
+                {.runUntilList={new Image("军备合成/结束战斗.png")}}
+        )->click(
+                {.finishUntilList={new Image("军备合成/开始战斗.png")}}
+        );
+    }
+}
+
 void countryWar(Env &e) {
     env = e;
     std::unique_ptr<Clicker> clicker;
@@ -485,73 +552,6 @@ void countryWar(Env &e) {
         }
 
         clicker->click({.finishUntilList={new Image("国家战争/结束战斗.png", InnerReverse), new Image("国家战争/当前所在.png")}})->end();
-    }
-}
-
-void armsCompound(Env &e) {
-    env = e;
-    std::unique_ptr<Clicker> clicker;
-    auto setting = loadSetting(state.config, env.qqRemark, env.redRemark, state.settingDefault);
-    auto boolSetting = parseBoolSetting("军备合成", "checkbox", setting);
-
-    clicker = std::make_unique<Clicker>("军备合成/合成军备.png");
-
-    if (!clicker->founded()) {
-        std::vector<QString> candidates;
-        for (const auto &[key, value]: boolSetting) {
-            if (value) candidates.push_back(QString("军备合成/%1.png").arg(QString::fromStdString(key)));
-        }
-
-        clicker = std::make_unique<Clicker>(
-                "军备合成/军备研究图标.png"
-        )->click(
-                {.runUntilList={new Image("军备合成/军备合成.png")}}
-        )->click(
-                {.runUntilList={new Image("军备合成/选择品质.png")}}
-        )->click(
-                {.finishUntilList={new Image("军备合成/橙色品质.png")}}
-        )->click(
-                {.finishUntilList={new Image("军备合成/合成军备.png")}}
-        )->click(
-                {.finishUntilList={new AnyImage({"军备合成/滚动条A.png", "军备合成/滚动条B.png"})}}
-        )->drag(
-                {.runUntilList={new Image(choice(candidates))}}
-        );
-
-        if (!clicker->founded()) clicker = std::make_unique<Clicker>(candidates);
-    }
-
-    clicker = clicker->click({.finishUntilList={new IfImage("军备合成/合成军备.png", {.mode=Mode::RGB})}});
-
-    if (clicker->founded()) clicker->click({.runUntilList={new Image("军备合成/获取碎片.png")}})->end();
-
-
-    clicker = std::make_unique<Clicker>(
-            "军备合成/获取碎片.png"
-    )->click(
-            {.finishUntilList={new Image("军备合成/开始战斗.png")}}
-    );
-
-    while (!env.stopFlag->load()) {
-        clicker = clicker->click({.finishUntilList={new AnyImage({"军备合成/跳过战斗.png", "军备合成/次数不足.png"})}});
-
-        if (clicker->imgPath == "军备合成/次数不足.png") {
-            clicker->click(
-                    {.runUntilList{new Image("军备合成/次数不足.png", InnerReverse), new Image("军备合成/关闭窗口.png", {.startWait=1})}}
-            )->click(
-                    {.finishUntilList={new Image("军备合成/关闭窗口.png", InnerReverse), new Image("军备合成/关闭窗口.png", {.startWait=1})}}
-            )->click(
-                    {.finishUntilList={new Image("军备合成/关闭窗口.png", InnerReverse)}}
-            )->end();
-
-            return;
-        }
-
-        clicker = clicker->click(
-                {.runUntilList={new Image("军备合成/结束战斗.png")}}
-        )->click(
-                {.finishUntilList={new Image("军备合成/开始战斗.png")}}
-        );
     }
 }
 

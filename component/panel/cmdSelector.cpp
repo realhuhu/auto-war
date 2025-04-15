@@ -9,6 +9,7 @@ CmdSelector::CmdSelector(const QString &title, QWidget *parent) : QDialog(parent
     tasks["剿灭将领"] = exterminateEnemy;
     tasks["军备合成"] = armsCompound;
     tasks["国家战争"] = countryWar;
+    tasks["征战"] = expedition;
 
     tasks["英雄中心"] = heroCenter;
     tasks["战争学院"] = warCenter;
@@ -39,7 +40,7 @@ CmdSelector::CmdSelector(const QString &title, QWidget *parent) : QDialog(parent
             "自动战斗",
             {
                     "国家争霸", "世界争霸", "剿灭将领", "军备合成",
-                    "国家战争"
+                    "国家战争", "征战"
             }
     ));
     mainLayout->addWidget(

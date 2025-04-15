@@ -1,5 +1,66 @@
 ﻿#include "browser.h"
 
+
+// 构建PID到父PID的映射
+std::map<DWORD, DWORD> BuildPidParentPidMap() {
+    std::map<DWORD, DWORD> pidMap;
+
+    // 创建进程快照
+    HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (hSnapshot == INVALID_HANDLE_VALUE) {
+        return pidMap;
+    }
+
+    PROCESSENTRY32 pe;
+    pe.dwSize = sizeof(PROCESSENTRY32);
+
+    // 遍历进程列表
+    if (!Process32First(hSnapshot, &pe)) {
+        CloseHandle(hSnapshot);
+        return pidMap;
+    }
+
+    do {
+        pidMap[pe.th32ProcessID] = pe.th32ParentProcessID;
+    } while (Process32Next(hSnapshot, &pe));
+
+    CloseHandle(hSnapshot);
+    return pidMap;
+}
+
+// 获取所有后代进程的PID
+std::vector<DWORD> GetAllChildProcesses(DWORD parentPid) {
+    std::map<DWORD, DWORD> pidMap = BuildPidParentPidMap();
+    std::vector<DWORD> children;
+    std::queue<DWORD> q;
+    std::set<DWORD> visited;
+
+    // 初始将父进程加入队列
+    q.push(parentPid);
+    visited.insert(parentPid);
+
+    // 广度优先搜索遍历子进程
+    while (!q.empty()) {
+        DWORD currentPid = q.front();
+        q.pop();
+
+        // 查找所有直接子进程
+        for (const auto &pair: pidMap) {
+            DWORD pid = pair.first;
+            DWORD ppid = pair.second;
+
+            if (ppid == currentPid && !visited.count(pid)) {
+                children.push_back(pid);
+                visited.insert(pid);
+                q.push(pid); // 继续查找该子进程的后代
+            }
+        }
+    }
+
+    return children;
+}
+
+
 Browser::Browser(
         QString redUrl,
         const QString &title,
@@ -43,13 +104,82 @@ Browser::Browser(
     browser->load(url);
     mainLayout->addWidget(browser);
 
-    QJsonObject obj;
-    obj["type"] = "HWND";
-    obj["value"] = QVariant(browser->winId()).toString();
-    socket->write(QJsonDocument(obj).toJson());
+    if (!remark.isEmpty()) {
+        auto timer = new QTimer(this);
+        timer->setInterval(1000); // 每秒触发一次
+        connect(timer, &QTimer::timeout, this, [this, timer, elapsed = 0]() mutable {
+            elapsed++;
+
+            // 获取进程ID并转换为字符串
+            QString pidStr = QString::number(getFlashProcess());
+
+            // 有效PID检查（假设非0为有效值）
+            bool validPid = !pidStr.isEmpty() && pidStr != "0";
+
+            if (validPid || elapsed >= 10) {
+                QJsonObject obj;
+                obj["type"] = "INIT";
+                obj["hwnd"] = QVariant(browser->winId()).toString();
+                obj["pid"] = validPid ? pidStr : "0"; // 超时后强制设为0
+
+                socket->write(QJsonDocument(obj).toJson());
+                timer->stop();
+                timer->deleteLater(); // 清理定时器
+
+                // 无论是否发送都停止定时器（符合需求逻辑）
+                if (elapsed >= 10) {
+                    timer->stop();
+                    timer->deleteLater();
+                }
+            }
+        });
+        timer->start();
+    }
 }
 
 void Browser::refresh() const { browser->load(url); }
+
+
+DWORD Browser::getFlashProcess() {
+    DWORD res = 0;
+    DWORD currentPid = GetCurrentProcessId();
+    std::vector<DWORD> childPids = GetAllChildProcesses(currentPid);
+
+    QStringList conditions;
+    for (DWORD pid: childPids) {
+        conditions.append(QString("ProcessID=%1").arg(pid));
+    }
+    QString whereClause = QString("(%1)").arg(conditions.join(" OR "));
+
+    QProcess wmicProcess;
+    QStringList args = {
+            "process",
+            "where",
+            whereClause,
+            "get",
+            "ProcessID,CommandLine",
+            "/value"
+    };
+
+    wmicProcess.start("wmic", args);
+
+    if (!wmicProcess.waitForStarted() || !wmicProcess.waitForFinished()) return res;
+
+    QByteArray output = wmicProcess.readAllStandardOutput();
+
+    QString outputStr = QString::fromStdString(output.toStdString());
+
+    QStringList lines = outputStr.split(QRegExp("[\r\n]+"), Qt::SkipEmptyParts);
+    bool founded = false;
+    for (QString &line: lines) {
+        if (line.startsWith("ProcessId=") && founded) {
+            return line.replace("ProcessId=", "").toInt();
+        }
+        if (line.contains("--type=ppapi") && !founded) founded = true;
+    }
+
+    return 0;
+}
 
 void Browser::onMainData() const {
     const QString msg = QString::fromUtf8(socket->readAll());
@@ -59,6 +189,7 @@ void Browser::onMainData() const {
         return;
     }
 }
+
 
 int main(int argc, char *argv[]) {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);

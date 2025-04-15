@@ -210,8 +210,33 @@
     ],
     "tips": "如果在晚上8点后运行，自动领取签到、VIP福利体力、VIP国战大礼"
   },
-  "英雄中心": {
+  "征战": {
     "order": 6,
+    "checkbox": [
+      {
+        "order": 0,
+        "text": "勋章征战",
+        "value": false
+      },
+      {
+        "order": 1,
+        "text": "VIP征战",
+        "value": false
+      }
+    ],
+    "input": [
+      {
+        "order": 0,
+        "text": "关卡数",
+        "value": 150
+      }
+    ],
+    "select": [
+    ],
+    "tips": ""
+  },
+  "英雄中心": {
+    "order": 7,
     "checkbox": [
       {
         "order": 0,
@@ -231,7 +256,7 @@
     "tips": ""
   },
   "战争学院": {
-    "order": 7,
+    "order": 8,
     "checkbox": [
       {
         "order": 0,
@@ -303,7 +328,7 @@
     "tips": "技能训练随机选择技能升级"
   },
   "国家宝箱": {
-    "order": 8,
+    "order": 9,
     "checkbox": [
       {
         "order": 0,
@@ -333,7 +358,7 @@
     "tips": ""
   },
   "将领抽奖": {
-    "order": 9,
+    "order": 10,
     "checkbox": [
       {
         "order": 0,
@@ -353,7 +378,7 @@
     "tips": ""
   },
   "参谋抽奖": {
-    "order": 10,
+    "order": 11,
     "checkbox": [
       {
         "order": 0,
@@ -373,7 +398,7 @@
     "tips": ""
   },
   "矿区争夺": {
-    "order": 11,
+    "order": 12,
     "checkbox": [
       {
         "order": 0,
@@ -388,7 +413,7 @@
     "tips": ""
   },
   "其它活动": {
-    "order": 12,
+    "order": 13,
     "checkbox": [
       {
         "order": 0,
@@ -423,7 +448,7 @@
     "tips": ""
   },
   "公会领奖": {
-    "order": 13,
+    "order": 14,
     "checkbox": [
       {
         "order": 0,
@@ -453,7 +478,7 @@
     "tips": ""
   },
   "公会建筑": {
-    "order": 14,
+    "order": 15,
     "checkbox": [
     ],
     "input": [
@@ -473,7 +498,7 @@
     "tips": "例如拖动X100、拖动Y100表示向右下拖动各100像素再定位公会建筑"
   },
   "开卡国战": {
-    "order": 15,
+    "order": 16,
     "checkbox": [
       {
         "order": 0,
@@ -498,7 +523,7 @@
     "tips": "开卡数为0表示无限开卡"
   },
   "预设1": {
-    "order": 16,
+    "order": 17,
     "checkbox": [
       {
         "order": 0,
@@ -618,7 +643,7 @@
     "tips": "按顺序执行选择的功能"
   },
   "预设2": {
-    "order": 17,
+    "order": 18,
     "checkbox": [
       {
         "order": 0,
@@ -738,7 +763,7 @@
     "tips": "按顺序执行选择的功能"
   },
   "预设3": {
-    "order": 18,
+    "order": 19,
     "checkbox": [
       {
         "order": 0,
@@ -858,7 +883,7 @@
     "tips": "按顺序执行选择的功能"
   },
   "预设4": {
-    "order": 19,
+    "order": 20,
     "checkbox": [
       {
         "order": 0,

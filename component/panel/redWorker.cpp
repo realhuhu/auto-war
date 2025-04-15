@@ -149,11 +149,12 @@ void RedWorker::onBrowserData() {
 
     auto json = QJsonDocument::fromJson(data).object();
 
-    if (json["type"] == "HWND") {
-        auto var = QVariant::fromValue(json["value"].toString());
-        auto wid = var.value<WId>();
+    if (json["type"] == "INIT") {
+        auto wid = QVariant::fromValue(json["hwnd"].toString()).value<WId>();
+        auto pid = json["pid"].toString().toInt();
         env.hwnd = reinterpret_cast<HWND>(wid);
-        emit toLog("初始化完成");
+        env.pid = pid;
+        emit toLog(QString("初始化完成: hwnd(%1); pid(%2)").arg(json["hwnd"].toString(), json["pid"].toString()));
     }
 }
 

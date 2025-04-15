@@ -11,6 +11,7 @@
 
 struct Env {
     HWND hwnd{};
+    DWORD pid{};
     Emitter *emitter{};
     std::atomic<bool> *stopFlag{};
 

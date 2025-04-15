@@ -1,9 +1,18 @@
 ﻿#ifndef RED_BROWSER_H
 #define RED_BROWSER_H
 
+#include <set>
+#include <map>
+#include <queue>
+#include <windows.h>
+#include <tlhelp32.h>
+
 #include <QDir>
+#include <QTimer>
 #include <QWidget>
 #include <QVariant>
+#include <QProcess>
+#include <QTextCodec>
 #include <QJsonObject>
 #include <QHBoxLayout>
 #include <QLocalSocket>
@@ -34,6 +43,8 @@ public:
     );
 
     void refresh() const;
+
+    static DWORD getFlashProcess() ;
 
 public slots:
 
