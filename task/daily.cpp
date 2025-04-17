@@ -676,11 +676,11 @@ void otherActivity(Env &e) {
             clicker = clicker->click({.finishUntilList={new Image("其它活动/七天乐标题.png"), new IfImage("其它活动/免费签到.png")}});
 
             if (clicker->founded()) {
-                clicker = clicker->click(
+                clicker->click(
                         {.finishUntilList={new Image("其它活动/签到奖励.png"), new Image("其它活动/关闭窗口.png")}}
                 )->click(
                         {.selector=positionSelector("xCenter", "min"), .finishUntilList={new Image("其它活动/关闭窗口.png", InnerReverse)}}
-                );
+                )->end();
             }
 
             std::make_unique<Clicker>(
@@ -770,7 +770,7 @@ void otherActivity(Env &e) {
             clicker->click(
                     {.finishUntilList={new Image("其它活动/抽取一次.png")}}
             )->click(
-                    {.startWait=1, .finishUntilList={new Image("其它活动/关闭窗口.png")}}
+                    {.finishUntilList={new Image("其它活动/关闭窗口.png", {.startWait=1})}}
             )->click(
                     {.selector= positionSelector("xCenter", "min"), .finishUntilList={new Image("其它活动/关闭窗口.png", InnerReverse), new Image("其它活动/关闭窗口.png")}}
             )->click(

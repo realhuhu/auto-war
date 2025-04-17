@@ -1,6 +1,8 @@
 ﻿#include "presupposition.h"
 
 void presupposition(std::map<std::string, bool> &setting) {
+    env.context["presupposition"] = true;
+
     if (setting["国家争霸"]) countryArena(env);
     Mouse::leftDown(env.hwnd, 0, 0);
     sleep(env.stopFlag, 0.5);
@@ -18,6 +20,10 @@ void presupposition(std::map<std::string, bool> &setting) {
     sleep(env.stopFlag, 0.5);
 
     if (setting["国家战争"]) countryWar(env);
+    Mouse::leftDown(env.hwnd, 0, 0);
+    sleep(env.stopFlag, 0.5);
+
+    if (setting["征战"]) expedition(env);
     Mouse::leftDown(env.hwnd, 0, 0);
     sleep(env.stopFlag, 0.5);
 

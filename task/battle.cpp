@@ -339,7 +339,7 @@ void countryWar(Env &e) {
 
             if (clicker->founded()) {
                 clicker->click(
-                        {.finishUntilList={new AnyImage({"国家战争/未购买vip月卡.png", "国家战争/已成功领取.png"}), new Image("国家战争/关闭窗口.png")}}
+                        {.finishUntilList={new AnyImage({"国家战争/未购买vip月卡.png", "国家战争/已成功领取.png"}), new Image("国家战争/关闭窗口.png")}}//TODO 未购买vip
                 )->click(
                         {.selector=positionSelector("yCenter", "max"), .finishUntilList={new Image("国家战争/关闭窗口.png", InnerReverse)}}
                 )->end();

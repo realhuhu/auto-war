@@ -215,11 +215,16 @@
     "checkbox": [
       {
         "order": 0,
+        "text": "自动刷新",
+        "value": true
+      },
+      {
+        "order": 1,
         "text": "勋章征战",
         "value": false
       },
       {
-        "order": 1,
+        "order": 2,
         "text": "VIP征战",
         "value": false
       }
@@ -233,7 +238,7 @@
     ],
     "select": [
     ],
-    "tips": ""
+    "tips": "若开启自动刷新，达到指定关卡或征战失败后自动刷新次数\n若关闭自动刷新，一键执行预设时将跳过征战"
   },
   "英雄中心": {
     "order": 7,
@@ -547,12 +552,12 @@
       },
       {
         "order": 4,
-        "text": "公会战役",
-        "value": false
+        "text": "国家战争",
+        "value": true
       },
       {
         "order": 5,
-        "text": "国家战争",
+        "text": "征战",
         "value": true
       },
       {
@@ -667,12 +672,12 @@
       },
       {
         "order": 4,
-        "text": "公会战役",
-        "value": false
+        "text": "国家战争",
+        "value": true
       },
       {
         "order": 5,
-        "text": "国家战争",
+        "text": "征战",
         "value": true
       },
       {
@@ -787,12 +792,12 @@
       },
       {
         "order": 4,
-        "text": "公会战役",
+        "text": "国家战争",
         "value": false
       },
       {
         "order": 5,
-        "text": "国家战争",
+        "text": "征战",
         "value": false
       },
       {
@@ -907,12 +912,12 @@
       },
       {
         "order": 4,
-        "text": "公会战役",
+        "text": "国家战争",
         "value": false
       },
       {
         "order": 5,
-        "text": "国家战争",
+        "text": "征战",
         "value": false
       },
       {

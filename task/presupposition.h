@@ -4,6 +4,7 @@
 #include "daily.h"
 #include "battle.h"
 #include "common.h"
+#include "expedition.h"
 
 void presupposition1(Env &e);
 

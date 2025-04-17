@@ -18,6 +18,11 @@ void expedition(Env &e) {
     auto boolSetting = parseBoolSetting("征战", "checkbox", setting);
     auto intSetting = parseIntSetting("征战", "input", setting);
 
+    if (env.context["presupposition"] && !boolSetting["自动刷新"]) {
+        emit env.emitter->error("征战未开启自动刷新，将不在一键预设中执行");
+        return;
+    }
+
     clicker = std::make_unique<Clicker>(
             "征战/征战图标.png"
     )->click(
@@ -58,6 +63,22 @@ void expedition(Env &e) {
     while (true) {
         clicker = std::make_unique<Clicker>("征战/自动战斗.png", ClickerInitConfig{.mode=Mode::RGB});
 
+        if (!clicker->founded() && !boolSetting["自动刷新"]) {
+            CloseHandle(hProcess);
+
+            emit env.emitter->error("征战未开启自动刷新，已到关底，自动结束");
+
+            return;
+        }
+
+        if (env.context["refresh"] && !boolSetting["自动刷新"]) {
+            CloseHandle(hProcess);
+
+            emit env.emitter->error("征战未开启自动刷新，已到关底，自动结束");
+
+            return;
+        }
+
         if (!clicker->founded() || env.context["refresh"]) {
             env.context["refresh"] = false;
 
@@ -72,6 +93,7 @@ void expedition(Env &e) {
                 )->click(
                         {.finishUntilList={new Image("征战/确定.png", InnerReverse)}, .finishWait=2}
                 )->end();
+
                 continue;
             }
 
@@ -82,6 +104,7 @@ void expedition(Env &e) {
                 )->click(
                         {.finishUntilList={new Image("征战/确定.png", InnerReverse)}, .finishWait=2}
                 )->end();
+
                 continue;
             } else if (clicker->imgPath == "征战/勋章重置.png") {
                 if (!boolSetting["勋章征战"]) {
@@ -90,6 +113,7 @@ void expedition(Env &e) {
                     )->click(
                             {.selector=positionSelector("yCenter", "max"), .finishUntilList={new Image("征战/关闭窗口.png", InnerReverse)}}
                     )->end();
+
                     break;
                 }
 
@@ -98,6 +122,7 @@ void expedition(Env &e) {
                 )->click(
                         {.finishUntilList={new Image("征战/确定.png", InnerReverse)}, .finishWait=2}
                 )->end();
+
                 continue;
             }
         } else {
@@ -136,7 +161,7 @@ void expedition(Env &e) {
                 closeAllConfirm();
 
                 continue;
-            }else if(clicker->imgPath == "征战/战斗失败.png" || clicker->imgPath == "征战/次数已用完A.png" || clicker->imgPath == "征战/次数已用完B.png"){
+            } else if (clicker->imgPath == "征战/战斗失败.png" || clicker->imgPath == "征战/次数已用完A.png" || clicker->imgPath == "征战/次数已用完B.png") {
                 clicker->locate(
                         {.finishUntilList={new Image("征战/关闭窗口.png", {.onPrevious=Previous::RIGHT})}}
                 )->click(
@@ -166,7 +191,6 @@ void expedition(Env &e) {
                 closeAllConfirm();
 
                 continue;
-
             }
         }
     }
