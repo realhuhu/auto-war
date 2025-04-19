@@ -1,5 +1,5 @@
-﻿#ifndef RED_MEMORY_H
-#define RED_MEMORY_H
+﻿#ifndef MEMORY_MEMORY_H
+#define MEMORY_MEMORY_H
 
 #include <Windows.h>
 #include <vector>
@@ -16,7 +16,7 @@ public:
     std::vector<ULONG_PTR> Search(const char *pattern);
 
 private:
-    static constexpr size_t BLOCK_SIZE = 409600;  // 内存块大小
+    static constexpr size_t BLOCK_SIZE = 409600;
 
     struct MemoryRegion {
         ULONG_PTR base;
@@ -24,7 +24,7 @@ private:
     };
 
     HANDLE m_hProcess;
-    short m_next[260]{};  // KMP算法next数组
+    short m_badChar[256]{}; // BM算法的坏字符表
 
     static void GetPatternArray(
             const char *pattern,
@@ -32,7 +32,7 @@ private:
             WORD &length
     );
 
-    void BuildNextArray(
+    void BuildBadCharTable(
             const WORD *patternArray,
             WORD patternLength
     );
@@ -48,7 +48,6 @@ private:
 
     void CollectRegions(std::vector<MemoryRegion> &regions);
 };
-
 
 class Memory {
 public:
@@ -123,4 +122,5 @@ private:
     HANDLE m_hProcess;    // 进程句柄（由调用者管理生命周期）
     uintptr_t m_baseAddress; // 当前基地址
 };
-#endif //RED_MEMORY_H
+
+#endif //MEMORY_MEMORY_H

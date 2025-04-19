@@ -1,7 +1,7 @@
 ﻿#include "memory.h"
 
 MemoryScanner::MemoryScanner(HANDLE hProcess) : m_hProcess(hProcess) {
-    memset(m_next, -1, sizeof(m_next));
+    memset(m_badChar, -1, sizeof(m_badChar));
 }
 
 void MemoryScanner::GetPatternArray(
@@ -34,9 +34,17 @@ void MemoryScanner::GetPatternArray(
     }
 }
 
-void MemoryScanner::BuildNextArray(const WORD *patternArray, WORD patternLength) {
-    memset(m_next, -1, sizeof(m_next));
-    for (WORD i = 0; i < patternLength; ++i) m_next[patternArray[i]] = static_cast<short>(i);
+void MemoryScanner::BuildBadCharTable(
+        const WORD *patternArray,
+        WORD patternLength
+) {
+    memset(m_badChar, -1, sizeof(m_badChar));
+    for (WORD i = 0; i < patternLength; ++i) {
+        WORD c = patternArray[i];
+        if (c != 256) { // 忽略通配符
+            m_badChar[c] = static_cast<short>(i);
+        }
+    }
 }
 
 void MemoryScanner::SearchBlock(
@@ -57,53 +65,53 @@ void MemoryScanner::SearchBlock(
         return;
     }
 
-    for (size_t i = 0; i < size;) {
-        size_t j = i, k = 0;
-        for (; k < patternLength && j < size; ++k, ++j) {
-            if (pattern[k] != 256 && buffer[j] != pattern[k]) break;
+    const SIZE_T bufferSize = size;
+    const WORD m = patternLength;
+
+    for (SIZE_T i = 0; i <= bufferSize - m;) {
+        int j = m - 1;
+
+        // 从右到左匹配
+        while (j >= 0 && (pattern[j] == 256 || buffer[i + j] == pattern[j])) {
+            j--;
         }
 
-        if (k == patternLength) {
+        if (j < 0) {
+            // 找到匹配
             std::lock_guard<std::mutex> lock(mutex);
             results.push_back(base + i);
+            i++; // 移动到下一个位置
+        } else {
+            // 计算坏字符规则的移动量
+            BYTE c = buffer[i + j];
+            short badCharPos = m_badChar[c];
+            int shift = j - badCharPos;
+
+            // 如果坏字符不在模式中，移动 j + 1 位
+            if (badCharPos == -1) {
+                shift = j + 1;
+            }
+
+            // 确保至少移动1位
+            shift = (std::max)(1, shift);
+            i += shift;
         }
-
-        if (i + patternLength >= size) break;
-
-        int shift = m_next[buffer[i + patternLength]];
-        i += (shift == -1) ? (patternLength - m_next[256]) : (patternLength - shift);
     }
 }
 
-void MemoryScanner::CollectRegions(std::vector<MemoryRegion> &regions) {
-    ULONG_PTR address = 0;
-    MEMORY_BASIC_INFORMATION mbi;
-
-    while (VirtualQueryEx(m_hProcess, reinterpret_cast<LPCVOID>(address), &mbi, sizeof(mbi))) {
-        if (mbi.State == MEM_COMMIT && (mbi.Protect == PAGE_READWRITE || mbi.Protect == PAGE_EXECUTE_READWRITE)) {
-            regions.push_back({reinterpret_cast<ULONG_PTR>(mbi.BaseAddress), mbi.RegionSize});
-        }
-        address = reinterpret_cast<ULONG_PTR>(mbi.BaseAddress) + mbi.RegionSize;
-    }
-}
-
-std::vector<ULONG_PTR>  MemoryScanner::Search(const char *pattern) {
-    // 转换特征码
+std::vector<ULONG_PTR> MemoryScanner::Search(const char *pattern) {
     std::unique_ptr<WORD[]> patternArray;
     WORD patternLength;
     GetPatternArray(pattern, patternArray, patternLength);
-    BuildNextArray(patternArray.get(), patternLength);
+    BuildBadCharTable(patternArray.get(), patternLength);
 
-    // 收集内存区域
     std::vector<MemoryRegion> regions;
     CollectRegions(regions);
 
-    // 多线程参数
     std::atomic_size_t regionIndex(0);
     std::mutex resultMutex;
     std::vector<ULONG_PTR> results;
 
-    // 创建线程池
     unsigned threadCount = (std::max)(std::thread::hardware_concurrency(), 1u);
     std::vector<std::thread> workers;
     workers.reserve(threadCount);
@@ -129,4 +137,16 @@ std::vector<ULONG_PTR>  MemoryScanner::Search(const char *pattern) {
     for (auto &t: workers) if (t.joinable()) t.join();
 
     return results;
+}
+
+void MemoryScanner::CollectRegions(std::vector<MemoryRegion> &regions) {
+    ULONG_PTR address = 0;
+    MEMORY_BASIC_INFORMATION mbi;
+
+    while (VirtualQueryEx(m_hProcess, reinterpret_cast<LPCVOID>(address), &mbi, sizeof(mbi))) {
+        if (mbi.State == MEM_COMMIT && (mbi.Protect == PAGE_READWRITE || mbi.Protect == PAGE_EXECUTE_READWRITE)) {
+            regions.push_back({reinterpret_cast<ULONG_PTR>(mbi.BaseAddress), mbi.RegionSize});
+        }
+        address = reinterpret_cast<ULONG_PTR>(mbi.BaseAddress) + mbi.RegionSize;
+    }
 }
