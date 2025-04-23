@@ -310,26 +310,6 @@ void countryWar(Env &e) {
             )->end();
         }
 
-
-        if (boolSetting["8点领签到体力"]) {
-            clicker = std::make_unique<Clicker>("国家战争/活动及公告.png")->click(
-                    {
-                            .runUntilList={new Image("国家战争/连续登录.png")},
-                            .finishUntilList={new IfImage("国家战争/领取连续登录奖励.png", {.mode=Mode::RGB, .startWait=3})}
-                    }
-            );
-
-            if (clicker->founded()) {
-                clicker->click({.runUntilList={new Image("国家战争/领取连续登录奖励.png", {.onPrevious=Previous::INNER, .mode=Mode::RGB, .reverse=true})}})->end();
-            }
-
-            std::make_unique<Clicker>(
-                    "国家战争/关闭窗口.png"
-            )->click(
-                    {.finishUntilList={new Image("国家战争/关闭窗口.png", InnerReverse)}}
-            )->end();
-        }
-
         if (boolSetting["8点领VIP体力"]) {
             clicker = std::make_unique<Clicker>("国家战争/vip福利礼包.png")->click(
                     {.runUntilList={new Image("国家战争/vip福利礼包标题.png")}}
@@ -381,6 +361,26 @@ void countryWar(Env &e) {
                         {.finishUntilList={new Image("国家战争/关闭窗口.png", InnerReverse)}}
                 )->end();
             }
+        }
+
+
+        if (boolSetting["8点领签到体力"]) {
+            clicker = std::make_unique<Clicker>("国家战争/活动及公告.png")->click(
+                    {
+                            .runUntilList={new Image("国家战争/连续登录.png")},
+                            .finishUntilList={new IfImage("国家战争/领取连续登录奖励.png", {.mode=Mode::RGB, .startWait=1})}
+                    }
+            );
+
+            if (clicker->founded()) {
+                clicker->click({.runUntilList={new Image("国家战争/领取连续登录奖励.png", {.onPrevious=Previous::INNER, .mode=Mode::RGB, .reverse=true})}})->end();
+            }
+
+            std::make_unique<Clicker>(
+                    "国家战争/关闭窗口.png"
+            )->click(
+                    {.finishUntilList={new Image("国家战争/关闭窗口.png", InnerReverse)}}
+            )->end();
         }
     }
 
@@ -576,7 +576,7 @@ void loopCountryWar(Env &e) {
         if (env.context["不在摩多城"]) return;
 
         if (candidates.empty()) {
-            emit env.emitter->error("未设置开卡");
+            emit env.emitter->error("[开卡国战]提前结束: 未设置开卡");
             return;
         }
 
@@ -604,7 +604,7 @@ void loopCountryWar(Env &e) {
                     {.finishUntilList={new Image("开卡国战/关闭窗口.png", InnerReverse)}}
             )->end();
 
-            emit env.emitter->error("恢复卡不足");
+            emit env.emitter->error("[开卡国战]提前结束: 恢复卡不足");
             return;
         }
 

@@ -19,7 +19,7 @@ void expedition(Env &e) {
     auto intSetting = parseIntSetting("征战", "input", setting);
 
     if (env.context["presupposition"] && !boolSetting["自动刷新"]) {
-        emit env.emitter->error("征战未开启自动刷新，将不在一键预设中执行");
+        emit env.emitter->error("[征战]提前结束: 未开启自动刷新，将不在一键预设中执行");
         return;
     }
 
@@ -42,7 +42,7 @@ void expedition(Env &e) {
     try {
         auto scanner = new MemoryScanner(hProcess);
         auto startTime = std::chrono::steady_clock::now();
-        auto res = scanner->Search("?? ?? ?? ?? 96 00 00 00 01 00 00 00 ?? 00 00 00 01 00 00 00 01 00 00 00");
+        auto res = scanner->Search("?? 00 00 00 96 00 00 00 01 00 00 00 ?? 00 00 00 01 00 00 00 01 00 00 00");
         auto endTime = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
 
@@ -66,7 +66,7 @@ void expedition(Env &e) {
         if (!clicker->founded() && !boolSetting["自动刷新"]) {
             CloseHandle(hProcess);
 
-            emit env.emitter->error("征战未开启自动刷新，已到关底，自动结束");
+            emit env.emitter->error("[征战]提前结束: 未开启自动刷新，已到关底，自动结束");
 
             return;
         }
@@ -74,7 +74,7 @@ void expedition(Env &e) {
         if (env.context["refresh"] && !boolSetting["自动刷新"]) {
             CloseHandle(hProcess);
 
-            emit env.emitter->error("征战未开启自动刷新，已到关底，自动结束");
+            emit env.emitter->error("[征战]提前结束: 未开启自动刷新，已到关底，自动结束");
 
             return;
         }
@@ -182,7 +182,7 @@ void expedition(Env &e) {
 
                 closeAllConfirm();
 
-                emit env.emitter->error("资源不足，无法维修坦克");
+                emit env.emitter->error("[征战]提前结束: 资源不足，无法维修坦克");
 
                 break;
             } else {

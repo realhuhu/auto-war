@@ -21,7 +21,7 @@ void heroCenter(Env &e) {
             clicker = clicker->locate(
                     {.finishUntilList={new Image("英雄中心/英雄抽奖.png", {.onPrevious=Previous::TOP_CENTER})}}
             )->click(
-                    {.finishUntilList={new IfImage("英雄中心/确定.png", {.startWait=3})}}
+                    {.finishUntilList={new IfImage("英雄中心/确定.png", {.startWait=1})}}
             );
 
             if (!clicker->founded()) continue;
@@ -57,7 +57,7 @@ void heroCenter(Env &e) {
                         {.selector=positionSelector("yCenter", "max"), .finishUntilList={new Image("英雄中心/关闭窗口.png", InnerReverse)}}
                 )->end();
 
-                emit env.emitter->error("资源不足, 英雄训练失败");
+                emit env.emitter->error("[英雄中心]提前结束: 资源不足, 英雄训练失败");
                 break;
             }
         }
@@ -377,7 +377,7 @@ void adviser(Env &e) {
     }
 
     std::make_unique<Clicker>(
-            "参谋抽奖/关闭窗口.png"
+            "参谋抽奖/关闭窗口.png", ClickerInitConfig{.wait=1}
     )->click(
             {.finishUntilList={new Image("参谋抽奖/关闭窗口.png", InnerReverse)}}
     )->end();
@@ -1028,7 +1028,7 @@ void guildBuilding(Env &e) {
         clicker = std::make_unique<Clicker>("公会建筑/公会建筑.png", ClickerInitConfig{.wait=1});
 
         if (!clicker->founded()) {
-            emit env.emitter->error("无法定位公会建筑");
+            emit env.emitter->error("[公会建筑]提前结束: 无法定位公会建筑");
             return;
         }
 

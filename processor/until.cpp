@@ -241,7 +241,10 @@ IfImage::IfImage(
         UntilConfig untilConfig
 ) : Image(imgPath, untilConfig) {}
 
-void IfImage::loop(std::unique_ptr<Segment> &previous, float globalTimeout) { fulfilled(previous); }
+void IfImage::loop(std::unique_ptr<Segment> &previous, float globalTimeout) {
+    sleep(env.stopFlag, config.startWait);
+    fulfilled(previous);
+}
 
 QString IfImage::toString() const { return QString("尝试等待<img src='%1' height='14'>").arg(res(imgPath)); }
 
@@ -250,7 +253,10 @@ IfAnyImage::IfAnyImage(
         UntilConfig untilConfig
 ) : AnyImage(templatePathList, untilConfig) {}
 
-void IfAnyImage::loop(std::unique_ptr<Segment> &previous, float globalTimeout) { fulfilled(previous); }
+void IfAnyImage::loop(std::unique_ptr<Segment> &previous, float globalTimeout) {
+    sleep(env.stopFlag, config.startWait);
+    fulfilled(previous);
+}
 
 QString IfAnyImage::toString() const {
     auto text = QString("尝试等待任意|");
