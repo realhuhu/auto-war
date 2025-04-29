@@ -116,7 +116,7 @@ void warCenter(Env &e) {
         clicker = std::make_unique<Clicker>(
                 QString("战争学院/改装%1图片.png").arg(QString::fromStdString(refitType))
         )->click(
-                {.finishUntilList={new Image(QString("战争学院/%1提示.png").arg(QString::fromStdString(refitType))), new IfImage("战争学院/确定研究完成.png")}}
+                {.finishUntilList={new Image(QString("战争学院/%1提示.png").arg(QString::fromStdString(refitType))), new IfImage("战争学院/确定研究完成.png", {.startWait=1})}}
         );
 
         if (clicker->founded()) {
@@ -164,11 +164,15 @@ void warCenter(Env &e) {
             )->click()->end();
         }
 
-        std::make_unique<Clicker>(
+        clicker = std::make_unique<Clicker>(
                 QString("战争学院/干扰%1图片.png").arg(QString::fromStdString(jamType))
         )->click(
-                {.finishUntilList={new Image(QString("战争学院/%1提示.png").arg(QString::fromStdString(jamType))), new IfImage("战争学院/确定研究完成.png")}}
-        )->end();
+                {.finishUntilList={new Image(QString("战争学院/%1提示.png").arg(QString::fromStdString(jamType))), new IfImage("战争学院/确定研究完成.png", {.startWait=1})}}
+        );
+
+        if (clicker->founded()) {
+            clicker->click({.finishUntilList={new Image("战争学院/确定研究完成.png", InnerReverse)}})->end();
+        }
 
         clicker = std::make_unique<Clicker>("战争学院/干扰.png");
 
