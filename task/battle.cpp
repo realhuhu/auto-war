@@ -7,7 +7,9 @@ void countryArena(Env &e) {
     auto intSetting = parseIntSetting("国家争霸", "input", setting);
 
     clicker = std::make_unique<Clicker>(
-            "国家争霸/争霸战图标.png"
+            "国家争霸/争霸战.png"
+    )->click(
+            {.finishUntilList={new Image("国家争霸/争霸战图标.png")}}
     )->click(
             {.finishUntilList={new AnyImage({"国家争霸/争霸战标题.png", "国家争霸/未开启.png"})}}
     );
@@ -73,7 +75,9 @@ void worldArena(Env &e) {
     auto intSetting = parseIntSetting("世界争霸", "input", setting);
 
     clicker = std::make_unique<Clicker>(
-            "世界争霸/争霸战图标.png"
+            "世界争霸/争霸战.png"
+    )->click(
+            {.finishUntilList={new Image("世界争霸/争霸战图标.png")}}
     )->click(
             {.finishUntilList={new AnyImage({"世界争霸/争霸战标题.png", "世界争霸/未开启.png", "世界争霸/未参加.png"})}}
     );
