@@ -174,7 +174,7 @@ int QQManger::scanPID(const QString &id) {
     }
 
     QStringList hexIDParts;
-    for (const QChar &ch: id) {
+    for (const QChar &ch: id + ".sol") {
         auto asciiValue = static_cast<uchar>(ch.toLatin1());
         QString hexStr = QString("%1").arg(asciiValue, 2, 16, QLatin1Char('0')).toUpper();
         hexIDParts.append(hexStr);
