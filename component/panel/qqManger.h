@@ -4,22 +4,25 @@
 #include <QTimer>
 #include <QDialog>
 #include <QPainter>
+#include <QProcess>
 #include <QLineEdit>
+#include <QClipboard>
 #include <QJsonArray>
 #include <QHeaderView>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QMessageBox>
+#include <QApplication>
 #include <QTableWidget>
 #include <QInputDialog>
 #include <QNetworkReply>
-#include <QNetworkRequest>
 #include <QNetworkAccessManager>
 
 #include "qqBrowser.h"
 #include "../unit/placeholderDelegate.h"
 #include "../../../util/state.h"
+#include "../../../cheat/memory.h"
 
 
 class QQManger : public QDialog {
@@ -30,9 +33,10 @@ public:
         RemarkCol = 0,
         QQNumberCol = 1,
         PasswordCol = 2,
-        LinkCol = 3,
-        StatusCol = 4,
-        ActionCol = 5
+        GameIDCol = 3,
+        LinkCol = 4,
+        StatusCol = 5,
+        ActionCol = 6
     };
     enum Status {
         Waiting = 0,
@@ -54,10 +58,15 @@ public:
             const QString &remark,
             const QString &qq = "",
             const QString &password = "",
+            const QString &id = "",
             const QString &link = ""
     );
 
     void setStatus(int row, Status status) const;
+
+    static int scanPID(const QString &id);
+
+    static QString scanLink(int pid);
 
     void loadConfig();
 

@@ -8,14 +8,15 @@ QQManger::QQManger(QWidget *parent) : QDialog(parent), networkManager(new QNetwo
     auto mainLayout = new QVBoxLayout(this);
 
     QStringList headers;
-    headers << "备注" << "QQ号" << "密码" << "链接" << "状态" << "操作";
+    headers << "备注" << "QQ号" << "密码" << "游戏ID" << "链接" << "状态" << "操作";
     tableWidget = new QTableWidget(0, headers.size());
     tableWidget->setHorizontalHeaderLabels(headers);
     tableWidget->setEditTriggers(QAbstractItemView::AllEditTriggers);
     tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    tableWidget->setItemDelegateForColumn(QQNumberCol, new PlaceholderDelegate("不填则为手动登录", this));
-    tableWidget->setItemDelegateForColumn(PasswordCol, new PlaceholderDelegate("不填则为手动登录", this));
+    tableWidget->setItemDelegateForColumn(QQNumberCol, new PlaceholderDelegate("非必填", this));
+    tableWidget->setItemDelegateForColumn(PasswordCol, new PlaceholderDelegate("非必填", this));
+    tableWidget->setItemDelegateForColumn(GameIDCol, new PlaceholderDelegate("非必填", this));
     tableWidget->setItemDelegateForColumn(LinkCol, new PlaceholderDelegate("点击登录按钮获取链接", this));
     tableWidget->horizontalHeader()->setStyleSheet(R"(
         QHeaderView::section {
@@ -54,7 +55,7 @@ int QQManger::getIndex(QObject *button) const {
     return -1;
 }
 
-void QQManger::insertRow(const QString &remark, const QString &qq, const QString &password, const QString &link) {
+void QQManger::insertRow(const QString &remark, const QString &qq, const QString &password, const QString &id, const QString &link) {
     int row = tableWidget->rowCount();
     tableWidget->insertRow(row);
 
@@ -64,6 +65,7 @@ void QQManger::insertRow(const QString &remark, const QString &qq, const QString
 
     auto qqItem = new QTableWidgetItem(qq);
     auto pwdItem = new QTableWidgetItem(password);
+    auto idItem = new QTableWidgetItem(id);
     auto linkItem = new QTableWidgetItem(link);
 
     auto statusItem = new QTableWidgetItem("待测试");
@@ -85,6 +87,7 @@ void QQManger::insertRow(const QString &remark, const QString &qq, const QString
     tableWidget->setItem(row, RemarkCol, remarkItem);
     tableWidget->setItem(row, QQNumberCol, qqItem);
     tableWidget->setItem(row, PasswordCol, pwdItem);
+    tableWidget->setItem(row, GameIDCol, idItem);
     tableWidget->setItem(row, LinkCol, linkItem);
     tableWidget->setItem(row, StatusCol, statusItem);
     tableWidget->setCellWidget(row, ActionCol, buttonWidget);
@@ -145,6 +148,90 @@ void QQManger::setStatus(int row, Status status) const {
     statusItem->setForeground(color);
 }
 
+int QQManger::scanPID(const QString &id) {
+    QProcess wmicProcess;
+    QList<int> pidList;
+    wmicProcess.start("wmic", {
+            "process",
+            "get",
+            "ProcessID,CommandLine",
+            "/value"
+    });
+
+    if (!wmicProcess.waitForStarted() || !wmicProcess.waitForFinished()) return 0;
+
+    QString outputStr = QString(wmicProcess.readAllStandardOutput());
+    QStringList lines = outputStr.split(QRegExp("[\r\n]+"), Qt::SkipEmptyParts);
+
+    bool founded = false;
+    for (QString &line: lines) {
+        if (line.contains("--type=ppapi") && !founded) founded = true;
+
+        if (line.startsWith("ProcessId=") && founded) {
+            pidList.append(line.replace("ProcessId=", "").toInt());
+            founded = false;
+        }
+    }
+
+    QStringList hexIDParts;
+    for (const QChar &ch: id) {
+        auto asciiValue = static_cast<uchar>(ch.toLatin1());
+        QString hexStr = QString("%1").arg(asciiValue, 2, 16, QLatin1Char('0')).toUpper();
+        hexIDParts.append(hexStr);
+    }
+    const char *hexID = hexIDParts.join(" ").toUtf8().constData();
+
+    for (auto pid: pidList) {
+        HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, pid);
+        try {
+            auto scanner = new MemoryScanner(hProcess);
+            if (scanner->Search(hexID).empty()) {
+                CloseHandle(hProcess);
+                continue;
+            }
+
+            return pid;
+        } catch (const std::exception &e) {
+            CloseHandle(hProcess);
+            continue;
+        }
+    }
+
+    return 0;
+}
+
+
+QString QQManger::scanLink(int pid) {
+    QString url = "https://qqgame.app100616028.twsapp.com/?";
+    QStringList hexURLParts;
+    for (const QChar &ch: url) {
+        auto asciiValue = static_cast<uchar>(ch.toLatin1());
+        QString hexStr = QString("%1").arg(asciiValue, 2, 16, QLatin1Char('0')).toUpper();
+        hexURLParts.append(hexStr);
+    }
+    const char *hexURL = hexURLParts.join(" ").toUtf8().constData();
+
+    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, pid);
+    try {
+        auto scanner = new MemoryScanner(hProcess);
+        auto res = scanner->Search(hexURL);
+        if (res.empty()) {
+            CloseHandle(hProcess);
+            return nullptr;
+        }
+        auto mem = new Memory(hProcess, res.front());
+        auto rawURL = QString::fromStdString(mem->ReadString(0x00));
+        int regionIndex = rawURL.indexOf("&region=");
+        if (regionIndex != -1) rawURL = rawURL.left(regionIndex);
+        CloseHandle(hProcess);
+        return rawURL;
+    } catch (const std::exception &e) {
+        CloseHandle(hProcess);
+        return nullptr;
+    }
+}
+
+
 void QQManger::loadConfig() {
     tableWidget->setRowCount(0);
 
@@ -167,6 +254,7 @@ void QQManger::loadConfig() {
                 account["remark"].toString(),
                 account["qq"].toString(),
                 account["password"].toString(),
+                account["id"].toString(),
                 account["link"].toString()
         );
     }
@@ -187,12 +275,14 @@ void QQManger::saveConfig() {
         auto remarkItem = tableWidget->item(row, RemarkCol);
         auto qqItem = tableWidget->item(row, QQNumberCol);
         auto pwdItem = tableWidget->item(row, PasswordCol);
+        auto idItem = tableWidget->item(row, GameIDCol);
         auto linkItem = tableWidget->item(row, LinkCol);
 
         accountObj["order"] = row;
         accountObj["remark"] = remarkItem ? remarkItem->text() : "";
         accountObj["qq"] = qqItem ? qqItem->text() : "";
         accountObj["password"] = pwdItem ? pwdItem->text() : "";
+        accountObj["id"] = idItem ? idItem->text() : "";
         accountObj["link"] = linkItem ? linkItem->text() : "";
 
         if (existingReds.contains(accountObj["remark"].toString())) {
@@ -275,8 +365,27 @@ void QQManger::handleTest(int row) {
 
 void QQManger::handleLogin(int row) {
     auto remarkItem = tableWidget->item(row, RemarkCol);
+    auto passwordItem = tableWidget->item(row, PasswordCol);
+    auto idItem = tableWidget->item(row, GameIDCol);
+    auto linkItem = tableWidget->item(row, LinkCol);
     QString remark = remarkItem ? remarkItem->text() : "未知账号";
+    QString password = passwordItem ? passwordItem->text() : "";
+    QString id = idItem ? idItem->text() : nullptr;
 
+    if (id.size() > 5) {
+        auto pid = scanPID(id);
+        if (pid) {
+            auto url = scanLink(pid);
+            if (url != nullptr) {
+                linkItem->setText(url);
+                handleTest(row);
+                return;
+            }
+        }
+    }
+
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(password);
     auto browser = new QQBrowser(this, remark);
     connect(browser, &QQBrowser::linkDetected, [this, &row](const QUrl &url) {
         auto linkItem = tableWidget->item(row, LinkCol);

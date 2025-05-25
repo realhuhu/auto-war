@@ -100,6 +100,22 @@ public:
         return buffer;
     }
 
+    [[nodiscard]] std::string ReadString(uintptr_t offset = 0, size_t maxLength = 4096) const {
+        // 参数校验
+        if (maxLength == 0) {
+            throw std::invalid_argument("maxLength must be greater than 0");
+        }
+
+        // 读取原始字节数据
+        std::vector<BYTE> buffer = ReadBytes(offset, maxLength);
+
+        // 查找第一个空字符（0x00）的位置
+        auto endPos = std::find(buffer.begin(), buffer.end(), 0x00);
+
+        // 截断到空字符或最大长度
+        return std::string(buffer.begin(), endPos);
+    }
+
     void WriteBytes(uintptr_t offset, const std::vector<BYTE> &data) const {
         if (!WriteProcessMemory(m_hProcess,
                                 reinterpret_cast<LPVOID>(m_baseAddress + offset),
