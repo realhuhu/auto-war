@@ -9,7 +9,7 @@ void countryArena(Env &e) {
     clicker = std::make_unique<Clicker>(
             "国家争霸/争霸战.png"
     )->click(
-            {.finishUntilList={new Image("国家争霸/争霸战图标.png")}}
+            {.finishUntilList={new Image("国家争霸/争霸战图标.png", {.startWait=1})}}
     )->click(
             {.finishUntilList={new AnyImage({"国家争霸/争霸战标题.png", "国家争霸/未开启.png"})}}
     );
@@ -77,7 +77,7 @@ void worldArena(Env &e) {
     clicker = std::make_unique<Clicker>(
             "世界争霸/争霸战.png"
     )->click(
-            {.finishUntilList={new Image("世界争霸/争霸战图标.png")}}
+            {.finishUntilList={new Image("世界争霸/争霸战图标.png", {.startWait=1})}}
     )->click(
             {.finishUntilList={new AnyImage({"世界争霸/争霸战标题.png", "世界争霸/未开启.png", "世界争霸/未参加.png"})}}
     );

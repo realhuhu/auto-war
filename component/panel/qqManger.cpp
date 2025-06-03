@@ -174,22 +174,33 @@ int QQManger::scanPID(const QString &id) {
     }
 
     QStringList hexIDParts;
-    for (const QChar &ch: id + ".sol") {
+    for (const QChar &ch: id) {
         auto asciiValue = static_cast<uchar>(ch.toLatin1());
         QString hexStr = QString("%1").arg(asciiValue, 2, 16, QLatin1Char('0')).toUpper();
         hexIDParts.append(hexStr);
     }
-    const char *hexID = hexIDParts.join(" ").toUtf8().constData();
+
+    QString fullHexStr1 = hexIDParts.join(" ") + " 69 00 6E 00 76 00 65 00 72 00 74";
+    QString fullHexStr2 = hexIDParts.join(" ") + " 00 69 00 6E 00 76 00 65 00 72 00 74";
+    QByteArray hexData1 = fullHexStr1.toUtf8(); // 存储为局部变量确保生命周期
+    QByteArray hexData2 = fullHexStr2.toUtf8(); // 存储为局部变量确保生命周期
+    const char *hexID1 = hexData1.constData();
+    const char *hexID2 = hexData2.constData();
 
     for (auto pid: pidList) {
         HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, pid);
+        if (hProcess == nullptr || hProcess == INVALID_HANDLE_VALUE) {
+            continue;
+        }
+
         try {
             auto scanner = new MemoryScanner(hProcess);
-            if (scanner->Search(hexID).empty()) {
+            if (scanner->Search(hexID1).empty() && scanner->Search(hexID2).empty()) {
                 CloseHandle(hProcess);
                 continue;
             }
 
+            CloseHandle(hProcess);
             return pid;
         } catch (const std::exception &e) {
             CloseHandle(hProcess);
@@ -200,7 +211,6 @@ int QQManger::scanPID(const QString &id) {
     return 0;
 }
 
-
 QString QQManger::scanLink(int pid) {
     QString url = "https://qqgame.app100616028.twsapp.com/?";
     QStringList hexURLParts;
@@ -209,9 +219,13 @@ QString QQManger::scanLink(int pid) {
         QString hexStr = QString("%1").arg(asciiValue, 2, 16, QLatin1Char('0')).toUpper();
         hexURLParts.append(hexStr);
     }
-    const char *hexURL = hexURLParts.join(" ").toUtf8().constData();
+    QByteArray hexData = hexURLParts.join(" ").toUtf8(); // 保存到局部变量
+    const char *hexURL = hexData.constData();            // 安全使用
 
     HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, pid);
+    if (hProcess == nullptr || hProcess == INVALID_HANDLE_VALUE) {
+        return nullptr;
+    }
     try {
         auto scanner = new MemoryScanner(hProcess);
         auto res = scanner->Search(hexURL);
@@ -230,7 +244,6 @@ QString QQManger::scanLink(int pid) {
         return nullptr;
     }
 }
-
 
 void QQManger::loadConfig() {
     tableWidget->setRowCount(0);
@@ -370,7 +383,7 @@ void QQManger::handleLogin(int row) {
     auto linkItem = tableWidget->item(row, LinkCol);
     QString remark = remarkItem ? remarkItem->text() : "未知账号";
     QString password = passwordItem ? passwordItem->text() : "";
-    QString id = idItem ? idItem->text() : nullptr;
+    QString id = idItem ? idItem->text() : QString();
 
     if (id.size() > 5) {
         auto pid = scanPID(id);
