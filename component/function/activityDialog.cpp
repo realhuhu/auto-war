@@ -27,7 +27,7 @@ ActivityDialog::ActivityDialog(QWidget *parent) : QDialog(parent) {
 
 QVector<ResultEntry> ActivityDialog::getActivity() {
     QString text;
-    QString urlTemplate = "https://100616028cdn-1251006671.file.myqcloud.com/100616028/res/20120522/config/dll_%1.xml";
+    QString urlTemplate = "https://redwar-cdn.sincetimes.com/100616028/res/20120522/config/dll_%1.xml";
     QDateTime currentTime = QDateTime::currentDateTime();
     QDate currentDate = currentTime.date();
     int version = 1;
@@ -54,9 +54,9 @@ QVector<ResultEntry> ActivityDialog::getActivity() {
 
         if (!correctDate) text = tryText;
 
-        if (!correctDate && !tryText.contains("errorcode")) correctDate = true;
+        if (!correctDate && !tryText.contains("NoSuchKey")) correctDate = true;
 
-        if (correctDate && tryText.contains("errorcode")) {
+        if (correctDate && tryText.contains("NoSuchKey")) {
             label->setText(QString("最后更新: %1 v%2").arg(dateStr, QString::number(version - 1)));
             break;
         }

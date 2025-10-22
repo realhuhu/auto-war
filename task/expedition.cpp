@@ -42,7 +42,7 @@ void expedition(Env &e) {
     try {
         auto scanner = new MemoryScanner(hProcess);
         auto startTime = std::chrono::steady_clock::now();
-        auto res = scanner->Search("?? 00 00 00 96 00 00 00 01 00 00 00 ?? 00 00 00 01 00 00 00 01 00 00 00");
+        auto res = scanner->Search("?? 00 00 00 a0 00 00 00 01 00 00 00 ?? 00 00 00 01 00 00 00 01 00 00 00");
         auto endTime = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
 

@@ -355,13 +355,23 @@ void adviser(Env &e) {
     }
 
     if (boolSetting["免费抽奖"]) {
-        while (!env.stopFlag->load()) {
-            clicker = std::make_unique<Clicker>(std::vector<QString>{"参谋抽奖/参谋免费.png", "参谋抽奖/必得紫.png"}, ClickerInitConfig{.wait=2});
+        clicker = std::make_unique<Clicker>("参谋抽奖/参谋免费.png", ClickerInitConfig{.wait=2});
 
-            if (!clicker->founded()) break;
-
+        if (clicker->founded()) {
             clicker->click(
                     {.finishUntilList={new Image("参谋抽奖/参谋抽奖.png", {.onPrevious=Previous::TOP_CENTER})}}
+            )->click(
+                    {.finishUntilList={new Image("参谋抽奖/确定.png", {.finishWait=2})}}
+            )->click(
+                    {.finishUntilList={new Image("参谋抽奖/确定.png", InnerReverse)}}
+            )->end();
+        }
+
+        clicker = std::make_unique<Clicker>("参谋抽奖/紫色参谋免费.png");
+
+        if (clicker->founded()) {
+            clicker->click(
+                    {.finishUntilList={new Image("参谋抽奖/紫色参谋抽奖.png", {.onPrevious=Previous::TOP_CENTER})}}
             )->click(
                     {.finishUntilList={new Image("参谋抽奖/确定.png", {.finishWait=2})}}
             )->click(
@@ -404,7 +414,7 @@ void mortar(Env &e) {
         return;
     }
 
-    for (const auto &i: std::vector<QString>{"绿", "蓝", "紫"}) {
+    for (const auto &i: std::vector<QString>{"绿", "蓝"}) {
         while (!env.stopFlag->load()) {
             clicker = std::make_unique<Clicker>(QString("火炮抽奖/%1色免费派遣.png").arg(i), ClickerInitConfig{.mode=Mode::RGB});
 
@@ -418,6 +428,19 @@ void mortar(Env &e) {
                     {.finishUntilList={new Image("火炮抽奖/确定.png", InnerReverse)}}
             )->end();
         }
+    }
+
+    clicker = std::make_unique<Clicker>("火炮抽奖/紫色免费派遣.png", ClickerInitConfig{.mode=Mode::RGB});
+
+    if (clicker->founded()) {
+        clicker->click(
+                {.finishUntilList={new Image("火炮抽奖/派遣紫.png", {.onPrevious=Previous::TOP_CENTER})}}
+        )->click(
+                {.finishUntilList={new Image("火炮抽奖/确定.png", {.finishWait=1})}}
+        )->click(
+                {.finishUntilList={new Image("火炮抽奖/确定.png", InnerReverse)}}
+        )->end();
+
     }
 
     std::make_unique<Clicker>(
