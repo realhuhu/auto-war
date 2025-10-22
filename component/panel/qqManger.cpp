@@ -180,12 +180,10 @@ int QQManger::scanPID(const QString &id) {
         hexIDParts.append(hexStr);
     }
 
-    QString fullHexStr1 = hexIDParts.join(" ") + " 69 00 6E 00 76 00 65 00 72 00 74";
-    QString fullHexStr2 = hexIDParts.join(" ") + " 00 69 00 6E 00 76 00 65 00 72 00 74";
-    QByteArray hexData1 = fullHexStr1.toUtf8(); // 存储为局部变量确保生命周期
-    QByteArray hexData2 = fullHexStr2.toUtf8(); // 存储为局部变量确保生命周期
-    const char *hexID1 = hexData1.constData();
-    const char *hexID2 = hexData2.constData();
+    const char *hexID = hexIDParts.join(" ").toUtf8().constData();
+
+    int maxPid = 0;
+    size_t maxCount = 0;
 
     for (auto pid: pidList) {
         HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, pid);
@@ -195,20 +193,21 @@ int QQManger::scanPID(const QString &id) {
 
         try {
             auto scanner = new MemoryScanner(hProcess);
-            if (scanner->Search(hexID1).empty() && scanner->Search(hexID2).empty()) {
-                CloseHandle(hProcess);
-                continue;
+            size_t matchCount = scanner->Search(hexID).size();
+
+            if (matchCount > maxCount) {
+                maxCount = matchCount;
+                maxPid = pid;
             }
 
             CloseHandle(hProcess);
-            return pid;
         } catch (const std::exception &e) {
             CloseHandle(hProcess);
             continue;
         }
     }
 
-    return 0;
+    return maxPid;
 }
 
 QString QQManger::scanLink(int pid) {
@@ -357,7 +356,7 @@ void QQManger::handleTest(int row) {
         Status status;
 
         if (reply->error() == QNetworkReply::NoError) {
-            status = QString::fromUtf8(reply->readAll()).contains("\">ID:") ? Valid : Invalid;
+            status = QString::fromUtf8(reply->readAll()).contains("ID:") ? Valid : Invalid;
         } else {
             status = reply->error() == QNetworkReply::OperationCanceledError ? Timeout : NetError;
         }
@@ -444,7 +443,10 @@ void QQManger::onAdd() {
 
 void QQManger::onTestAll() { for (int row = 0; row < tableWidget->rowCount(); ++row) handleTest(row); }
 
-void QQManger::onLoginAll() { for (int row = 0; row < tableWidget->rowCount(); ++row) handleLogin(row); }
+void QQManger::onLoginAll() {
+    for (int row = 0; row < tableWidget->rowCount(); ++row) { setStatus(row, Waiting); }
+    for (int row = 0; row < tableWidget->rowCount(); ++row) { handleLogin(row); }
+}
 
 void QQManger::closeEvent(QCloseEvent *event) {
     saveConfig();
