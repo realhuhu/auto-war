@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.30)
 project(Red)
 add_definitions(-DUNICODE -D_UNICODE)
 
+if (MSVC)
+    add_compile_options(/utf-8)
+endif()
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -10,8 +14,8 @@ set(CMAKE_PREFIX_PATH "D:/Qt/5.15.2/msvc2019_64")
 
 find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets Network WebEngineWidgets REQUIRED)
 
-set(OpenCV_DIR "D:/opencv/dist_vc/install")
-include(D:/opencv/dist_vc/install/OpenCVConfig.cmake)
+set(OpenCV_DIR "D:/CLibrary/opencv/build/install")
+include("D:/CLibrary/opencv/build/install/OpenCVConfig.cmake")
 find_package(OpenCV REQUIRED)
 
 qt5_add_resources(qrc_FILES resource/resource.qrc)
