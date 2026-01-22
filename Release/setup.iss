@@ -2,7 +2,7 @@
 ;由 Inno Setup 脚本向导 生成的脚本,有关创建 INNO SETUP 脚本文件的详细信息，请参阅文档！!
 
 #define MyAppName "红警多开"
-#define MyAppVersion "1.1.9a"
+#define MyAppVersion "1.1.10"
 #define MyAppExeName "启动多开器.exe"
 
 [Setup]
@@ -42,6 +42,7 @@ Source: "resources\*"; DestDir: "{app}\resources"; Flags: ignoreversion recurses
 Source: "游戏图片\*"; DestDir: "{app}\游戏图片"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full
 Source: "自定义图片\使用说明.txt"; DestDir: "{app}\自定义图片"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full
 Source: "游戏窗口.exe"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
+Source: "红警工具.exe"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
 Source: "setting-default.json"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
 Source: "QtWebEngineProcess.exe"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
 Source: "{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
